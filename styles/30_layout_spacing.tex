@@ -1,0 +1,155 @@
+% ============================================================
+% 30_layout_spacing.tex — Layout-Grundlagen, Spacing-Skala, Box-Bindungen
+% ============================================================
+
+\setlength{\parskip}{3.5pt plus 1pt minus 0.5pt}
+\setlength{\parindent}{0pt}
+
+\widowpenalty=10000
+\clubpenalty=10000
+\brokenpenalty=4000
+\predisplaypenalty=10000
+
+\raggedcolumns
+\newcounter{zsfFirstChap}\setcounter{zsfFirstChap}{1}
+
+% ------------------------------------------------------------
+% SPACING-SKALA (4 Stufen) — die einzige Quelle für Abstände
+% ------------------------------------------------------------
+\newlength{\ZSFspaceXS}\setlength{\ZSFspaceXS}{1pt}
+\newlength{\ZSFspaceS} \setlength{\ZSFspaceS}{4pt}
+\newlength{\ZSFspaceM} \setlength{\ZSFspaceM}{7pt}
+\newlength{\ZSFspaceL} \setlength{\ZSFspaceL}{10pt}
+
+% Outer (Text-Box-Bindung) und Sep (Trennlinien)
+\newlength{\ZSFspaceOuter}\setlength{\ZSFspaceOuter}{7pt}
+\newlength{\ZSFspaceSep}  \setlength{\ZSFspaceSep}{3pt}
+
+% ------------------------------------------------------------
+% Spalten-Layout
+% ------------------------------------------------------------
+\setlength{\columnsep}{\ZSFspaceL}
+\setlength{\multicolsep}{\ZSFspaceS}
+\setlength{\emergencystretch}{2em}
+
+% ------------------------------------------------------------
+% Schwellwerte und Titelbalken-Hilfsgrößen
+% ------------------------------------------------------------
+\newlength{\ZSFbreakThreshold}\setlength{\ZSFbreakThreshold}{3\baselineskip}
+\newlength{\ZSFbreakThresholdChapter}\setlength{\ZSFbreakThresholdChapter}{10\baselineskip} % Größere Mindesthöhe für ChapterBar (verhindert Bars am Spaltenende)
+\newlength{\ZSFpostChapterNudge}\setlength{\ZSFpostChapterNudge}{0pt}
+\newlength{\ZSFtitleBarHeight}\setlength{\ZSFtitleBarHeight}{9.2pt}
+\newlength{\ZSFsubsectionBarBeforeSkip}\setlength{\ZSFsubsectionBarBeforeSkip}{\ZSFspaceL}
+\newlength{\ZSFsubsectionAfterChapterGap}\setlength{\ZSFsubsectionAfterChapterGap}{\ZSFspaceXS}
+\newlength{\ZSFsubsectionAfterGap}\setlength{\ZSFsubsectionAfterGap}{\ZSFspaceXS}
+\newlength{\ZSFchapterBarAfterSkip}\setlength{\ZSFchapterBarAfterSkip}{2pt}
+
+% Maximale Höhe für Bilder in figboxen (verhindert überhohe Aspect-Ratios).
+\newlength{\ZSFfigMaxHeight}\setlength{\ZSFfigMaxHeight}{2.6cm}
+
+% Tokens für statementbox / procedure
+\newlength{\ZSFstatementBarWidth}\setlength{\ZSFstatementBarWidth}{2pt}
+\newlength{\ZSFstatementLeftPad} \setlength{\ZSFstatementLeftPad}{\ZSFspaceM}
+\newlength{\ZSFprocStepGap}      \setlength{\ZSFprocStepGap}{\ZSFspaceXS}
+\newlength{\ZSFprocItemSep}      \setlength{\ZSFprocItemSep}{\ZSFspaceXS}
+
+% Padding für cellspace (siehe styles/20_tables.tex Konvention)
+\newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFspaceXS}
+
+% ------------------------------------------------------------
+% Code-Längen — nur für die optionalen Code-Module benötigt
+% (styles/65_code_style.tex + 67_code_comments.tex). Schadlos
+% wenn die Module in preamble.tex deaktiviert sind.
+% MaxWidth:   max. Breite des rechts-stehenden Kommentars
+% Threshold:  Schwelle für Auto-Overflow (Code+Kommentar > Threshold -> oben)
+% Default-Register sind immutabel und dienen \ResetCodeCommentThreshold
+% als Anker; \SetCodeCommentThreshold modifiziert nur die "lebenden" Register.
+% ------------------------------------------------------------
+\newlength{\ZSFcodeMiniSkip}  \setlength{\ZSFcodeMiniSkip}{1mm}
+\newlength{\ZSFcodeFrameRule} \setlength{\ZSFcodeFrameRule}{0.4pt}
+\newlength{\ZSFcodeXMargin}   \setlength{\ZSFcodeXMargin}{8pt}
+\newlength{\ZSFcodeCommentMaxWidthDefault}
+  \setlength{\ZSFcodeCommentMaxWidthDefault}{.25\columnwidth}
+\newlength{\ZSFcodeCommentThresholdDefault}
+  \setlength{\ZSFcodeCommentThresholdDefault}{\maxdimen}
+\newlength{\ZSFcodeCommentMaxWidth} \setlength{\ZSFcodeCommentMaxWidth}{\ZSFcodeCommentMaxWidthDefault}
+\newlength{\ZSFcodeCommentThreshold}\setlength{\ZSFcodeCommentThreshold}{\ZSFcodeCommentThresholdDefault}
+\newlength{\ZSFcodeCommentGap}      \setlength{\ZSFcodeCommentGap}{\ZSFspaceM}
+
+% ============================================================
+% TEXT-BOX-BINDUNGEN
+% Koppeln Fließtext direkt an Boxen — verhindert visuellen Bruch.
+% ============================================================
+
+% Robustes Skip-/Penalty-Aufrollen (vmode-/hmode-aware)
+\newcommand{\ZSFRobustUnskip}{%
+  \ifvmode
+    \ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
+    \ifnum\lastpenalty=0\else\unpenalty\fi
+    \ifdim\lastskip>0pt\relax\vskip-\lastskip\fi
+  \else
+    \ifdim\lastskip>0pt\relax\unskip\fi
+    \ifnum\lastpenalty=0\else\unpenalty\fi
+    \ifdim\lastskip>0pt\relax\unskip\fi
+  \fi
+}
+
+% Text der zur Box DARUNTER gehoert (Einleitung)
+\newcommand{\textVorBox}[1]{%
+  \par
+  \addvspace{\ZSFspaceOuter}%
+  \begingroup
+  \setlength{\parskip}{0pt}%
+  {\small\color{TextVorBoxColor} \noindent #1\par}%
+  \endgroup
+  \nopagebreak
+  \vspace{\ZSFspaceXS}%
+  \vspace{-\ZSFspaceS}%
+  \nopagebreak
+}
+
+% Text der zur Box DARUEBER gehoert (Ergaenzung/Folgerung)
+\newcommand{\textNachBox}[1]{%
+  \par
+  \ZSFRobustUnskip
+  \vspace{\ZSFspaceXS}%
+  \begingroup
+  \setlength{\parskip}{0pt}%
+  \nopagebreak
+  {\small\color{TextNachBoxColor} \noindent #1\par}%
+  \endgroup
+  \addvspace{\ZSFspaceOuter}%
+}
+
+% Titel/Text vor einer Formel (innerhalb der formulabox)
+\newcommand{\textVorFormel}[1]{%
+  \par
+  \begingroup
+  \setlength{\parskip}{0pt}%
+  \noindent\raggedright\textcolor{black!60}{\textbf{#1}}\par
+  \endgroup
+  \vspace{\ZSFspaceXS}%
+  \centering
+}
+
+% Erklaerungstext nach einer Formel (innerhalb der formulabox)
+\newcommand{\textNachFormel}[1]{%
+  \par
+  \vspace{\ZSFspaceXS}%
+  \begingroup
+  \setlength{\parskip}{0pt}%
+  \noindent\raggedright\textcolor{black!60}{\small #1}\par
+  \endgroup
+  \centering
+}
+
+% ------------------------------------------------------------
+% Semantische Gap-Helfer für Kapitel (sparsam einsetzen)
+% ------------------------------------------------------------
+\newcommand{\ZSFSectionGap}{\vspace{\ZSFspaceL}}
+\newcommand{\ZSFgapXS}{\vspace{\ZSFspaceXS}}
+\newcommand{\ZSFgapS}{\vspace{\ZSFspaceS}}
+\newcommand{\ZSFgapM}{\vspace{\ZSFspaceM}}
+\newcommand{\ZSFgapL}{\vspace{\ZSFspaceL}}
+\newcommand{\ZSFmanualColumnBreak}{\columnbreak}
+\newcommand{\ZSFtabColGap}{\hspace{1.5em}}

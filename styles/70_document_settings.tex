@@ -1,0 +1,34 @@
+% ============================================================
+% 70_document_settings.tex — Finale Dokument-Einstellungen
+% ============================================================
+% Hinweis: hyperref wird bereits in 00_packages.tex geladen.
+
+% Link-Farben: stabile Slots aus der Index-Palette (Gruen/Blau),
+% unabhängig von der aktiven Kapitelfarbe.
+\hypersetup{colorlinks=true, linkcolor=ChapterColor1, urlcolor=ChapterColor14}
+
+% Seitenzahl unten rechts (overlay, layout-neutral)
+\AddToShipoutPictureFG{%
+  \AtPageLowerLeft{%
+    \put(\dimexpr\paperwidth-1.5em\relax,1.2ex){%
+      \makebox(0,0)[rb]{\sffamily\fontsize{6.5pt}{7pt}\selectfont\color{black!55}\thepage}%
+    }%
+  }%
+}
+
+% Enge Math-Display-Abstände (wie Analysis: keine großen Lücken um Formeln)
+\AtBeginDocument{
+  \setlength{\abovedisplayskip}{\ZSFspaceXS}
+  \setlength{\belowdisplayskip}{\ZSFspaceXS}
+  \setlength{\abovedisplayshortskip}{\ZSFspaceXS}
+  \setlength{\belowdisplayshortskip}{\ZSFspaceXS}
+  \setlength{\mathsurround}{\ZSFspaceXS}
+}
+
+% Kompakte Listen (wie Analysis: kein überschüssiges Whitespace)
+\setlist{nosep, itemsep=0pt, parsep=0pt, topsep=\ZSFspaceXS, partopsep=0pt}
+\setlist[itemize]{leftmargin=3mm}
+\setlist[enumerate]{leftmargin=4mm}
+
+% Tabellen-Zellenabstand einheitlich
+\setlength{\tabcolsep}{\ZSFspaceM}

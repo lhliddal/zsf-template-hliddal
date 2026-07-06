@@ -1,0 +1,33 @@
+% PREAMBLE LOADER
+% Bleibt klein und lädt nur die modularen Style-Module aus styles/.
+% Öffentliche Macros für Kapiteldateien werden in den Modulen definiert.
+%
+% ── Opt-in-Schalter ──────────────────────────────────────────────────
+% Fachspezifische Module sind mitgeliefert, aber standardmäßig AUS.
+% Pro Fach hier (und NUR hier) einkommentieren, was gebraucht wird:
+%   11_math_advanced  → mathe-lastige Fächer (LinAlg, Analysis):
+%                       Operatoren (Ker, rang, Spur, proj, …), Im/Re,
+%                       TikZ-Klammern (\drawbrace/\tikzmark), Pfeil-Fix.
+%   65_code_style     → code-lastige Fächer (Informatik): lstlisting +
+%                       CodeExpert-Style + Code-Container (codebox).
+%   66_index          → Stichwortverzeichnis am Dokumentende (\printindex);
+%                       \ZSFkeyword indexiert dann automatisch.
+%   67_code_comments  → Smart Inline/Overflow Code-Kommentare (\CodeLine);
+%                       NUR zusammen mit 65_code_style aktivieren.
+% Module nicht löschen — nur deaktivieren (siehe rules/10_architecture).
+% ─────────────────────────────────────────────────────────────────────
+
+\input{styles/00_packages}
+\input{styles/10_math}
+% \input{styles/11_math_advanced}   % opt-in: LinAlg/Analysis
+\input{styles/20_tables}
+\input{styles/30_layout_spacing}
+\input{styles/40_colors_structure}
+\input{styles/50_typography_semantics}
+\input{styles/55_readability}
+\input{styles/60_boxes}
+% \input{styles/65_code_style}      % opt-in: Informatik
+% \input{styles/66_index}           % opt-in: Stichwortverzeichnis
+% \input{styles/67_code_comments}   % opt-in: Informatik (nach 65_code_style)
+\input{styles/75_pdf_identity}
+\input{styles/70_document_settings}

@@ -1,0 +1,113 @@
+% ============================================================
+% 50_typography_semantics.tex — Schriftmakros für Box-Typen & semantische Inhaltsmakros
+% ============================================================
+
+% Explizite bp-Größen (wie Analysis) für präzise, font-unabhängige Kontrolle
+\newcommand{\ZSFfontChapter}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
+\newcommand{\ZSFfontSection}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
+\newcommand{\ZSFfontBoxTitle}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
+% chktex 6
+\newcommand{\ZSFfontNote}{\sffamily\fontsize{6.7bp}{7.5bp}\itshape\selectfont}
+% Rechtsbuendiges Meta-/Kategorie-Tag im Titelbalken (vgl. \ZSFTitleTag in
+% styles/60_boxes.tex). Etwas kleiner und kursiv, damit es den Titel begleitet
+% statt mit ihm zu konkurrieren.
+\newcommand{\ZSFfontTitleTag}{\sffamily\fontsize{6.4bp}{7.0bp}\itshape\selectfont}
+
+% Schrift/Farbe für Code-Kommentare — nur für das optionale Code-Modul
+% (styles/67_code_comments.tex) benötigt. ce_green stammt aus
+% styles/40_colors_structure.tex. Schadlos wenn das Modul deaktiviert ist.
+\newcommand{\ZSFfontCodeComment}{\ttfamily\color{ce_green}}
+
+% Tabellen-Hilfsmakros
+\newcommand{\TableCellNote}[1]{{\ZSFfontNote #1}}
+\newcommand{\TableTitleBreak}{\newline}
+\newcommand{\TableTitle}[2][]{%
+  \textbf{#2}%
+  \if\relax\detokenize{#1}\relax\else\TableTitleBreak\TableCellNote{#1}\fi
+}
+
+% Semantische Tabellen-Fontgrößen
+% (werden als optionales Argument an ZSFtable/ZSFtableFlat/ZSFtablePlain
+%  übergeben — siehe styles/20_tables.tex).
+% Default = \ZSFfontTable. Für lange, dichte Tabellen (viele Zeilen,
+% knapper Inhalt) \ZSFfontTableDense verwenden.
+\newcommand{\ZSFfontTable}{\normalsize}
+\newcommand{\ZSFfontTableDense}{\footnotesize}
+
+% Semantische Inhaltsmakros (konsistente Skalierung und einfache Anpassung)
+%
+% \ZSFkeyword{...} — hebt zentrale Fachbegriffe im Fließtext hervor.
+% Verwendung:
+%   * nur in \begin{runintext}, \begin{defbox}, \begin{warnbox} und
+%     aehnlichen Text-Boxen, NIEMALS in Formeln, \formulanote oder
+%     Überschriften (\SubsectionBar, \StartChapter).
+%   * sparsam einsetzen (Richtwert: 1-3 pro runintext, 4-6 im
+%     Kapitel-Intro, insgesamt ca. 10 pro Kapitel) -- es sollen echte
+%     Fachbegriffe (Gesetze, Effekte, Bauteile, zentrale Größen)
+%     sein, keine generischen Substantive oder Verben.
+% Rendering ist bewusst schlicht als \textbf{...}; Änderungen zentral
+% hier vornehmen (z.B. Farbe, Underline) -- nicht in Kapiteln.
+\newcommand{\ZSFkeyword}[1]{\textbf{#1}}
+\newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{white!80}{\small (S.#1)}}
+
+% \ZSFhl{...} — Hervorhebung des EINEN prüfungskritischsten Fakts pro Box
+% (fett + unterstrichen). Bewusst sparsam: hoechstens einmal pro Block.
+% Klare Rollentrennung:
+%   * Fachbegriff/Scan-Anker        -> \ZSFkeyword
+%   * Stolperfalle/kritische Ausnahme -> \ZSFdanger
+%   * Folgerung                      -> \ZSFconclusion
+%   * sonst die EINE Schlüsselaussage -> \ZSFhl
+\newcommand{\ZSFhl}[1]{\underline{\textbf{#1}}}
+
+% \ZSFref{label} — kompakter interner Querverweis, gerendert als "(→ 6.2)".
+% Verwendung:
+%   * am Ende eines \ProcStep, wenn der Schritt ein Verfahren delegiert,
+%     das in einem ANDEREN Kapitel erklaert wird.
+%   * NICHT für Delegationen im selben Kapitel und nicht für elementare
+%     Standardoperationen — sparsam einsetzen.
+% Ziel-Label via optionales Argument von \SubsectionBar/\StartChapter setzen:
+%   \SubsectionBar[sec:matrix-inverse]{Inverse}
+% \ref* (hyperref) unterdrueckt den Link, Nummern bleiben automatisch korrekt.
+% Farbe = Palette-Farbe des ZIELkapitels (Wegweiser-Prinzip): wird automatisch
+% aus der Kapitelnummer der Referenz abgeleitet ("6.6" -> ChapterColor6).
+% Aufrecht + fett statt kursiv für maximale Lesbarkeit bei 6.7bp.
+\makeatletter
+\def\ZSF@refExtractFirst#1#2\@nil{#1}
+\def\ZSF@refExtractChap#1.#2\@nil{#1}
+% Bestimmt \ZSF@refTargetColor aus dem Label; Fallback auf die aktive
+% Kapitelfarbe im ersten latexmk-Pass (Label noch undefiniert).
+\newcommand{\ZSF@refComputeTargetColor}[1]{%
+  \@ifundefined{r@#1}{%
+    \edef\ZSF@refTargetColor{\chaptercolor}%
+  }{%
+    \edef\ZSF@refTargetNum{\expandafter\expandafter\expandafter
+      \ZSF@refExtractFirst\csname r@#1\endcsname\@nil}%
+    \edef\ZSF@refTargetColor{ChapterColor\expandafter\ZSF@refExtractChap\ZSF@refTargetNum.\@nil}%
+  }%
+}
+\newcommand{\ZSFref}[1]{%
+  \begingroup
+  \ZSF@refComputeTargetColor{#1}%
+  {\ZSFfontNote\upshape\bfseries\color{\ZSF@refTargetColor}($\rightarrow$\,\ref*{#1})}%
+  \endgroup
+}
+\makeatother
+
+\newcommand{\ZSFconclusion}[1]{%
+  \par\vspace{-\parskip}\vspace{\ZSFspaceS}%
+  \noindent$\Rightarrow$ #1%
+  \par\vspace{-\parskip}\vspace{\ZSFspaceS}%
+}
+
+% Tabellen-Styling (benötigt [table]{xcolor} und array)
+\newcommand{\ZSFrowColor}{\rowcolor{\FormulaboxBackColor}}
+\newcommand{\ZSFtableRuleColor}{black!70}
+\newcommand{\SetZSFtableRuleColor}[1]{\renewcommand{\ZSFtableRuleColor}{#1}}
+\newcommand{\ZSFtableRuleWidth}{0.5pt}
+\newcommand{\SetZSFtableRuleWidth}[1]{\renewcommand{\ZSFtableRuleWidth}{#1}}
+\newcommand{\ZSFbeginTableRuleStyle}{%
+  \begingroup
+  \arrayrulecolor{\ZSFtableRuleColor}%
+  \setlength{\arrayrulewidth}{\ZSFtableRuleWidth}%
+}
+\newcommand{\ZSFendTableRuleStyle}{\endgroup}

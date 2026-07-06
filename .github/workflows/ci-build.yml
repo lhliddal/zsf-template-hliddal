@@ -1,0 +1,31 @@
+name: CI Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install LaTeX toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            latexmk \
+            texlive-latex-extra \
+            texlive-fonts-extra \
+            texlive-science \
+            texlive-lang-german \
+            poppler-utils
+      - name: Build PDF
+        run: make build
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: template_fs0000_hliddal-pdf
+          path: template_fs0000_hliddal.pdf

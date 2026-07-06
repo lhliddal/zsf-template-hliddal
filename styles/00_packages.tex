@@ -1,0 +1,57 @@
+% ============================================================
+% 00_packages.tex — Pakete und Paket-Level-Setup
+% ============================================================
+% Hinweis: Reihenfolge ist relevant. Schriften vor Mathe, xcolor mit
+% [table]-Option vor allem, was Tabellen-Farben braucht.
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[sfdefault,lf]{carlito}  % Calibri-Aequivalent (Google), lf = Lining Figures
+\usepackage{sansmath}               % Mathe-Modus auch in Sans-Serif
+\sansmath
+\linespread{0.95}                   % Etwas engere Zeilen für Kompaktheit
+
+\usepackage[landscape, a4paper, margin=1.5mm]{geometry}
+\usepackage{microtype}
+\usepackage{multicol}
+
+\usepackage{mathtools}              % Superset von amsmath
+\let\Bbbk\relax                     % Konfliktvermeidung mit newpxmath/amssymb
+\usepackage{amssymb}
+\usepackage{siunitx}
+\sisetup{
+  mode=match,
+  propagate-math-font=true,
+  reset-text-family=false,
+  exponent-product = \cdot,
+  output-decimal-marker = {,},
+  per-mode = symbol
+}
+
+\usepackage[table]{xcolor}          % [table] aktiviert \rowcolor / \columncolor
+\usepackage{array}                  % erweiterte Spaltentypen + \arrayrulecolor
+\usepackage{tabularx}               % \linewidth-Fit + X-Spalten
+\usepackage{tabularray}             % moderne Tabellen (valuegrid)
+\usepackage[column=O]{cellspace}    % cellspace nutzt 'O', damit siunitx 'S' frei bleibt
+\usepackage{xstring}
+\usepackage{varwidth}
+\usepackage{ragged2e}               % Silbentrennung bei Flattersatz
+\usepackage{enumitem}               % \setlist
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins, breakable, raster}
+
+% Code-Listings: nur für das optionale Code-Modul (styles/65_code_style.tex)
+% benötigt. Schadlos wenn das Modul in preamble.tex deaktiviert ist.
+\usepackage{listings}
+\tcbuselibrary{listings}
+
+% Stichwortverzeichnis: nur für das optionale Index-Modul
+% (styles/66_index.tex) benötigt. Schadlos wenn deaktiviert.
+\usepackage{makeidx}
+
+\usepackage{hyperref}

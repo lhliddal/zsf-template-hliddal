@@ -1,0 +1,118 @@
+% ============================================================
+% ch01_beispiel.tex — Living Documentation
+% ------------------------------------------------------------
+% Zeigt jede öffentliche Macro/Box im Template einmal mit Mini-Beispiel.
+% Beim Kopieren des Templates dieses Kapitel als Referenz behalten oder
+% durch echte Inhalte ersetzen.
+% ============================================================
+
+\StartChapter[ch:beispiel]{Beispielkapitel}
+
+\begin{runintext}
+  Dieses Kapitel demonstriert die im Template verfuegbaren Macros, Boxen
+  und Listen. Alle Layout-Bausteine kommen aus \texttt{styles/}; Kapitel
+  liefern nur \ZSFkeyword{Inhalt}, niemals Layout-Hacks. Siehe
+  \texttt{MODULAR\_SYSTEM.md} für die verbindlichen Regeln.
+\end{runintext}
+
+\SubsectionBar{Math-Macros}
+
+\begin{formulabox}
+  \[ A \subset \R,\quad z \in \C,\quad n \in \N \]
+  \formulasep
+  \[ \dd x,\quad \norm{v},\quad \abs{x},\quad \sgn(x),\quad \grad f,\quad \divg \vect{F} \]
+\end{formulabox}
+
+\SubsectionBar{Formel-Box mit Notes}
+
+\textVorBox{Beispielhafte Formel mit erklaerender Vor-Box.}
+\begin{formulabox}
+  \textVorFormel{Definition:}
+  \[ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} \]
+  \formulanote{Existenz nur, falls links- und rechtsseitiger Grenzwert übereinstimmen.}
+\end{formulabox}
+\textNachBox{Folgerung: Differenzierbarkeit impliziert Stetigkeit.}
+
+\SubsectionBar{Definitions-, Tabellen-, Figur- und Warn-Box}
+
+% defbox: Definitionen, Saetze, Lemmas (unbreakable, mit Titel-Lasche).
+\begin{defbox}[Definition]
+  Eine Funktion $f: A \to B$ heisst \ZSFkeyword{injektiv}, wenn aus
+  $f(x_1) = f(x_2)$ stets $x_1 = x_2$ folgt.
+\end{defbox}
+
+% tablebox: Wrapper für ZSFtable — niemals \tabular oder \tabularx in Kapiteln.
+\begin{tablebox}[Wertetabelle]
+  \begin{ZSFtable}{Y{0.6} Y{1.4} Y{1.0}}
+    \ZSFheaderRow \ZSFhead{Symbol} & \ZSFhead{Bedeutung} & \ZSFhead{Einheit} \\
+    $m$ & Masse & \si{kg} \\
+    $v$ & Geschwindigkeit & \si{m/s} \\
+    $E$ & Energie & \si{J}
+  \end{ZSFtable}
+\end{tablebox}
+
+% warnbox: rote Warnung für Stolperfallen / häufige Fehler.
+\begin{warnbox}[Stolperfalle]
+  Achte auf den \ZSFkeyword{Definitionsbereich} — Division durch Null oder
+  negative Argumente unter Wurzeln werfen typische Anfangerfehler.
+\end{warnbox}
+
+\SubsectionBar{Aussagen, Verfahren, Listen}
+
+% statementbox: kurze, eigenstaendige Aussage (Satz, Bemerkung) mit Farbbalken.
+\begin{statementbox}[Satz]
+  Jede stetige Funktion auf einem kompakten Intervall nimmt Maximum und
+  Minimum an.
+\end{statementbox}
+
+% procedure: nummerierte Schrittfolge — \ProcStep{Lead}{Beschreibung}.
+\begin{procedure}[Vorgehen]
+  \ProcStep{Definitionsbereich prüfen}{Pole, Sprungstellen, Ränder notieren.}
+  \ProcStep{Ableitung berechnen}{$f'$ bilden und Nullstellen bestimmen.}
+  \ProcStep{Vorzeichen testen}{Monotonie und Extrema klassifizieren.}
+\end{procedure}
+
+% factlist: rahmenlose Faktenliste — \ZSFFact{Lead}{Beschreibung}.
+\begin{factlist}
+  \ZSFFact{Konvergenz}{Notwendig: Folgenglieder werden beliebig klein.}
+  \ZSFFact{Monotonie}{Hinreichend zusammen mit Beschraenktheit.}
+\end{factlist}
+
+% propertylist: factlist innerhalb einer statementbox (mit Titel + Rahmen).
+\begin{propertylist}[Eigenschaften stetiger Funktionen]
+  \ZSFFact{Beschraenktheit}{Auf kompaktem Intervall stets beschraenkt.}
+  \ZSFFact{Zwischenwertsatz}{Nimmt jeden Wert zwischen Rand-Werten an.}
+\end{propertylist}
+
+\SubsectionBar{Goal-System (Bedingung -- Umformung -- Ziel)}
+
+\begin{formulabox}
+  \ZSFDerivationCase{$x > 0$}{\sqrt{x^2}}{x}
+  \formulasep
+  \ZSFDerivationCase{$x < 0$}{\sqrt{x^2}}{-x}
+\end{formulabox}
+
+\SubsectionBar{Valuegrid, Splitbox und Inline-Marker}
+
+% valuegrid: kompakte Wertetabelle ohne tablebox-Overhead.
+\begin{valuegrid}{3}[Wichtige Werte]
+  Konstante & Wert & Einheit \\
+  $g$ & $9{,}81$ & \si{m/s^2} \\
+  $c$ & $2{,}998 \cdot 10^8$ & \si{m/s} \\
+  $h$ & $6{,}626 \cdot 10^{-34}$ & \si{J\cdot s}
+\end{valuegrid}
+
+% splitbox: Bild + Text nebeneinander. Argument = linke Spaltenbreite (0..1).
+% Linke Seite vor \tcblower, rechte Seite nach \tcblower.
+\begin{splitbox}[0.4]
+  \centering\textit{[hier \texttt{\textbackslash{}ZSFfig\{path\}} einsetzen]}
+  \tcblower
+  Kurzer erklaerender Text neben einer Abbildung. Spart vertikalen Platz
+  bei kleinen Bildern.
+\end{splitbox}
+
+\begin{runintext}
+  Inline-Hinweise: \ZSFdanger{Achtung Vorzeichen} und das
+  \ZSFkeyword{Schlagwort}-System für Fachbegriffe. Mit
+  \ZSFconclusion{Schlussfolgerungen werden so eingeleitet.}
+\end{runintext}

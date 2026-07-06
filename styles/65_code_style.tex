@@ -1,0 +1,121 @@
+% ============================================================
+% 65_code_style.tex — OPTIONALES Code-Listing-Modul (CodeExpert)
+% ============================================================
+% Opt-in: in preamble.tex einkommentieren für code-lastige
+% Faecher (Informatik). Voraussetzungen (aus 00_packages.tex):
+%   - listings + \tcbuselibrary{listings}
+% Farben (ce_*, code_*) aus 40_colors_structure.tex,
+% Längen (\ZSFcode*) aus 30_layout_spacing.tex,
+% Box-Stile (zsftitlebox, \BoxFrameColor) aus 60_boxes.tex.
+%
+% Stellt bereit:
+%   - lstlisting-Style "CodeExpert" (dunkler Code-Block)
+%   - codebox[Titel]            — Container für Code-Snippets
+%                                 (zero top/bottom padding, lstlisting
+%                                 bringt eigene Skips mit)
+%   - codeboxfirst/mid/last     — mehrteilige Code-Gruppen mit
+%                                 möglichem Spaltenumbruch zwischen
+%                                 den Teilen (offene Kanten, visuell
+%                                 zusammenhaengend)
+%
+% Herkunft: konsolidiert aus ZSF_Informatik2_v2
+% (styles/65_code_style.tex + Code-Container aus styles/60_boxes.tex).
+% ============================================================
+% -------------------------
+% CodeExpert Listings Style
+% -------------------------
+\lstset{
+    basicstyle=\ttfamily,
+    frame=tb,
+    aboveskip=\ZSFcodeMiniSkip,
+    belowskip=\ZSFcodeMiniSkip,
+    showstringspaces=true,
+    columns=flexible,
+    breaklines=true,
+    breakatwhitespace=true,
+    tabsize=2,
+}
+
+\lstdefinestyle{CodeExpert}{
+    language=Python,
+    basicstyle=\ttfamily\linespread{0.8}\color{ce_white},
+    numbers=none,
+    aboveskip=\ZSFspaceM,
+    belowskip=\ZSFspaceM,
+    frame=single,
+    rulecolor=\color{code_rule},
+    framerule=\ZSFcodeFrameRule,
+    framexleftmargin=\ZSFcodeXMargin,
+    framexrightmargin=\ZSFcodeXMargin,
+    framextopmargin=\ZSFspaceM,
+    framexbottommargin=\ZSFspaceM,
+    xleftmargin=\ZSFcodeXMargin,
+    xrightmargin=\ZSFcodeXMargin,
+    backgroundcolor=\color{code_bg},
+    keywordstyle=\bfseries\color{ce_pink},
+    commentstyle=\color{ce_green},
+    stringstyle=\color{ce_yellow},
+    identifierstyle=\color{ce_white},
+    showstringspaces=false,
+    breaklines=true,
+    breakatwhitespace=true,
+    literate={->}{{$\rightarrow$}}2 {ü}{{\"u}}1 {ä}{{\"a}}1 {ö}{{\"o}}1 {Ü}{{\"U}}1 {Ä}{{\"A}}1 {Ö}{{\"O}}1 {ß}{{\ss}}1 {—}{{---}}1 {−}{{-}}1 {„}{{\glqq}}1 {“}{{\grqq}}1 {”}{{''}}1 {’}{{'}}1 {–}{{--}}1 {→}{{$\rightarrow$}}1
+}
+
+% ------------------------------------------------------------
+% codebox — Container für Code-Snippets (optional mit Titel)
+%   Identisches Erscheinungsbild wie die Titelboxen (zsftitlebox),
+%   aber weisser Hintergrund und zero top/bottom padding, da
+%   lstlisting eigene above/belowskips mitbringt.
+% ------------------------------------------------------------
+\tcbset{zsfcodeboxbase/.style={
+  zsftitlebox,
+  colback=white,
+  top=0pt, bottom=0pt,
+}}
+\newtcolorbox{zsf@codebox@plain}{zsfcodeboxbase}
+\newtcolorbox{zsf@codebox@titled}[1]{zsfcodeboxbase, title={#1}}
+\NewDocumentEnvironment{codebox}{o}
+  {\IfNoValueTF{#1}{\begin{zsf@codebox@plain}}{\begin{zsf@codebox@titled}{#1}}}
+  {\IfNoValueTF{#1}{\end{zsf@codebox@plain}}{\end{zsf@codebox@titled}}}
+
+% ------------------------------------------------------------
+% Split-codebox — drei Teil-Environments für mehrteilige
+% Code-Gruppen mit möglichem Spaltenumbruch zwischen Teilen.
+% Visuell zusammenhaengend (offene Kante), physisch getrennt.
+%   codeboxfirst  — Anfang  (Rahmen oben + Seiten, unten offen)
+%   codeboxmid    — Mitte   (nur Seiten, oben und unten offen)
+%   codeboxlast   — Ende    (Rahmen unten + Seiten, oben offen)
+% ------------------------------------------------------------
+\tcbset{zsf@codebox@split@base/.style={
+  enhanced jigsaw,
+  breakable=false,
+  colback=white,
+  colframe=\BoxFrameColor,
+  leftrule=0.5pt, rightrule=0.5pt,
+  toprule=0pt, bottomrule=0pt,
+  arc=0pt, outer arc=0pt,
+  boxsep=0pt,
+  left=\ZSFspaceS, right=\ZSFspaceS,
+  top=0pt, bottom=0pt,
+  before skip=0pt,
+  after skip=\ZSFspaceXS,
+}}
+\newtcolorbox{codeboxfirst}{
+  zsf@codebox@split@base,
+  toprule=0.5pt,
+  arc=1pt, outer arc=1pt,
+  sharp corners=south,
+  before skip=\ZSFBoxBeforeSkip,
+  before={\ZSFConsumeAfterSubsectionBar},
+}
+\newtcolorbox{codeboxmid}{
+  zsf@codebox@split@base,
+}
+\newtcolorbox{codeboxlast}{
+  zsf@codebox@split@base,
+  bottomrule=0.5pt,
+  arc=1pt, outer arc=1pt,
+  sharp corners=north,
+  after skip=\ZSFspaceS,
+}
