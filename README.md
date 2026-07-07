@@ -2,10 +2,9 @@
 
 ## Download
 
-**Schnellzugriff:** [template_fs0000_hliddal.pdf direkt herunterladen](https://github.com/lhliddal/zsf-template-hliddal/releases/latest/download/template_fs0000_hliddal.pdf)
+**Template-PDF:** [template_fs0000_hliddal.pdf herunterladen](https://github.com/lhliddal/zsf-template-hliddal/releases/latest/download/template_fs0000_hliddal.pdf)
 
-- PDF im Repository: [template_fs0000_hliddal.pdf](./template_fs0000_hliddal.pdf)
-- Versionen und Prüfsummen: [GitHub Releases](https://github.com/lhliddal/zsf-template-hliddal/releases)
+Wenn du nur sehen willst, wie das Template aussieht, reicht diese PDF. Den LaTeX-Code brauchst du, wenn du damit eine eigene Zusammenfassung bauen willst.
 
 ## Persönlicher Hinweis
 
