@@ -23,7 +23,7 @@ Kapitel bleiben inhaltsfokussiert; Layout/Styling läuft komplett über diese Mo
 
 ## Readability-System (55_readability.tex)
 
-Fließtext (`runintext`, `defbox`, `warnbox`) ist im **Flattersatz**, damit
+Fliesstext (`runintext`, `defbox`, `warnbox`) ist im **Flattersatz**, damit
 LaTeX in den schmalen 4-Spalten-Zeilen lieber frueh umbricht als zu trennen
 oder Leerraum aufzublaehen.
 

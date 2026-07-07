@@ -2,7 +2,7 @@
 % 50_typography_semantics.tex — Schriftmakros für Box-Typen & semantische Inhaltsmakros
 % ============================================================
 
-% Explizite bp-Größen (wie Analysis) für präzise, font-unabhängige Kontrolle
+% Explizite bp-Grössen (wie Analysis) für präzise, font-unabhängige Kontrolle
 \newcommand{\ZSFfontChapter}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
 \newcommand{\ZSFfontSection}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
 \newcommand{\ZSFfontBoxTitle}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
@@ -26,7 +26,7 @@
   \if\relax\detokenize{#1}\relax\else\TableTitleBreak\TableCellNote{#1}\fi
 }
 
-% Semantische Tabellen-Fontgrößen
+% Semantische Tabellen-Fontgrössen
 % (werden als optionales Argument an ZSFtable/ZSFtableFlat/ZSFtablePlain
 %  übergeben — siehe styles/20_tables.tex).
 % Default = \ZSFfontTable. Für lange, dichte Tabellen (viele Zeilen,
@@ -36,14 +36,14 @@
 
 % Semantische Inhaltsmakros (konsistente Skalierung und einfache Anpassung)
 %
-% \ZSFkeyword{...} — hebt zentrale Fachbegriffe im Fließtext hervor.
+% \ZSFkeyword{...} — hebt zentrale Fachbegriffe im Fliesstext hervor.
 % Verwendung:
 %   * nur in \begin{runintext}, \begin{defbox}, \begin{warnbox} und
 %     aehnlichen Text-Boxen, NIEMALS in Formeln, \formulanote oder
 %     Überschriften (\SubsectionBar, \StartChapter).
 %   * sparsam einsetzen (Richtwert: 1-3 pro runintext, 4-6 im
 %     Kapitel-Intro, insgesamt ca. 10 pro Kapitel) -- es sollen echte
-%     Fachbegriffe (Gesetze, Effekte, Bauteile, zentrale Größen)
+%     Fachbegriffe (Gesetze, Effekte, Bauteile, zentrale Grössen)
 %     sein, keine generischen Substantive oder Verben.
 % Rendering ist bewusst schlicht als \textbf{...}; Änderungen zentral
 % hier vornehmen (z.B. Farbe, Underline) -- nicht in Kapiteln.
