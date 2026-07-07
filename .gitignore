@@ -1,42 +1,5 @@
-# Local authoring / agent instructions
-AGENTS.md
-CLAUDE.md
-MODULAR_SYSTEM.md
-ZSF_DIDAKTIK_PRINZIP.md
-ZSF_IDEEN.md
-rules/
-.cursor/
-.cursorrules
-.github/copilot-instructions.md
-.github/instructions/
-.github/skills/
-.claude/
-.vscode/
-
-# Local tooling and checks
-Makefile.local
-.pre-commit-config.yaml
-.latexindent.yaml
-tests/
-tools/
-scripts/
-
-# Scratch / experiments / non-public source material
-_scratch/
-scratch/
-Scratch/
-_orphan_images/
-**/_originals/
-Maschinenkonstruktion_inspiration_alt/
-Backups/
-mwe*.tex
-mwe*.idx
-mwe*.pdf
-*.bak
-
-# Build artifacts
+# LaTeX build artifacts
 build/
-tests/build/
 main.pdf
 main.synctex.gz
 *.aux
@@ -54,5 +17,5 @@ main.synctex.gz
 *.ilg
 *.ind
 
-# macOS
+# Local system files
 .DS_Store
