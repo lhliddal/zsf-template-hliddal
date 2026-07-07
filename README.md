@@ -14,7 +14,7 @@ Wenn du es verwendest, verlinke bitte dieses Repository und kennzeichne eigene �
 
 ## Nutzung
 
-Dieses Repository ist ein schlankes LaTeX-Template für ZSF-Zusammenfassungen. Es enthält keine privaten Agent-, Prompt- oder IDE-Regeln.
+Dieses Repository ist ein schlankes LaTeX-Template für ZSF-Zusammenfassungen. Es ist für kompakte, gut bearbeitbare Prüfungszusammenfassungen gedacht.
 
 Nutzung, Anpassung und Weitergabe sind willkommen. Bitte die im PDF ausgewiesene Originalfassung nennen und Änderungen als "Bearbeitet von ..." kennzeichnen.
 
