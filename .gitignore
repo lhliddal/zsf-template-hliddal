@@ -14,6 +14,7 @@ rules/
 .vscode/
 
 # Local tooling and checks
+Makefile.local
 .pre-commit-config.yaml
 .latexindent.yaml
 tests/

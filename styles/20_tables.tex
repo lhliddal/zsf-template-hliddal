@@ -51,7 +51,7 @@
 \newcommand{\ZSFzebraBG}{\chaptercolorlight!70}
 \newcommand{\SetZSFzebraBG}[1]{\renewcommand{\ZSFzebraBG}{#1}}
 \newcommand{\ZSFzebra}{\rowcolors{2}{white}{\ZSFzebraBG}}          % Header in Zeile 1
-\newcommand{\ZSFzebraStart}[1]{\rowcolors{#1}{white}{\ZSFzebraBG}} % frei waehlbar
+\newcommand{\ZSFzebraStart}[1]{\rowcolors{#1}{white}{\ZSFzebraBG}} % frei wählbar
 \newcommand{\ZSFzebraOff}{\rowcolors{1}{}{}}
 
 % ------------------------------------------------------------
@@ -96,26 +96,35 @@
 %   \end{ZSFtable}
 
 \NewDocumentEnvironment{ZSFtable}{O{\ZSFfontTable} m}{%
+  \begingroup
+  \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
   #1%
   \ZSFzebra
   \tabularx{\linewidth}{#2}%
 }{%
   \endtabularx
+  \endgroup
 }
 
 \NewDocumentEnvironment{ZSFtableFlat}{O{\ZSFfontTable} m}{%
+  \begingroup
+  \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
   #1%
   \ZSFzebraStart{1}%
   \tabularx{\linewidth}{#2}%
 }{%
   \endtabularx
+  \endgroup
 }
 
 % Reine Tabelle ohne Zebra (selten; für einspaltige Zebraschäden etc.)
 \NewDocumentEnvironment{ZSFtablePlain}{O{\ZSFfontTable} m}{%
+  \begingroup
+  \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
   #1%
   \ZSFzebraOff
   \tabularx{\linewidth}{#2}%
 }{%
   \endtabularx
+  \endgroup
 }

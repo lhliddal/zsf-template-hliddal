@@ -1,9 +1,12 @@
 name: Release PDF
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing vX.Y.Z tag to publish"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -12,8 +15,13 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate tag
+        run: |
+          [[ "${{ inputs.tag }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
       - name: Install LaTeX toolchain
         run: |
           sudo apt-get update
@@ -31,6 +39,7 @@ jobs:
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ inputs.tag }}
           files: |
             template_fs0000_hliddal.pdf
             build/main.pdf.sha256

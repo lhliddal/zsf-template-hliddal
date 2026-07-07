@@ -9,6 +9,9 @@ BUILD_STAMP ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo nogit)
 LATEX_DEFS := \def\ZSFBuildStamp{$(BUILD_STAMP)}\def\ZSFGitCommit{$(GIT_COMMIT)}
 
+# Optional local-only automation; Makefile.local is gitignored.
+-include Makefile.local
+
 .PHONY: build release-proof clean all
 
 build:

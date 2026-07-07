@@ -43,6 +43,8 @@
 \newlength{\ZSFsubsectionAfterChapterGap}\setlength{\ZSFsubsectionAfterChapterGap}{\ZSFspaceXS}
 \newlength{\ZSFsubsectionAfterGap}\setlength{\ZSFsubsectionAfterGap}{\ZSFspaceXS}
 \newlength{\ZSFchapterBarAfterSkip}\setlength{\ZSFchapterBarAfterSkip}{2pt}
+\newlength{\ZSFboxArc}\setlength{\ZSFboxArc}{\ZSFspaceXS}
+\newcommand{\ZSFtableArrayStretch}{1.04}
 
 % Maximale Höhe für Bilder in figboxen (verhindert überhohe Aspect-Ratios).
 \newlength{\ZSFfigMaxHeight}\setlength{\ZSFfigMaxHeight}{2.6cm}
@@ -94,7 +96,7 @@
   \fi
 }
 
-% Text der zur Box DARUNTER gehoert (Einleitung)
+% Text der zur Box DARUNTER gehört (Einleitung)
 \newcommand{\textVorBox}[1]{%
   \par
   \addvspace{\ZSFspaceOuter}%
@@ -108,7 +110,7 @@
   \nopagebreak
 }
 
-% Text der zur Box DARUEBER gehoert (Ergaenzung/Folgerung)
+% Text der zur Box DARÜBER gehört (Ergänzung/Folgerung)
 \newcommand{\textNachBox}[1]{%
   \par
   \ZSFRobustUnskip
