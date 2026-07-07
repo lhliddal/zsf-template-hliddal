@@ -1,4 +1,4 @@
-# ZSF Template
+# Hliddal Template für Zusammenfassungen
 
 ## Download
 
@@ -6,6 +6,12 @@
 
 - PDF im Repository: [template_fs0000_hliddal.pdf](./template_fs0000_hliddal.pdf)
 - Versionen und Prüfsummen: [GitHub Releases](https://github.com/lhliddal/zsf-template-hliddal/releases)
+
+## Persönlicher Hinweis
+
+Ich habe dieses Template gebaut, weil ich meine Zusammenfassungen möglichst übersichtlich, kompakt und prüfungstauglich setzen wollte. Es soll auch anderen helfen, schneller eine saubere eigene ZSF aufzubauen, ohne zuerst ein komplettes LaTeX-System zusammensuchen zu müssen.
+
+Wenn du es verwendest, verlinke bitte dieses Repository und kennzeichne eigene Änderungen sauber.
 
 ## Nutzung
 
