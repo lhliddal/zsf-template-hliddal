@@ -16,7 +16,7 @@ LATEX_DEFS := \def\ZSFBuildStamp{$(BUILD_STAMP)}\def\ZSFGitCommit{$(GIT_COMMIT)}
 
 build:
 	INDEXSTYLE="$(CURDIR)/styles:" \
-	latexmk -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
+	latexmk -g -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
 		-e '$$makeindex = q{makeindex -r -s zsfindex.ist %O -o %D %S};' \
 		-pdflatex="pdflatex %O '$(LATEX_DEFS)\input{%S}'" $(MAIN)
 	@cp $(BUILD_DIR)/main.pdf "$(OUTPUT_PDF)"
