@@ -1,8 +1,11 @@
 name: Release PDF
 
+# Nur manueller Fallback. Der kanonische Release-Weg ist lokal:
+# `make release-patch` / `make release-minor` (scripts/release-local.sh),
+# damit der Release-Autor lhliddal ist statt github-actions[bot].
+# Kein push-Trigger — sonst würde jeder Push nach main automatisch veröffentlichen
+# und dem dokumentierten lokalen Flow widersprechen.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -32,6 +35,9 @@ jobs:
             poppler-utils
       - name: Build PDF
         run: make build
+      - name: Resolve PDF name
+        id: pdf
+        run: echo "name=$(make -s print-pdf-basename)" >> "$GITHUB_OUTPUT"
       - name: Generate release hash
         run: make release-proof
       - name: Determine next release tag
@@ -64,5 +70,5 @@ jobs:
           name: ${{ steps.version.outputs.tag }}
           body: Update auf neue Version.
           files: |
-            template_fs0000_hliddal.pdf
+            ${{ steps.pdf.outputs.name }}.pdf
             build/main.pdf.sha256

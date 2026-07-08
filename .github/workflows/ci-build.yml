@@ -22,10 +22,18 @@ jobs:
             texlive-science \
             texlive-lang-german \
             poppler-utils
+      # Hinweis: der Verifier `make check` läuft NICHT in CI, weil das
+      # Harness (tests/ tools/ rules/) bewusst git-excluded ist (.git/info/exclude)
+      # und in einem frischen Clone fehlt. `make check` ist der LOKALE Gate
+      # (+ pre-commit). CI baut nur das PDF. Um check CI-fähig zu machen,
+      # müsste das Harness versioniert/geteilt werden (Phase 3).
       - name: Build PDF
         run: make build
+      - name: Resolve PDF name
+        id: pdf
+        run: echo "name=$(make -s print-pdf-basename)" >> "$GITHUB_OUTPUT"
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
-          name: template_fs0000_hliddal-pdf
-          path: template_fs0000_hliddal.pdf
+          name: ${{ steps.pdf.outputs.name }}-pdf
+          path: ${{ steps.pdf.outputs.name }}.pdf
