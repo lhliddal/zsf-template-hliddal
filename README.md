@@ -8,7 +8,11 @@ Wenn du nur sehen willst, wie das Template aussieht, reicht diese PDF. Den LaTeX
 
 ## Persönlicher Hinweis
 
-Ich habe dieses Template gebaut, weil ich meine Zusammenfassungen möglichst übersichtlich, kompakt und prüfungstauglich setzen wollte. Es soll auch anderen helfen, schneller eine saubere eigene ZSF aufzubauen, ohne zuerst ein komplettes LaTeX-System zusammensuchen zu müssen.
+Ich habe dieses Template gebaut, weil ich meine Zusammenfassungen möglichst übersichtlich, kompakt und prüfungstauglich setzen wollte. Eine ZSF soll in der Prüfung Zeit sparen: Inhalte sollen schnell auffindbar, direkt anwendbar und sinnvoll aufgebaut sein. Struktur, Inhalt und Layout sollen darauf ausgelegt sein, dass man unter Prüfungsdruck intuitiv findet, was man sucht.
+
+Fachspezifische Zusatzanforderungen gehören nur in die jeweilige ZSF. Was bei einem Fach sinnvoll ist, kann bei einem anderen unnötiger Ballast sein.
+
+Beispiel: Eine Informatik-ZSF kann zusätzlich festhalten, dass Codebeispiele als übertragbare Skelette gedacht sind und Theorie-, Single-Choice- sowie Multiple-Choice-Aufgaben durch klare Begriffe, Eigenschaften und Entscheidungskriterien unterstützt werden sollen.
 
 Wenn du es verwendest, verlinke bitte dieses Repository und kennzeichne eigene Änderungen sauber.
 
