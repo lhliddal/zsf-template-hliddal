@@ -11,6 +11,9 @@
 \newcommand{\BreakIfNotEnoughSpaceChapter}{%
   \par\penalty0\vspace{0pt plus \ZSFbreakThresholdChapter}\penalty-100\vspace{0pt plus -\ZSFbreakThresholdChapter}\relax
 }
+\newcommand{\BreakIfNotEnoughSpaceSubsubsection}{%
+  \par\penalty0\vspace{0pt plus \ZSFbreakThresholdSubsubsection}\penalty-100\vspace{0pt plus -\ZSFbreakThresholdSubsubsection}\relax
+}
 
 % Einheitlicher Top-Spacing-Kontrakt für Titelbalken.
 % Reihenfolge ist kritisch: \addvspace MUSS vor \BreakIfNotEnoughSpace stehen,
@@ -98,6 +101,22 @@
   fontupper=\ZSFfontSection,
   #1
 }
+\newtcolorbox{subsubsectionbar}[1][]{
+  enhanced jigsaw,
+  breakable=false,
+  colback=\SubsubsectionBarColor,
+  colframe=\SubsubsectionBarColor,
+  boxrule=0pt,
+  boxsep=0pt,
+  left=\ZSFspaceS,
+  right=\ZSFspaceS,
+  top=\ZSFspaceXS,
+  bottom=\ZSFspaceXS,
+  before skip=0pt,
+  after skip=\ZSFsubsectionAfterGap,
+  fontupper=\ZSFfontSubsubsection,
+  #1
+}
 \makeatletter
 \newcommand{\SubsectionBar}{\@ifstar{\SubsectionBarStar}{\SubsectionBarNumbered}}
 \newcommand{\SubsectionBarNumbered}[2][]{%
@@ -105,6 +124,7 @@
   \penalty-500
   \ZSFCollapseAfterChapterBar
   \refstepcounter{subsection}
+  \setcounter{subsubsection}{0}
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsectionbar}
     \textcolor{white}{\thesubsection. #2}
@@ -132,6 +152,39 @@
 \newcommand{\SubsectionBarOnNewColumnStar}[2][]{%
   \columnbreak
   \SubsectionBarStar[#1]{#2}%
+}
+\newcommand{\SubsubsectionBar}{\@ifstar{\SubsubsectionBarStar}{\SubsubsectionBarNumbered}}
+\newcommand{\SubsubsectionBarNumbered}[2][]{%
+  \BreakIfNotEnoughSpaceSubsubsection
+  \par\addvspace{\ZSFsubsubsectionBarBeforeSkip}%
+  \penalty-300
+  \refstepcounter{subsubsection}%
+  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
+  \begin{subsubsectionbar}
+    \textcolor{\SubsubsectionTitleColor}{\thesubsubsection. #2}
+  \end{subsubsectionbar}
+  \penalty10000
+  \ZSFMarkAfterSubsectionBar
+}
+\newcommand{\SubsubsectionBarStar}[2][]{%
+  \BreakIfNotEnoughSpaceSubsubsection
+  \par\addvspace{\ZSFsubsubsectionBarBeforeSkip}%
+  \penalty-300
+  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
+  \begin{subsubsectionbar}
+    \textcolor{\SubsubsectionTitleColor}{#2}
+  \end{subsubsectionbar}
+  \penalty10000
+  \ZSFMarkAfterSubsectionBar
+}
+\newcommand{\SubsubsectionBarOnNewColumn}{\@ifstar{\SubsubsectionBarOnNewColumnStar}{\SubsubsectionBarOnNewColumnNumbered}}
+\newcommand{\SubsubsectionBarOnNewColumnNumbered}[2][]{%
+  \columnbreak
+  \SubsubsectionBarNumbered[#1]{#2}%
+}
+\newcommand{\SubsubsectionBarOnNewColumnStar}[2][]{%
+  \columnbreak
+  \SubsubsectionBarStar[#1]{#2}%
 }
 \makeatother
 

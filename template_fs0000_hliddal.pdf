@@ -182,7 +182,7 @@ stream
         </rdf:Bag>
       </pdfaExtension:schemas>
       <pdf:Producer>latexmk</pdf:Producer>
-      <pdf:Keywords>owner-name:Loris Einar Kristjan Hliddal, owner-id:LEKH-ZSF-A1B2, release-id:R0000.00, build-id:20260708T190457Z-5833159</pdf:Keywords>
+      <pdf:Keywords>owner-name:Loris Einar Kristjan Hliddal, owner-id:LEKH-ZSF-A1B2, release-id:R0000.00, build-id:20260709T140652Z-9a0ee0c</pdf:Keywords>
       <pdf:PDFVersion>1.7</pdf:PDFVersion>
       <dc:format>application/pdf</dc:format>
       <dc:title>
@@ -197,7 +197,7 @@ stream
       </dc:description>
       <dc:date>
         <rdf:Seq>
-          <rdf:li>2026-07-08T21:04:58+02:00</rdf:li>
+          <rdf:li>2026-07-09T16:06:52+02:00</rdf:li>
         </rdf:Seq>
       </dc:date>
       <dc:type>
@@ -215,16 +215,16 @@ stream
           <rdf:li>owner-name:Loris Einar Kristjan Hliddal</rdf:li>
           <rdf:li>owner-id:LEKH-ZSF-A1B2</rdf:li>
           <rdf:li>release-id:R0000.00</rdf:li>
-          <rdf:li>build-id:20260708T190457Z-5833159</rdf:li>
+          <rdf:li>build-id:20260709T140652Z-9a0ee0c</rdf:li>
         </rdf:Bag>
       </dc:subject>
       <dc:source>main.tex</dc:source>
-      <xmp:CreateDate>2026-07-08T21:04:58+02:00</xmp:CreateDate>
-      <xmp:ModifyDate>2026-07-08T21:04:58+02:00</xmp:ModifyDate>
-      <xmp:MetadataDate>2026-07-08T21:04:58+02:00</xmp:MetadataDate>
+      <xmp:CreateDate>2026-07-09T16:06:52+02:00</xmp:CreateDate>
+      <xmp:ModifyDate>2026-07-09T16:06:52+02:00</xmp:ModifyDate>
+      <xmp:MetadataDate>2026-07-09T16:06:52+02:00</xmp:MetadataDate>
       <xmp:CreatorTool>LaTeX</xmp:CreatorTool>
       <xmpMM:DocumentID>uuid:267fdcef-dc41-4333-a413-ea82b67a33ea</xmpMM:DocumentID>
-      <xmpMM:InstanceID>uuid:f20541d1-8d18-4dce-a39b-6cef2bbb1339</xmpMM:InstanceID>
+      <xmpMM:InstanceID>uuid:0aef7f20-5954-467a-af7a-3954cef7fdc4</xmpMM:InstanceID>
       <xmpMM:VersionID>1</xmpMM:VersionID>
       <xmpMM:RenditionClass>default</xmpMM:RenditionClass>
       <prism:complianceProfile>three</prism:complianceProfile>
@@ -1150,9 +1150,9 @@ endstream
 endobj
 86 0 obj
 <<
- /Author (Loris Einar Kristjan Hliddal) /Title (ZSF Template) /Subject (Originalfassung; owner=LEKH-ZSF-A1B2; release=R0000.00) /Keywords (owner-name:Loris Einar Kristjan Hliddal, owner-id:LEKH-ZSF-A1B2, release-id:R0000.00, build-id:20260708T190457Z-5833159) /Title(\376\377\000Z\000S\000F\000\040\000T\000e\000m\000p\000l\000a\000t\000e)/Subject(\376\377\000O\000r\000i\000g\000i\000n\000a\000l\000f\000a\000s\000s\000u\000n\000g\000;\000\040\000o\000w\000n\000e\000r\000=\000L\000E\000K\000H\000-\000Z\000S\000F\000-\000A\0001\000B\0002\000;\000\040\000r\000e\000l\000e\000a\000s\000e\000=\000R\0000\0000\0000\0000\000.\0000\0000)/Creator(\376\377\000L\000a\000T\000e\000X)/Producer(\376\377\000l\000a\000t\000e\000x\000m\000k)
-/CreationDate (D:20260708210458+02'00')
-/ModDate (D:20260708210458+02'00')
+ /Author (Loris Einar Kristjan Hliddal) /Title (ZSF Template) /Subject (Originalfassung; owner=LEKH-ZSF-A1B2; release=R0000.00) /Keywords (owner-name:Loris Einar Kristjan Hliddal, owner-id:LEKH-ZSF-A1B2, release-id:R0000.00, build-id:20260709T140652Z-9a0ee0c) /Title(\376\377\000Z\000S\000F\000\040\000T\000e\000m\000p\000l\000a\000t\000e)/Subject(\376\377\000O\000r\000i\000g\000i\000n\000a\000l\000f\000a\000s\000s\000u\000n\000g\000;\000\040\000o\000w\000n\000e\000r\000=\000L\000E\000K\000H\000-\000Z\000S\000F\000-\000A\0001\000B\0002\000;\000\040\000r\000e\000l\000e\000a\000s\000e\000=\000R\0000\0000\0000\0000\000.\0000\0000)/Creator(\376\377\000L\000a\000T\000e\000X)/Producer(\376\377\000l\000a\000t\000e\000x\000m\000k)
+/CreationDate (D:20260709160652+02'00')
+/ModDate (D:20260709160652+02'00')
 /Trapped /False
 /PTEX.Fullbanner (This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) kpathsea version 6.4.1)
 >>
@@ -1189,7 +1189,7 @@ endobj
 /W [1 3 1]
 /Root 85 0 R
 /Info 86 0 R
-/ID [<6986D48CCA534BE7E9D280603BC10AB4> <6986D48CCA534BE7E9D280603BC10AB4>]
+/ID [<4697D5973123AADBE496E99EB44872ED> <4697D5973123AADBE496E99EB44872ED>]
 /Length 249       
 /Filter /FlateDecode
 >>

@@ -5,6 +5,7 @@
 % Explizite bp-Grössen (wie Analysis) für präzise, font-unabhängige Kontrolle
 \newcommand{\ZSFfontChapter}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
 \newcommand{\ZSFfontSection}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
+\newcommand{\ZSFfontSubsubsection}{\sffamily\bfseries\fontsize{7.2bp}{8.0bp}\selectfont}
 \newcommand{\ZSFfontBoxTitle}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
 % chktex 6
 \newcommand{\ZSFfontNote}{\sffamily\fontsize{6.7bp}{7.5bp}\itshape\selectfont}
@@ -40,7 +41,7 @@
 % Verwendung:
 %   * nur in \begin{runintext}, \begin{defbox}, \begin{warnbox} und
 %     aehnlichen Text-Boxen, NIEMALS in Formeln, \formulanote oder
-%     Überschriften (\SubsectionBar, \StartChapter).
+%     Überschriften (\SubsubsectionBar, \SubsectionBar, \StartChapter).
 %   * sparsam einsetzen (Richtwert: 1-3 pro runintext, 4-6 im
 %     Kapitel-Intro, insgesamt ca. 10 pro Kapitel) -- es sollen echte
 %     Fachbegriffe (Gesetze, Effekte, Bauteile, zentrale Grössen)
@@ -65,7 +66,7 @@
 %     das in einem ANDEREN Kapitel erklaert wird.
 %   * NICHT für Delegationen im selben Kapitel und nicht für elementare
 %     Standardoperationen — sparsam einsetzen.
-% Ziel-Label via optionales Argument von \SubsectionBar/\StartChapter setzen:
+% Ziel-Label via optionales Argument von \SubsubsectionBar/\SubsectionBar/\StartChapter setzen:
 %   \SubsectionBar[sec:matrix-inverse]{Inverse}
 % \ref* (hyperref) unterdrueckt den Link, Nummern bleiben automatisch korrekt.
 % Farbe = Palette-Farbe des ZIELkapitels (Wegweiser-Prinzip): wird automatisch
