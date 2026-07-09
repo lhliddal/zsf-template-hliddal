@@ -9,7 +9,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, TikZ-Klammern (`\drawbrace`/`\tikzmark`), Pfeil-Fix |
 | `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable*`, `\ZSFheaderRow`, `\ZSFhead`, Zebra |
 | `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Schwellwerte, `\textVorBox`/`\textNachBox`/`\textVorFormel`/`\textNachFormel`, `\ZSFRobustUnskip`, Gap-Helfer |
-| `40_colors_structure.tex` | 20-Slot-Index-Palette, semantische Farben, Aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`/`\StartChapterOnNewColumn` |
+| `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`/`\StartChapterOnNewColumn` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc.), `\ZSFkeyword`, `\ZSFconclusion`, Tabellen-Rules |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
 | `60_boxes.tex` | tcolorbox-Stile, `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\SubsectionBarOnNewColumn`, `\SubsubsectionBarOnNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\formulasep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `statementbox`/`procedure`/`factlist`/`propertylist`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), `\ZSFdanger` |

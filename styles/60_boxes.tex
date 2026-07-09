@@ -48,7 +48,7 @@
 \newcommand{\ChapterBar}[1]{
   \BreakIfNotEnoughSpaceChapter
   \begin{chapterbar}
-    \textcolor{white}{#1}
+    \textcolor{\ChapterBarTextColor}{#1}
   \end{chapterbar}
 }
 
@@ -75,9 +75,9 @@
   \penalty-500
   \begin{zsftitleheader}
     \sffamily
-    {\color{white}\fontsize{11bp}{12.5bp}\bfseries\selectfont #1\par}%
+    {\color{ChapterColor0Text}\fontsize{11bp}{12.5bp}\bfseries\selectfont #1\par}%
     \vspace{1pt}%
-    {\color{white!88}\fontsize{6.7bp}{7.5bp}\itshape\selectfont von~#2\par}%
+    {\color{ChapterColor0Text!88}\fontsize{6.7bp}{7.5bp}\itshape\selectfont von~#2\par}%
   \end{zsftitleheader}
   \penalty10000
 }
@@ -127,7 +127,7 @@
   \setcounter{subsubsection}{0}
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsectionbar}
-    \textcolor{white}{\thesubsection. #2}
+    \textcolor{\SubsectionBarTextColor}{\thesubsection. #2}
   \end{subsectionbar}
   \penalty10000
   \ZSFMarkAfterSubsectionBar
@@ -138,7 +138,7 @@
   \ZSFCollapseAfterChapterBar
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsectionbar}
-    \textcolor{white}{#2}
+    \textcolor{\SubsectionBarTextColor}{#2}
   \end{subsectionbar}
   \penalty10000
   \ZSFMarkAfterSubsectionBar

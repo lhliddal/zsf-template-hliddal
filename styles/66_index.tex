@@ -12,7 +12,8 @@
 %
 % Index-Einträge verweisen auf ABSCHNITTSNUMMERN ("6.2"), nicht auf
 % Seitenzahlen — konsistent zum \ZSFref-Wegweiser-Prinzip. Jede Nummer
-% wird in der Palette-Farbe des Zielkapitels gerendert.
+% wird in der Palette-Farbe des Zielkapitels gerendert. Der Farbnamen-Lookup
+% nutzt denselben Modulo wie \StartChapter.
 %
 % Mechanik: Einträge werden SOFORT via \immediate\write in die .idx
 % geschrieben (Nummer per \edef eingefroren) — nicht beim Shipout, denn
@@ -81,7 +82,11 @@
 % \ZSFref (\ZSF@refExtractChap aus 50_typography_semantics).
 \makeatletter
 \newcommand{\ZSFidxnum}[1]{%
-  {\upshape\bfseries\color{ChapterColor\expandafter\ZSF@refExtractChap#1.\@nil}#1}}
+  \begingroup
+    \edef\ZSF@idxTargetChap{\expandafter\ZSF@refExtractChap#1.\@nil}%
+    \ZSFSetPaletteColorNameFromNumber{\ZSF@idxTargetChap}{\ZSF@idxTargetColor}%
+    {\upshape\bfseries\color{\ZSF@idxTargetColor}#1}%
+  \endgroup}
 \makeatother
 
 % see-Verweise zeigen zusätzlich die (farbcodierte) Abschnittsnummer des

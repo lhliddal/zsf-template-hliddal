@@ -49,7 +49,7 @@
 % Rendering ist bewusst schlicht als \textbf{...}; Änderungen zentral
 % hier vornehmen (z.B. Farbe, Underline) -- nicht in Kapiteln.
 \newcommand{\ZSFkeyword}[1]{\textbf{#1}}
-\newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{white!80}{\small (S.#1)}}
+\newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ChapterBarTextColor!80}{\small (S.#1)}}
 
 % \ZSFhl{...} — Hervorhebung des EINEN prüfungskritischsten Fakts pro Box
 % (fett + unterstrichen). Bewusst sparsam: hoechstens einmal pro Block.
@@ -71,6 +71,8 @@
 % \ref* (hyperref) unterdrueckt den Link, Nummern bleiben automatisch korrekt.
 % Farbe = Palette-Farbe des ZIELkapitels (Wegweiser-Prinzip): wird automatisch
 % aus der Kapitelnummer der Referenz abgeleitet ("6.6" -> ChapterColor6).
+% Bei Kapiteln jenseits der Palette wird derselbe Modulo-Lookup wie bei
+% \StartChapter genutzt, damit gewrappte Kapitel und Verweise konsistent sind.
 % Aufrecht + fett statt kursiv für maximale Lesbarkeit bei 6.7bp.
 \makeatletter
 \def\ZSF@refExtractFirst#1#2\@nil{#1}
@@ -83,7 +85,8 @@
   }{%
     \edef\ZSF@refTargetNum{\expandafter\expandafter\expandafter
       \ZSF@refExtractFirst\csname r@#1\endcsname\@nil}%
-    \edef\ZSF@refTargetColor{ChapterColor\expandafter\ZSF@refExtractChap\ZSF@refTargetNum.\@nil}%
+    \edef\ZSF@refTargetChap{\expandafter\ZSF@refExtractChap\ZSF@refTargetNum.\@nil}%
+    \ZSFSetPaletteColorNameFromNumber{\ZSF@refTargetChap}{\ZSF@refTargetColor}%
   }%
 }
 \newcommand{\ZSFref}[1]{%
