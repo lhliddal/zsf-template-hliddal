@@ -94,6 +94,8 @@
 \newcommand{\chaptercolorlight}{ChapterColor1Light}
 \newcommand{\ChapterBarColor}{\chaptercolor}
 \newcommand{\SubsectionBarColor}{\chaptercolor!75}
+\newcommand{\SubsubsectionBarColor}{\chaptercolorlight!78!white}
+\newcommand{\SubsubsectionTitleColor}{\chaptercolor!72!black}
 \newcommand{\FormulaboxBackColor}{\chaptercolorlight!40}
 
 \newcommand{\BoxTitleColor}{\chaptercolorlight}
@@ -167,6 +169,7 @@
   \refstepcounter{section}
   \SetChapterPaletteByNumber
   \setcounter{subsection}{0}
+  \setcounter{subsubsection}{0}
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \ChapterBar{\thesection. #2}
   \ZSFMarkAfterChapterBar
@@ -186,6 +189,7 @@
   \renewcommand{\chaptercolor}{ChapterColor0}%
   \renewcommand{\chaptercolorlight}{ChapterColor0Light}%
   \setcounter{subsection}{0}%
+  \setcounter{subsubsection}{0}%
   \ChapterBar{#1}%
   \ZSFMarkAfterChapterBar
   \ZSFPostChapterSpacing
