@@ -173,7 +173,14 @@ jobs:
             (.semesterLabel | type == "string" and length > 0) and
             (.status == "active" or .status == "archive" or .status == "template") and
             (.githubRepository == env.GITHUB_REPOSITORY) and
-            (.pdfFilename | type == "string" and test("^[A-Za-z0-9_.-]+\\.pdf$"))
+            (.pdfFilename | type == "string" and test("^[A-Za-z0-9_.-]+\\.pdf$")) and
+            (.presentation | type == "object") and
+            (.presentation.drawingNumber | type == "string" and length > 0) and
+            (.presentation.description | type == "string" and length > 0) and
+            (.presentation.stage == "in-progress" or .presentation.stage == "content-complete" or .presentation.stage == "layout-final") and
+            (.presentation.diagram == "template" or .presentation.diagram == "mechanics" or .presentation.diagram == "analysis" or .presentation.diagram == "physics" or .presentation.diagram == "thermo" or .presentation.diagram == "fluids" or .presentation.diagram == "design") and
+            (.presentation.statusLabel == null or (.presentation.statusLabel | type == "string")) and
+            (.presentation.credits == null or (.presentation.credits | type == "string"))
           ' "$metadata" >/dev/null
           echo "id=$(jq -r '.id' "$metadata")" >> "$GITHUB_OUTPUT"
           echo "status=$(jq -r '.status' "$metadata")" >> "$GITHUB_OUTPUT"

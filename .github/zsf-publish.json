@@ -2,10 +2,17 @@
   "schemaVersion": 1,
   "id": "zsf-template",
   "kind": "template",
-  "title": "ZSF Template",
+  "title": "Hliddal Template",
   "semesterCode": "fs0000",
   "semesterLabel": "Template",
   "status": "template",
   "githubRepository": "lhliddal/zsf-template-hliddal",
-  "pdfFilename": "template_fs0000_hliddal.pdf"
+  "pdfFilename": "template_fs0000_hliddal.pdf",
+  "presentation": {
+    "drawingNumber": "TPL · ETH",
+    "description": "Mein persönliches Template, das ich für übersichtliche, kompakte und prüfungstaugliche Zusammenfassungen erstellt habe. Der Code ist möglichst flexibel und nach Good Practices aufgebaut, damit sich Zusammenfassungen damit gut anpassen, wartungsarm halten und auf viele Zusammenfassungen anwenden lassen.",
+    "stage": "layout-final",
+    "statusLabel": "Wird stetig angepasst",
+    "diagram": "template"
+  }
 }
