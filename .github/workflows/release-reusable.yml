@@ -263,6 +263,7 @@ jobs:
           jq -n \
             --slurpfile project .github/zsf-publish.json \
             --arg commit "$(git rev-parse HEAD)" \
+            --arg releaseVersion "${{ needs.build-and-release.outputs.release_tag }}" \
             --arg publishedAt "$published_at" \
             --arg pdfKey "active/$PROJECT_ID/latest.pdf" \
             --arg sourceKey "active/$PROJECT_ID/latest-source.zip" \
@@ -275,6 +276,7 @@ jobs:
               project: $project[0],
               revision: {
                 commit: $commit,
+                releaseVersion: $releaseVersion,
                 publishedAt: $publishedAt
               },
               artifacts: {
