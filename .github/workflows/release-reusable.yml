@@ -22,7 +22,9 @@ on:
         default: garcon-zsf-active
         type: string
     secrets:
-      cloudflare_api_token:
+      r2_access_key_id:
+        required: false
+      r2_secret_access_key:
         required: false
       cloudflare_account_id:
         required: false
@@ -192,14 +194,16 @@ jobs:
       - name: Validate Cloudflare credentials
         shell: bash
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.cloudflare_api_token }}
+          R2_ACCESS_KEY_ID: ${{ secrets.r2_access_key_id }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.r2_secret_access_key }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.cloudflare_account_id }}
         run: |
           set -euo pipefail
-          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
-            echo "Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID repository secret" >&2
+          if [[ -z "$R2_ACCESS_KEY_ID" || -z "$R2_SECRET_ACCESS_KEY" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "Missing R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY or CLOUDFLARE_ACCOUNT_ID repository secret" >&2
             exit 1
           fi
+          command -v aws >/dev/null
 
       - name: Download released PDF
         if: ${{ steps.metadata.outputs.status == 'active' }}
@@ -291,43 +295,47 @@ jobs:
         if: ${{ steps.metadata.outputs.status == 'active' }}
         shell: bash
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.cloudflare_api_token }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.cloudflare_account_id }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.r2_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.r2_secret_access_key }}
+          AWS_DEFAULT_REGION: auto
           PROJECT_ID: ${{ steps.metadata.outputs.id }}
           PDF_NAME: ${{ needs.build-and-release.outputs.pdf_name }}.pdf
           R2_BUCKET: ${{ inputs.r2_bucket }}
+          R2_ENDPOINT: https://${{ secrets.cloudflare_account_id }}.r2.cloudflarestorage.com
         run: |
           set -euo pipefail
-          prefix="$R2_BUCKET/active/$PROJECT_ID"
-          npx --yes wrangler@4.110.0 r2 object put "$prefix/latest.pdf" \
-            --file="$RUNNER_TEMP/zsf-publish/latest.pdf" \
+          prefix="s3://$R2_BUCKET/active/$PROJECT_ID"
+          aws s3 cp "$RUNNER_TEMP/zsf-publish/latest.pdf" "$prefix/latest.pdf" \
+            --endpoint-url="$R2_ENDPOINT" \
             --content-type=application/pdf \
             --content-disposition="inline; filename=\"$PDF_NAME\"" \
             --cache-control=no-store \
-            --remote
-          npx --yes wrangler@4.110.0 r2 object put "$prefix/latest-source.zip" \
-            --file="$RUNNER_TEMP/zsf-publish/latest-source.zip" \
+            --no-progress
+          aws s3 cp "$RUNNER_TEMP/zsf-publish/latest-source.zip" "$prefix/latest-source.zip" \
+            --endpoint-url="$R2_ENDPOINT" \
             --content-type=application/zip \
             --content-disposition="attachment; filename=\"${PROJECT_ID}-source.zip\"" \
             --cache-control=no-store \
-            --remote
-          npx --yes wrangler@4.110.0 r2 object put "$prefix/manifest.json" \
-            --file="$RUNNER_TEMP/zsf-publish/manifest.json" \
+            --no-progress
+          aws s3 cp "$RUNNER_TEMP/zsf-publish/manifest.json" "$prefix/manifest.json" \
+            --endpoint-url="$R2_ENDPOINT" \
             --content-type=application/json \
             --cache-control=no-store \
-            --remote
+            --no-progress
 
       - name: Remove protected copies after archival
         if: ${{ steps.metadata.outputs.status == 'archive' }}
         shell: bash
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.cloudflare_api_token }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.cloudflare_account_id }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.r2_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.r2_secret_access_key }}
+          AWS_DEFAULT_REGION: auto
           PROJECT_ID: ${{ steps.metadata.outputs.id }}
           R2_BUCKET: ${{ inputs.r2_bucket }}
+          R2_ENDPOINT: https://${{ secrets.cloudflare_account_id }}.r2.cloudflarestorage.com
         run: |
           set -euo pipefail
-          prefix="$R2_BUCKET/active/$PROJECT_ID"
-          npx --yes wrangler@4.110.0 r2 object delete "$prefix/latest.pdf" --remote
-          npx --yes wrangler@4.110.0 r2 object delete "$prefix/latest-source.zip" --remote
-          npx --yes wrangler@4.110.0 r2 object delete "$prefix/manifest.json" --remote
+          prefix="s3://$R2_BUCKET/active/$PROJECT_ID"
+          aws s3 rm "$prefix/latest.pdf" --endpoint-url="$R2_ENDPOINT"
+          aws s3 rm "$prefix/latest-source.zip" --endpoint-url="$R2_ENDPOINT"
+          aws s3 rm "$prefix/manifest.json" --endpoint-url="$R2_ENDPOINT"
