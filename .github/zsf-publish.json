@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "zsf-template",
+  "kind": "template",
+  "title": "ZSF Template",
+  "semesterCode": "fs0000",
+  "semesterLabel": "Template",
+  "status": "template",
+  "githubRepository": "lhliddal/zsf-template-hliddal",
+  "pdfFilename": "template_fs0000_hliddal.pdf"
+}

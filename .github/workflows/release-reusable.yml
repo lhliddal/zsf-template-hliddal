@@ -11,6 +11,21 @@ on:
         description: Exakter Commit, der gebaut und getaggt wird
         required: true
         type: string
+      publish_to_r2:
+        description: Aktuelle PDF und Source-ZIP nach R2 synchronisieren
+        required: false
+        default: false
+        type: boolean
+      r2_bucket:
+        description: Privater R2-Bucket für aktive ZSFs
+        required: false
+        default: garcon-zsf-active
+        type: string
+    secrets:
+      cloudflare_api_token:
+        required: false
+      cloudflare_account_id:
+        required: false
 
 permissions:
   contents: write
@@ -18,6 +33,9 @@ permissions:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    outputs:
+      pdf_name: ${{ steps.pdf.outputs.name }}
+      release_tag: ${{ steps.version.outputs.tag }}
     steps:
       - name: Checkout release commit
         uses: actions/checkout@v4
@@ -125,3 +143,191 @@ jobs:
             --verify-tag \
             --title "$RELEASE_TAG" \
             --generate-notes
+
+  sync-active-downloads:
+    if: ${{ inputs.publish_to_r2 }}
+    needs: build-and-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout published commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.release_sha }}
+
+      - name: Read and validate publish metadata
+        id: metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          metadata=.github/zsf-publish.json
+          jq -e '
+            .schemaVersion == 1 and
+            (.id | type == "string" and test("^[a-z0-9]+(-[a-z0-9]+)*$")) and
+            (.kind == "zsf" or .kind == "template") and
+            (.title | type == "string" and length > 0) and
+            (.semesterCode | type == "string" and test("^(fs|hs)[0-9]{4}$")) and
+            (.semesterLabel | type == "string" and length > 0) and
+            (.status == "active" or .status == "archive" or .status == "template") and
+            (.githubRepository == env.GITHUB_REPOSITORY) and
+            (.pdfFilename | type == "string" and test("^[A-Za-z0-9_.-]+\\.pdf$"))
+          ' "$metadata" >/dev/null
+          echo "id=$(jq -r '.id' "$metadata")" >> "$GITHUB_OUTPUT"
+          echo "status=$(jq -r '.status' "$metadata")" >> "$GITHUB_OUTPUT"
+
+      - name: Validate protected publication boundary
+        if: ${{ steps.metadata.outputs.status == 'active' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          visibility="$(gh repo view "$GITHUB_REPOSITORY" --json visibility --jq .visibility)"
+          if [[ "$visibility" != "PRIVATE" ]]; then
+            echo "status=active requires a private GitHub repository (found: $visibility)" >&2
+            exit 1
+          fi
+
+      - name: Validate Cloudflare credentials
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.cloudflare_api_token }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.cloudflare_account_id }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo "Missing CLOUDFLARE_API_TOKEN or CLOUDFLARE_ACCOUNT_ID repository secret" >&2
+            exit 1
+          fi
+
+      - name: Download released PDF
+        if: ${{ steps.metadata.outputs.status == 'active' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PDF_NAME: ${{ needs.build-and-release.outputs.pdf_name }}
+          RELEASE_TAG: ${{ needs.build-and-release.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          gh release download "$RELEASE_TAG" --pattern "${PDF_NAME}.pdf" --dir "$RUNNER_TEMP"
+
+      - name: Create protected publish bundle
+        if: ${{ steps.metadata.outputs.status == 'active' }}
+        shell: bash
+        env:
+          PDF_NAME: ${{ needs.build-and-release.outputs.pdf_name }}
+          PROJECT_ID: ${{ steps.metadata.outputs.id }}
+        run: |
+          set -euo pipefail
+          required_paths=(README.md main.tex preamble.tex Makefile chapters styles)
+          optional_paths=(graphics Images figures .latexmkrc)
+          archive_paths=()
+
+          for path in "${required_paths[@]}"; do
+            if ! git ls-files --error-unmatch "$path" >/dev/null 2>&1 &&
+               [[ -z "$(git ls-files "$path/**")" ]]; then
+              echo "Required publish path is not tracked: $path" >&2
+              exit 1
+            fi
+            archive_paths+=("$path")
+          done
+
+          for path in "${optional_paths[@]}"; do
+            if git ls-files --error-unmatch "$path" >/dev/null 2>&1 ||
+               [[ -n "$(git ls-files "$path/**")" ]]; then
+              archive_paths+=("$path")
+            fi
+          done
+
+          output="$RUNNER_TEMP/zsf-publish"
+          mkdir -p "$output"
+          cp "$RUNNER_TEMP/${PDF_NAME}.pdf" "$output/latest.pdf"
+          git archive \
+            --format=zip \
+            --prefix="$PROJECT_ID/" \
+            --output="$output/latest-source.zip" \
+            HEAD \
+            -- "${archive_paths[@]}"
+
+          pdf_size="$(wc -c < "$output/latest.pdf" | tr -d ' ')"
+          source_size="$(wc -c < "$output/latest-source.zip" | tr -d ' ')"
+          pdf_sha256="$(sha256sum "$output/latest.pdf" | awk '{print $1}')"
+          source_sha256="$(sha256sum "$output/latest-source.zip" | awk '{print $1}')"
+          published_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          jq -n \
+            --slurpfile project .github/zsf-publish.json \
+            --arg commit "$(git rev-parse HEAD)" \
+            --arg publishedAt "$published_at" \
+            --arg pdfKey "active/$PROJECT_ID/latest.pdf" \
+            --arg sourceKey "active/$PROJECT_ID/latest-source.zip" \
+            --arg pdfSha256 "$pdf_sha256" \
+            --arg sourceSha256 "$source_sha256" \
+            --argjson pdfSize "$pdf_size" \
+            --argjson sourceSize "$source_size" \
+            '{
+              schemaVersion: 1,
+              project: $project[0],
+              revision: {
+                commit: $commit,
+                publishedAt: $publishedAt
+              },
+              artifacts: {
+                pdf: {
+                  key: $pdfKey,
+                  bytes: $pdfSize,
+                  sha256: $pdfSha256
+                },
+                source: {
+                  key: $sourceKey,
+                  bytes: $sourceSize,
+                  sha256: $sourceSha256
+                }
+              }
+            }' > "$output/manifest.json"
+
+      - name: Upload current files to private R2
+        if: ${{ steps.metadata.outputs.status == 'active' }}
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.cloudflare_api_token }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.cloudflare_account_id }}
+          PROJECT_ID: ${{ steps.metadata.outputs.id }}
+          PDF_NAME: ${{ needs.build-and-release.outputs.pdf_name }}.pdf
+          R2_BUCKET: ${{ inputs.r2_bucket }}
+        run: |
+          set -euo pipefail
+          prefix="$R2_BUCKET/active/$PROJECT_ID"
+          npx --yes wrangler@4.110.0 r2 object put "$prefix/latest.pdf" \
+            --file="$RUNNER_TEMP/zsf-publish/latest.pdf" \
+            --content-type=application/pdf \
+            --content-disposition="inline; filename=\"$PDF_NAME\"" \
+            --cache-control=no-store \
+            --remote
+          npx --yes wrangler@4.110.0 r2 object put "$prefix/latest-source.zip" \
+            --file="$RUNNER_TEMP/zsf-publish/latest-source.zip" \
+            --content-type=application/zip \
+            --content-disposition="attachment; filename=\"${PROJECT_ID}-source.zip\"" \
+            --cache-control=no-store \
+            --remote
+          npx --yes wrangler@4.110.0 r2 object put "$prefix/manifest.json" \
+            --file="$RUNNER_TEMP/zsf-publish/manifest.json" \
+            --content-type=application/json \
+            --cache-control=no-store \
+            --remote
+
+      - name: Remove protected copies after archival
+        if: ${{ steps.metadata.outputs.status == 'archive' }}
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.cloudflare_api_token }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.cloudflare_account_id }}
+          PROJECT_ID: ${{ steps.metadata.outputs.id }}
+          R2_BUCKET: ${{ inputs.r2_bucket }}
+        run: |
+          set -euo pipefail
+          prefix="$R2_BUCKET/active/$PROJECT_ID"
+          npx --yes wrangler@4.110.0 r2 object delete "$prefix/latest.pdf" --remote
+          npx --yes wrangler@4.110.0 r2 object delete "$prefix/latest-source.zip" --remote
+          npx --yes wrangler@4.110.0 r2 object delete "$prefix/manifest.json" --remote
