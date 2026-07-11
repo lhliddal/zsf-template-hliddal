@@ -28,4 +28,4 @@ Nutzung, Anpassung und Weitergabe sind willkommen. Bitte die im PDF ausgewiesene
 make build
 ```
 
-Die Quellen liegen in `main.tex`, `preamble.tex`, `chapters/`, `styles/` und den benötigten Grafikordnern. Der Build erzeugt `template_fs0000_hliddal.pdf` im Repository-Root.
+Die Quellen liegen in `main.tex`, `preamble.tex`, `chapters/`, `styles/` und den benötigten Grafikordnern. Der Build erzeugt `template_fs0000_hliddal.pdf` lokal im Repository-Root. Diese Build-Datei wird nicht versioniert; die oben verlinkte PDF im GitHub Release ist die veröffentlichte Fassung.

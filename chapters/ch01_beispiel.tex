@@ -9,15 +9,15 @@
 \StartChapter[ch:beispiel]{Beispielkapitel}
 
 \begin{runintext}
-  Dieses Kapitel demonstriert die im Template verfuegbaren Macros, Boxen
+  Dieses Kapitel demonstriert die im Template verfügbaren Makros, Boxen
   und Listen. Alle Layout-Bausteine kommen aus \texttt{styles/}; Kapitel
   liefern nur \ZSFkeyword{Inhalt}, niemals Layout-Hacks. Siehe
   \texttt{MODULAR\_SYSTEM.md} für die verbindlichen Regeln.
 \end{runintext}
 
-\SubsectionBar{Math-Macros}
+\SubsectionBar[sec:template-math]{Math-Macros}
 
-\begin{formulabox}
+\begin{formulabox}[title={Grundmengen und Operatoren}]
   \[ A \subset \R,\quad z \in \C,\quad n \in \N \]
   \formulasep
   \[ \dd x,\quad \norm{v},\quad \abs{x},\quad \sgn(x),\quad \grad f,\quad \divg \vect{F} \]
@@ -25,8 +25,9 @@
 
 \SubsectionBar{Formel-Box mit Notes}
 
-\textVorBox{Beispielhafte Formel mit erklaerender Vor-Box.}
-\begin{formulabox}
+\textVorBox{Beispielhafte Formel mit erklärender Vor-Box.}
+% Legacy-Optionen bleiben gültig; Analysis-Anhänge nutzen z.B. [breakable].
+\begin{formulabox}[breakable]
   \textVorFormel{Definition:}
   \[ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} \]
   \formulanote{Existenz nur, falls links- und rechtsseitiger Grenzwert übereinstimmen.}
@@ -35,7 +36,7 @@
 
 \SubsectionBar{Definitions-, Tabellen-, Figur- und Warn-Box}
 
-% defbox: Definitionen, Saetze, Lemmas (unbreakable, mit Titel-Lasche).
+% defbox: Definitionen, Sätze, Lemmas (unbreakable, mit Titel-Lasche).
 \begin{defbox}[Definition]
   Eine Funktion $f: A \to B$ heisst \ZSFkeyword{injektiv}, wenn aus
   $f(x_1) = f(x_2)$ stets $x_1 = x_2$ folgt.
@@ -54,7 +55,7 @@
 % warnbox: rote Warnung für Stolperfallen / häufige Fehler.
 \begin{warnbox}[Stolperfalle]
   Achte auf den \ZSFkeyword{Definitionsbereich} — Division durch Null oder
-  negative Argumente unter Wurzeln werfen typische Anfangerfehler.
+  negative Argumente unter Wurzeln führen zu typischen Anfängerfehlern.
 \end{warnbox}
 
 \SubsectionBar{Aussagen, Verfahren, Listen}
@@ -102,12 +103,12 @@
   $h$ & $6{,}626 \cdot 10^{-34}$ & \si{J\cdot s}
 \end{valuegrid}
 
-% splitbox: Bild + Text nebeneinander. Argument = linke Spaltenbreite (0..1).
-% Linke Seite vor \tcblower, rechte Seite nach \tcblower.
-\begin{splitbox}[0.4]
+% splitbox: Bild + Text nebeneinander. Erstes Argument = linke Spaltenbreite,
+% zweites Argument = optionale tcolorbox-Schlüssel; hier vertikal zentriert.
+\begin{splitbox}[0.4][sidebyside align=center]
   \centering\textit{[hier \texttt{\textbackslash{}ZSFfig\{path\}} einsetzen]}
   \tcblower
-  Kurzer erklaerender Text neben einer Abbildung. Spart vertikalen Platz
+  Kurzer erklärender Text neben einer Abbildung. Spart vertikalen Platz
   bei kleinen Bildern.
 \end{splitbox}
 

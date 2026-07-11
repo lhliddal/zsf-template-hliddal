@@ -10,7 +10,7 @@
 %
 % Herkunft: konsolidiert aus zsf-linalg-fs2026/styles/65_index.tex.
 %
-% Index-Einträge verweisen auf ABSCHNITTSNUMMERN ("6.2"), nicht auf
+% Index-Einträge verweisen auf ABSCHNITTSNUMMERN ("6.2" / "6.2.1"), nicht auf
 % Seitenzahlen — konsistent zum \ZSFref-Wegweiser-Prinzip. Jede Nummer
 % wird in der Palette-Farbe des Zielkapitels gerendert. Der Farbnamen-Lookup
 % nutzt denselben Modulo wie \StartChapter.
@@ -41,10 +41,12 @@
 % Sofort-Writer
 % ------------------------------------------------------------
 \makeatletter
-% Aktuelle Abschnittsnummer einfrieren; vor der ersten \SubsectionBar
-% eines Kapitels (subsection=0) Fallback auf die Kapitelnummer.
+% Tiefste aktuelle Abschnittsnummer einfrieren; vor der ersten
+% \SubsectionBar eines Kapitels Fallback auf die Kapitelnummer.
 \newcommand{\ZSF@idxnumnow}{%
-  \ifnum\value{subsection}>0 \thesubsection\else\thesection\fi}
+  \ifnum\value{subsubsection}>0 \thesubsubsection\else
+    \ifnum\value{subsection}>0 \thesubsection\else\thesection\fi
+  \fi}
 % #1 = Eintrag (ggf. sort@display), #2 = Encap (ZSFidxnum | see{...})
 \newcommand{\ZSF@writeidx}[2]{%
   \@ifundefined{@indexfile}{}{%

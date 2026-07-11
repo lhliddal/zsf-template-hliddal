@@ -311,11 +311,23 @@
 % Formula-Box + Longformula
 % ------------------------------------------------------------
 \newenvironment{longformula}{\[\begin{aligned}}{\end{aligned}\]}
-\newtcolorbox{formulabox}[1][]{
+% Das optionale Argument bleibt eine tcolorbox-Optionsliste. Dadurch bleiben
+% bestehende Aufrufe wie \begin{formulabox}[breakable] kompatibel; ein Titel
+% wird explizit als \begin{formulabox}[title={Titel}] gesetzt.
+\tcbset{zsfformulastyle/.style={
   enhanced jigsaw,
   colback=\FormulaboxBackColor,
+  colbacktitle=\FormulaboxBackColor,
   colframe=black,
+  coltitle=TextVorBoxColor,
   boxrule=0.5pt,
+  titlerule=0pt,
+  fonttitle=\ZSFfontBoxTitle,
+  halign title=center,
+  lefttitle=\ZSFspaceS,
+  righttitle=\ZSFspaceS,
+  toptitle=\ZSFspaceXS,
+  bottomtitle=0pt,
   left=\ZSFspaceS,
   right=\ZSFspaceS,
   top=\ZSFspaceS,
@@ -326,8 +338,8 @@
   before upper={\parskip=\ZSFspaceS\centering},
   after upper={\par},
   middle=\ZSFspaceSep,
-  #1
-}
+}}
+\newtcolorbox{formulabox}[1][]{zsfformulastyle,#1}
 
 % Formel-Note (klein, kursiv, dezent) — unter oder über Formeln
 \newcommand{\formulanote}[1]{%
@@ -372,47 +384,58 @@
   \fi
 }
 
-% \ZSFfig{pfad}{Titel}{Caption} — figbox mit Bild + optionaler Caption.
-% Bild wird auf min(Spaltenbreite, ZSFfigMaxHeight) skaliert.
-\newcommand{\ZSFfig}[3]{%
-  \begin{figbox}[{#2}]%
+% \ZSFfig[breite]{pfad}{Titel}{Caption} — figbox mit Bild + optionaler Caption.
+% Ohne [breite]: min(Spaltenbreite, ZSFfigMaxHeight). Mit einem Anteil von
+% \linewidth (z.B. [0.7]): exakte lokale Breite ohne Höhen-Cap.
+\newcommand{\ZSFfig}[4][]{%
+  \begin{figbox}[{#3}]%
     \centering
-    \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,keepaspectratio]{#1}%
-    \ZSFfigcaption{#3}%
+    \if\relax\detokenize{#1}\relax
+      \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,keepaspectratio]{#2}%
+    \else
+      \includegraphics[width=\dimexpr#1\linewidth\relax,keepaspectratio]{#2}%
+    \fi
+    \ZSFfigcaption{#4}%
   \end{figbox}%
 }
 
-% \ZSFfigside{pfad}{Titel}{Inhalt rechts} — Bild links (~30%), Inhalt rechts.
-\newlength{\ZSFfigsideImgWidth}\setlength{\ZSFfigsideImgWidth}{0.30\linewidth}
-\newlength{\ZSFfigsideTextWidth}\setlength{\ZSFfigsideTextWidth}{0.66\linewidth}
-\newcommand{\ZSFfigside}[3]{%
-  \begin{figbox}[{#2}]%
+% \ZSFfigside[Bildanteil]{pfad}{Titel}{Inhalt rechts} — Bild links,
+% Inhalt rechts. Der Anteil wird erst am Einsatzort gegen die dortige
+% \linewidth ausgewertet; Standard sind 30%.
+\newcommand{\ZSFfigside}[4][0.30]{%
+  \begin{figbox}[{#3}]%
     \noindent
-    \begin{minipage}[c]{\ZSFfigsideImgWidth}%
+    \begin{minipage}[c]{#1\linewidth}%
       \centering
-      \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,keepaspectratio]{#1}%
+      \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,keepaspectratio]{#2}%
     \end{minipage}%
     \hfill
-    \begin{minipage}[c]{\ZSFfigsideTextWidth}%
+    \begin{minipage}[c]{\dimexpr0.96\linewidth-#1\linewidth\relax}%
       \raggedright
-      #3%
+      #4%
     \end{minipage}%
     \par
   \end{figbox}%
 }
 
-% Side-by-side-Layout (Bild + Text in gleicher Linie) — sehr platzsparend
-\newtcolorbox{splitbox}[1][0.3]{
-  blankest,
-  sidebyside,
-  sidebyside align=top,
-  sidebyside gap=\ZSFspaceM,
-  lefthand width=#1\linewidth,
-  lower separated=false,
-  before={\ZSFConsumeAfterSubsectionBar},
-  before skip=\ZSFspaceS,
-  after skip=\ZSFspaceS,
-  boxsep=0pt, left=0pt, right=0pt, top=0pt, bottom=0pt
+% Side-by-side-Layout (Bild + Text in gleicher Linie). Das zweite optionale
+% Argument nimmt tcolorbox-Schlüssel auf, z.B. [sidebyside align=center].
+\NewDocumentEnvironment{splitbox}{O{0.3} O{}}{%
+  \begin{tcolorbox}[
+    blankest,
+    sidebyside,
+    sidebyside align=top,
+    sidebyside gap=\ZSFspaceM,
+    lefthand width=#1\linewidth,
+    lower separated=false,
+    before={\ZSFConsumeAfterSubsectionBar},
+    before skip=\ZSFspaceS,
+    after skip=\ZSFspaceS,
+    boxsep=0pt, left=0pt, right=0pt, top=0pt, bottom=0pt,
+    #2
+  ]%
+}{%
+  \end{tcolorbox}%
 }
 
 % ------------------------------------------------------------

@@ -17,7 +17,7 @@ LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_
 -include Makefile.local
 
 .PHONY: build check clean all \
-        check-main-full check-chapters check-tables check-refs check-index \
+        check-main-full check-chapters check-tables check-refs check-index check-init-project \
         check-root-clean check-pdf-identity check-guardrails lint \
         sync-rules check-rules check-rule-authorship \
         release-proof print-pdf-basename
@@ -56,6 +56,11 @@ check-refs:
 
 check-index:
 	@bash tests/check_index.sh
+
+# Template-spezifischer, separater E2E-Test: initialisiert und baut eine
+# temporäre Kopie, ohne den normalen Fachprojekt-Check zu verteuern.
+check-init-project:
+	@bash tests/check_init_project.sh
 
 check-root-clean:
 	@PDF_BASENAME="$(PDF_BASENAME)" bash tests/check_root_clean.sh

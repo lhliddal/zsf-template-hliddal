@@ -60,15 +60,12 @@
 %   * sonst die EINE Schlüsselaussage -> \ZSFhl
 \newcommand{\ZSFhl}[1]{\underline{\textbf{#1}}}
 
-% \ZSFref{label} — kompakter interner Querverweis, gerendert als "(→ 6.2)".
-% Verwendung:
-%   * am Ende eines \ProcStep, wenn der Schritt ein Verfahren delegiert,
-%     das in einem ANDEREN Kapitel erklaert wird.
-%   * NICHT für Delegationen im selben Kapitel und nicht für elementare
-%     Standardoperationen — sparsam einsetzen.
+% Papierorientierte Referenzrollen:
+%   * \ZSFref{label}: echter Fernsprung mit Abschnitt und physischer Seite.
+%   * \ZSFsectionref{label}: kompakte Zielnummer für lokale Router/Tabellen.
+%   * \ZSFseealso{label}{Titel}: benannter lokaler Hinweis.
 % Ziel-Label via optionales Argument von \SubsubsectionBar/\SubsectionBar/\StartChapter setzen:
 %   \SubsectionBar[sec:matrix-inverse]{Inverse}
-% \ref* (hyperref) unterdrueckt den Link, Nummern bleiben automatisch korrekt.
 % Farbe = Palette-Farbe des ZIELkapitels (Wegweiser-Prinzip): wird automatisch
 % aus der Kapitelnummer der Referenz abgeleitet ("6.6" -> ChapterColor6).
 % Bei Kapiteln jenseits der Palette wird derselbe Modulo-Lookup wie bei
@@ -92,9 +89,17 @@
 \newcommand{\ZSFref}[1]{%
   \begingroup
   \ZSF@refComputeTargetColor{#1}%
-  {\ZSFfontNote\upshape\bfseries\color{\ZSF@refTargetColor}($\rightarrow$\,\ref*{#1})}%
+  \hyperref[#1]{{\ZSFfontNote\upshape\bfseries\color{\ZSF@refTargetColor}%
+    ($\rightarrow$\,\ref*{#1}\enspace\textperiodcentered\enspace S.\,\pageref*{#1})}}%
   \endgroup
 }
+\newcommand{\ZSFsectionref}[1]{%
+  \begingroup
+  \ZSF@refComputeTargetColor{#1}%
+  \hyperref[#1]{{\upshape\bfseries\color{\ZSF@refTargetColor}\ref*{#1}}}%
+  \endgroup
+}
+\newcommand{\ZSFseealso}[2]{\enspace{\ZSFfontTable\sffamily\upshape siehe #2~\ZSFsectionref{#1}}}
 \makeatother
 
 \newcommand{\ZSFconclusion}[1]{%
