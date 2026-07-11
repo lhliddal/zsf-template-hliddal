@@ -61,9 +61,8 @@
 \newcommand{\ZSFhl}[1]{\underline{\textbf{#1}}}
 
 % Papierorientierte Referenzrollen:
-%   * \ZSFref{label}: echter Fernsprung mit Abschnitt und physischer Seite.
+%   * \ZSFref{label}: echter Fernsprung mit farbiger Abschnittsnummer.
 %   * \ZSFsectionref{label}: kompakte Zielnummer für lokale Router/Tabellen.
-%   * \ZSFseealso{label}{Titel}: benannter lokaler Hinweis.
 % Ziel-Label via optionales Argument von \SubsubsectionBar/\SubsectionBar/\StartChapter setzen:
 %   \SubsectionBar[sec:matrix-inverse]{Inverse}
 % Farbe = Palette-Farbe des ZIELkapitels (Wegweiser-Prinzip): wird automatisch
@@ -89,8 +88,7 @@
 \newcommand{\ZSFref}[1]{%
   \begingroup
   \ZSF@refComputeTargetColor{#1}%
-  \hyperref[#1]{{\ZSFfontNote\upshape\bfseries\color{\ZSF@refTargetColor}%
-    ($\rightarrow$\,\ref*{#1}\enspace\textperiodcentered\enspace S.\,\pageref*{#1})}}%
+  \hyperref[#1]{{\ZSFfontNote\upshape\bfseries\color{\ZSF@refTargetColor}($\rightarrow$\,\ref*{#1})}}%
   \endgroup
 }
 \newcommand{\ZSFsectionref}[1]{%
@@ -99,7 +97,6 @@
   \hyperref[#1]{{\upshape\bfseries\color{\ZSF@refTargetColor}\ref*{#1}}}%
   \endgroup
 }
-\newcommand{\ZSFseealso}[2]{\enspace{\ZSFfontTable\sffamily\upshape siehe #2~\ZSFsectionref{#1}}}
 \makeatother
 
 \newcommand{\ZSFconclusion}[1]{%
