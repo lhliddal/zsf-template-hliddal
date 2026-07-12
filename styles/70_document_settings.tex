@@ -7,9 +7,13 @@
 % unabhängig von der aktiven Kapitelfarbe.
 \hypersetup{colorlinks=true, linkcolor=ChapterColor0, urlcolor=ChapterColor4}
 
-% Seitenzahl unten rechts (overlay, layout-neutral)
+% Öffentliche GitHub-Release-Version unten links, Seitenzahl unten rechts
+% (overlay, layout-neutral). \ZSFReleaseID wird im Release-Workflow gesetzt.
 \AddToShipoutPictureFG{%
   \AtPageLowerLeft{%
+    \put(2mm,1mm){%
+      \makebox(0,0)[lb]{\sffamily\bfseries\fontsize{9.5pt}{9.5pt}\selectfont\color{black}\ZSFReleaseID}%
+    }%
     \put(\dimexpr\paperwidth-2mm\relax,1mm){%
       \makebox(0,0)[rb]{\sffamily\bfseries\fontsize{9.5pt}{9.5pt}\selectfont\color{black}\thepage}%
     }%
