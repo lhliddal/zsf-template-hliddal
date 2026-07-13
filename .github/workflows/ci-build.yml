@@ -1,8 +1,6 @@
 name: CI Build
 
 on:
-  push:
-    branches: [main]
   pull_request:
     branches: [main]
 
@@ -24,11 +22,10 @@ jobs:
             poppler-utils
       # Hinweis: der Verifier `make check` läuft NICHT in CI, weil das
       # Harness (tests/ tools/ rules/) bewusst git-excluded ist (.git/info/exclude)
-      # und in einem frischen Clone fehlt. `make check` ist der LOKALE Gate
-      # (+ pre-commit). CI baut nur das PDF. Um check CI-fähig zu machen,
-      # müsste das Harness versioniert/geteilt werden (Phase 3).
+      # und in einem frischen Clone fehlt. Dieser Workflow baut nur PRs;
+      # main-Pushes werden genau einmal im Release-Workflow gebaut.
       - name: Build PDF
-        run: make build
+        run: make SYNCTEX=0 build
       - name: Resolve PDF name
         id: pdf
         run: echo "name=$(make -s print-pdf-basename)" >> "$GITHUB_OUTPUT"

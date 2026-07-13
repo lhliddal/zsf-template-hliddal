@@ -111,6 +111,7 @@ jobs:
             RELEASE_ID="$RELEASE_TAG" \
             BUILD_STAMP="$(date -u +%Y%m%dT%H%M%SZ)" \
             GIT_COMMIT="${RELEASE_SHA::7}" \
+            SYNCTEX=0 \
             build
           make release-proof
 

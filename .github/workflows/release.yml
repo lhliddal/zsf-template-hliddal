@@ -1,11 +1,7 @@
 name: Release PDF
 
 on:
-  workflow_run:
-    workflows:
-      - CI Build
-    types:
-      - completed
+  push:
     branches:
       - main
   workflow_dispatch:
@@ -25,15 +21,11 @@ permissions:
 
 concurrency:
   group: release-${{ github.repository }}
-  cancel-in-progress: false
+  queue: max
 
 jobs:
   release:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.conclusion == 'success')
     uses: lhliddal/zsf-template-hliddal/.github/workflows/release-reusable.yml@main
     with:
       bump: ${{ github.event_name == 'workflow_dispatch' && inputs.bump || 'patch' }}
-      release_sha: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      release_sha: ${{ github.sha }}

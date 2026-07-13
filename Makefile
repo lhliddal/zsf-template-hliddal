@@ -5,6 +5,12 @@ BUILD_DIR := build
 PDF_BASENAME ?= template_fs0000_hliddal
 OUTPUT_PDF := $(PDF_BASENAME).pdf
 OUTPUT_SYNC := $(PDF_BASENAME).synctex.gz
+SYNCTEX ?= 1
+LATEXMK_FORCE ?=
+LATEXMK_FLAGS := -interaction=nonstopmode -file-line-error -pdf
+ifeq ($(SYNCTEX),1)
+LATEXMK_FLAGS += -synctex=1
+endif
 
 # Identity (Forks überschreiben diese; müssen zu styles/75_pdf_identity.tex passen).
 SUBJECT_TITLE ?= ZSF Template
@@ -16,7 +22,7 @@ LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_
 # Optional local-only automation; Makefile.local is gitignored.
 -include Makefile.local
 
-.PHONY: build check clean all \
+.PHONY: build rebuild check clean all \
         check-main-full check-chapters check-tables check-refs check-index check-init-project \
         check-root-clean check-pdf-identity check-guardrails lint \
         sync-rules check-rules check-rule-authorship \
@@ -24,11 +30,14 @@ LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_
 
 build:
 	INDEXSTYLE="$(CURDIR)/styles:" \
-	latexmk -g -synctex=1 -interaction=nonstopmode -file-line-error -pdf -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
+	latexmk $(LATEXMK_FORCE) $(LATEXMK_FLAGS) -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
 		-e '$$makeindex = q{makeindex -r -s zsfindex.ist %O -o %D %S};' \
 		-pdflatex="pdflatex %O '$(LATEX_DEFS)\input{%S}'" $(MAIN)
 	@cp $(BUILD_DIR)/main.pdf "$(OUTPUT_PDF)"
-	@if [ -f "$(BUILD_DIR)/main.synctex.gz" ]; then cp "$(BUILD_DIR)/main.synctex.gz" "$(OUTPUT_SYNC)"; fi
+	@if [ "$(SYNCTEX)" = "1" ] && [ -f "$(BUILD_DIR)/main.synctex.gz" ]; then cp "$(BUILD_DIR)/main.synctex.gz" "$(OUTPUT_SYNC)"; fi
+
+rebuild: LATEXMK_FORCE := -g
+rebuild: build
 
 # --- Verifier ----------------------------------------------------------
 # 'make check' ist das lokale Feedback-Loop: Struktur-, Tabellen-, Ref-,
