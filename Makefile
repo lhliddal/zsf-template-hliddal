@@ -23,7 +23,7 @@ LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_
 -include Makefile.local
 
 .PHONY: build rebuild check clean all \
-        check-main-full check-chapters check-tables check-refs check-index check-init-project \
+        check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules check-init-project \
         check-root-clean check-pdf-identity check-guardrails lint \
         sync-rules check-rules check-rule-authorship \
         release-proof print-pdf-basename
@@ -41,12 +41,13 @@ rebuild: build
 
 # --- Verifier ----------------------------------------------------------
 # 'make check' ist das lokale Feedback-Loop: Struktur-, Tabellen-, Ref-,
-# Index-, Root-, PDF-Identity-, Guardrail-, Lint- und Rule-Drift-Prüfung.
+# Index-, Style-Token-, Root-, PDF-Identity-, Guardrail-, Lint- und
+# Rule-Drift-Prüfung.
 # check-pdf-identity und die .ind-Prüfungen brauchen einen vorherigen Build
 # (also: `make build && make check`).
 # Läuft NICHT in CI: tests/ tools/ rules/ sind git-excluded und fehlen im Clone.
 # 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
-check: check-main-full check-chapters check-tables check-refs check-index \
+check: check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
        check-root-clean check-pdf-identity check-guardrails lint \
        check-rule-authorship check-rules
 	@echo "make check: alle Prüfungen bestanden."
@@ -65,6 +66,12 @@ check-refs:
 
 check-index:
 	@bash tests/check_index.sh
+
+check-styles:
+	@bash tests/check_style_tokens.sh
+
+check-optional-modules:
+	@bash tests/check_optional_modules.sh
 
 # Template-spezifischer, separater E2E-Test: initialisiert und baut eine
 # temporäre Kopie, ohne den normalen Fachprojekt-Check zu verteuern.

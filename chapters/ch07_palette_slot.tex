@@ -1,4 +1,63 @@
-% Palette-Demo: zeigt ChapterColor7.
-\StartChapter{Palette Slot 7}
+% Living Showcase: optionale Code-Module (Palette Slot 7).
+\StartChapterOnNewColumn[ch:code]{Code und Kommentare}
 
-\input{chapters/_palette_demo_content}
+\SubsectionBar[sec:code-listing]{CodeExpert-Listing}
+\ZSFindex{Code-Listing}
+
+\begin{codebox}[Binäre Suche\ZSFTitleTag{codebox}]
+\begin{lstlisting}[style=CodeExpert]
+def binary_search(values, target):
+    lo, hi = 0, len(values) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if values[mid] == target:
+            return mid
+        if values[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid - 1
+    return -1
+\end{lstlisting}
+\end{codebox}
+
+\SubsectionBar[sec:code-split]{Teilbare Code-Gruppe}
+
+\begin{codeboxfirst}
+\begin{lstlisting}[style=CodeExpert]
+data = [2, 5, 8, 13]
+\end{lstlisting}
+\end{codeboxfirst}
+\begin{codeboxmid}
+\begin{lstlisting}[style=CodeExpert]
+position = binary_search(data, 8)
+\end{lstlisting}
+\end{codeboxmid}
+\begin{codeboxlast}
+\begin{lstlisting}[style=CodeExpert]
+print(position)  # 2
+\end{lstlisting}
+\end{codeboxlast}
+
+\SubsectionBar[sec:code-comments]{Smarte Zeilenkommentare}
+\ZSFindex{Code-Kommentar}
+
+\begin{statementbox}[Automatische Platzierung\ZSFTitleTag{CodeLine}]
+  \ttfamily
+  \CodeLine{result = values[mid]}[kurzer Kommentar]\\
+  \CodeLine{very_long_result_name = values[mid]}[zu breit: Kommentar steht darüber]\\
+  \CodeLine{limit = 10}\InlineComment{explizit rechts}\\
+  \OverlineComment{explizit vorangestellter Kommentar}
+  \CodeLine{return result}
+\end{statementbox}
+
+\begin{codebox}
+\begin{lstlisting}[style=CodeExpert]
+# codebox funktioniert auch ohne Titel
+active = True
+\end{lstlisting}
+\end{codebox}
+
+\begin{factlist}
+  \ZSFFact{Schwelle}{SetCodeCommentThreshold erzwingt früheren Umbruch.}
+  \ZSFFact{Reset}{ResetCodeCommentThreshold stellt den Standard wieder her.}
+\end{factlist}

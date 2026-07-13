@@ -1,119 +1,39 @@
-% ============================================================
-% ch01_beispiel.tex — Living Documentation
-% ------------------------------------------------------------
-% Zeigt jede öffentliche Macro/Box im Template einmal mit Mini-Beispiel.
-% Beim Kopieren des Templates dieses Kapitel als Referenz behalten oder
-% durch echte Inhalte ersetzen.
-% ============================================================
+% Living Showcase: grundlegende Aussagen- und Hinweisboxen (Palette Slot 1).
+\StartChapterOnNewColumn[ch:boxes]{Aussagen und Hinweise}
 
-\StartChapter[ch:beispiel]{Beispielkapitel}
+\SubsectionBar[sec:box-core]{Titelboxen}
+\ZSFindex{Definition}
+\ZSFindex{Aussage}
 
 \begin{runintext}
-  Dieses Kapitel demonstriert die im Template verfügbaren Makros, Boxen
-  und Listen. Alle Layout-Bausteine kommen aus \texttt{styles/}; Kapitel
-  liefern nur \ZSFkeyword{Inhalt}, niemals Layout-Hacks. Siehe
-  \texttt{MODULAR\_SYSTEM.md} für die verbindlichen Regeln.
+  \ZSFkeyword*{runintext} ist der ruhige Fliesstext-Baustein zwischen
+  strukturierten Elementen. Er übernimmt automatisch die Lesbarkeitsregeln
+  für schmale Spalten.
 \end{runintext}
 
-\SubsectionBar[sec:template-math]{Math-Macros}
-
-\begin{formulabox}[title={Grundmengen und Operatoren}]
-  \[ A \subset \R,\quad z \in \C,\quad n \in \N \]
-  \formulasep
-  \[ \dd x,\quad \norm{v},\quad \abs{x},\quad \sgn(x),\quad \grad f,\quad \divg \vect{F} \]
-\end{formulabox}
-
-\SubsectionBar{Formel-Box mit Notes}
-
-\textVorBox{Beispielhafte Formel mit erklärender Vor-Box.}
-% Legacy-Optionen bleiben gültig; Analysis-Anhänge nutzen z.B. [breakable].
-\begin{formulabox}[breakable]
-  \textVorFormel{Definition:}
-  \[ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} \]
-  \formulanote{Existenz nur, falls links- und rechtsseitiger Grenzwert übereinstimmen.}
-\end{formulabox}
-\textNachBox{Folgerung: Differenzierbarkeit impliziert Stetigkeit.}
-
-\SubsectionBar{Definitions-, Tabellen-, Figur- und Warn-Box}
-
-% defbox: Definitionen, Sätze, Lemmas (unbreakable, mit Titel-Lasche).
-\begin{defbox}[Definition]
-  Eine Funktion $f: A \to B$ heisst \ZSFkeyword{injektiv}, wenn aus
-  $f(x_1) = f(x_2)$ stets $x_1 = x_2$ folgt.
+\begin{defbox}[Injektive Abbildung\ZSFTitleTag{defbox}]
+  Eine Abbildung $f\colon A\to B$ heisst
+  \ZSFkeyword[Injektivitat@Injektivität]{injektiv}, wenn
+  $f(x_1)=f(x_2)$ stets $x_1=x_2$ impliziert.
+  \ZSFhl{Gleiche Bilder erzwingen gleiche Urbilder.}
 \end{defbox}
 
-% tablebox: Wrapper für ZSFtable — niemals \tabular oder \tabularx in Kapiteln.
-\begin{tablebox}[Wertetabelle]
-  \begin{ZSFtable}{Y{0.6} Y{1.4} Y{1.0}}
-    \ZSFheaderRow \ZSFhead{Symbol} & \ZSFhead{Bedeutung} & \ZSFhead{Einheit} \\
-    $m$ & Masse & \si{kg} \\
-    $v$ & Geschwindigkeit & \si{m/s} \\
-    $E$ & Energie & \si{J}
-  \end{ZSFtable}
-\end{tablebox}
-
-% warnbox: rote Warnung für Stolperfallen / häufige Fehler.
-\begin{warnbox}[Stolperfalle]
-  Achte auf den \ZSFkeyword{Definitionsbereich} — Division durch Null oder
-  negative Argumente unter Wurzeln führen zu typischen Anfängerfehlern.
-\end{warnbox}
-
-\SubsectionBar{Aussagen, Verfahren, Listen}
-
-% statementbox: kurze, eigenständige Aussage (Satz, Bemerkung) mit Farbbalken.
-\begin{statementbox}[Satz]
-  Jede stetige Funktion auf einem kompakten Intervall nimmt Maximum und
-  Minimum an.
+\begin{statementbox}[Extremwertsatz\ZSFTitleTag{statementbox}]
+  Jede stetige Funktion auf einem kompakten Intervall nimmt ein Maximum und
+  ein Minimum an.
 \end{statementbox}
 
-% procedure: nummerierte Schrittfolge — \ProcStep{Lead}{Beschreibung}.
-\begin{procedure}[Vorgehen]
-  \ProcStep{Definitionsbereich prüfen}{Pole, Sprungstellen, Ränder notieren.}
-  \ProcStep{Ableitung berechnen}{$f'$ bilden und Nullstellen bestimmen.}
-  \ProcStep{Vorzeichen testen}{Monotonie und Extrema klassifizieren.}
-\end{procedure}
+\begin{warnbox}[Definitionsbereich\ZSFTitleTag{warnbox}]
+  \ZSFindex{Warnung}
+  \ZSFindexsee{Stolperfalle}{Warnung}
+  Vor dem Umformen Nullstellen von Nennern und negative Radikanden prüfen.
+  \ZSFdanger{Nicht blind kürzen.}
+\end{warnbox}
 
-% factlist: rahmenlose Faktenliste — \ZSFFact{Lead}{Beschreibung}.
-\begin{factlist}
-  \ZSFFact{Konvergenz}{Notwendig: Folgenglieder werden beliebig klein.}
-  \ZSFFact{Monotonie}{Hinreichend zusammen mit Beschränktheit.}
-\end{factlist}
+\SubsubsectionBar[sec:box-hierarchy]{Dritte Lookup-Ebene}
+\ZSFindex{Subsubsection}
 
-% propertylist: factlist innerhalb einer statementbox (mit Titel + Rahmen).
-\begin{propertylist}[Eigenschaften stetiger Funktionen]
-  \ZSFFact{Beschränktheit}{Auf kompaktem Intervall stets beschränkt.}
-  \ZSFFact{Zwischenwertsatz}{Nimmt jeden Wert zwischen Rand-Werten an.}
-\end{propertylist}
-
-\SubsectionBar{Goal-System (Bedingung -- Umformung -- Ziel)}
-
-\begin{formulabox}
-  \ZSFDerivationCase{$x > 0$}{\sqrt{x^2}}{x}
-  \formulasep
-  \ZSFDerivationCase{$x < 0$}{\sqrt{x^2}}{-x}
-\end{formulabox}
-
-\SubsectionBar{Valuegrid, Splitbox und Inline-Marker}
-
-% valuegrid: kompakte Wertetabelle ohne tablebox-Overhead.
-\begin{valuegrid}{3}[Wichtige Werte]
-  Konstante & Wert & Einheit \\
-  $g$ & $9{,}81$ & \si{m/s^2} \\
-  $c$ & $2{,}998 \cdot 10^8$ & \si{m/s} \\
-  $h$ & $6{,}626 \cdot 10^{-34}$ & \si{J\cdot s}
-\end{valuegrid}
-
-% splitbox: Bild + Text nebeneinander. Erstes Argument = linke Spaltenbreite,
-% zweites Argument = optionale tcolorbox-Schlüssel; hier vertikal zentriert.
-\begin{splitbox}[0.4][sidebyside align=center]
-  \centering\textit{[hier \texttt{\textbackslash{}ZSFfig\{path\}} einsetzen]}
-  \tcblower
-  Kurzer erklärender Text neben einer Abbildung. Spart vertikalen Platz
-  bei kleinen Bildern.
-\end{splitbox}
-
-\begin{runintext}
-  Inline-Hinweise: \ZSFdanger{Achtung Vorzeichen} und das
-  \ZSFkeyword{Schlagwort}-System für Fachbegriffe. Mit
-  \ZSFconclusion{Schlussfolgerungen werden so eingeleitet.}
-\end{runintext}
+\begin{statementbox}
+  Die Subsubsection ist für echte fachliche Tiefe reserviert; diese Box zeigt
+  zugleich die titellose Variante von \ZSFkeyword*{statementbox}.
+\end{statementbox}

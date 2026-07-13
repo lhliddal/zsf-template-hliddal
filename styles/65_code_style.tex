@@ -2,8 +2,8 @@
 % 65_code_style.tex — OPTIONALES Code-Listing-Modul (CodeExpert)
 % ============================================================
 % Opt-in: in preamble.tex einkommentieren für code-lastige
-% Fächer (Informatik). Voraussetzungen (aus 00_packages.tex):
-%   - listings + \tcbuselibrary{listings}
+% Fächer (Informatik). Das Modul lädt seine optionale Abhängigkeit
+% listings samt tcolorbox-Listings-Library selbst.
 % Farben (ce_*, code_*) aus 40_colors_structure.tex,
 % Längen (\ZSFcode*) aus 30_layout_spacing.tex,
 % Box-Stile (zsftitlebox, \BoxFrameColor) aus 60_boxes.tex.
@@ -21,6 +21,10 @@
 % Herkunft: konsolidiert aus zsf-informatik2-fs2026
 % (styles/65_code_style.tex + Code-Container aus styles/60_boxes.tex).
 % ============================================================
+
+\RequirePackage{listings}
+\tcbuselibrary{listings}
+
 % -------------------------
 % CodeExpert Listings Style
 % -------------------------
@@ -92,7 +96,7 @@
   breakable=false,
   colback=white,
   colframe=\BoxFrameColor,
-  leftrule=0.5pt, rightrule=0.5pt,
+  leftrule=\ZSFboxRuleWidth, rightrule=\ZSFboxRuleWidth,
   toprule=0pt, bottomrule=0pt,
   arc=0pt, outer arc=0pt,
   boxsep=0pt,
@@ -103,8 +107,8 @@
 }}
 \newtcolorbox{codeboxfirst}{
   zsf@codebox@split@base,
-  toprule=0.5pt,
-  arc=1pt, outer arc=1pt,
+  toprule=\ZSFboxRuleWidth,
+  arc=\ZSFboxArc, outer arc=\ZSFboxArc,
   sharp corners=south,
   before skip=\ZSFBoxBeforeSkip,
   before={\ZSFConsumeAfterSubsectionBar},
@@ -114,8 +118,8 @@
 }
 \newtcolorbox{codeboxlast}{
   zsf@codebox@split@base,
-  bottomrule=0.5pt,
-  arc=1pt, outer arc=1pt,
+  bottomrule=\ZSFboxRuleWidth,
+  arc=\ZSFboxArc, outer arc=\ZSFboxArc,
   sharp corners=north,
   after skip=\ZSFspaceS,
 }

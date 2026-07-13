@@ -75,9 +75,9 @@
   \penalty-500
   \begin{zsftitleheader}
     \sffamily
-    {\color{ChapterColor0Text}\fontsize{11bp}{12.5bp}\bfseries\selectfont #1\par}%
-    \vspace{1pt}%
-    {\color{ChapterColor0Text!88}\fontsize{6.7bp}{7.5bp}\itshape\selectfont von~#2\par}%
+    {\color{ChapterColor0Text}\ZSFfontTitleHeader #1\par}%
+    \vspace{\ZSFspaceXS}%
+    {\color{\TitleHeaderBylineColor}\ZSFfontNote von~#2\par}%
   \end{zsftitleheader}
   \penalty10000
 }
@@ -216,7 +216,7 @@
   colbacktitle=\BoxTitleColor,
   colframe=\BoxTitleColor,
   coltitle=\BoxTitleTextColor,
-  boxrule=0.5pt,
+  boxrule=\ZSFboxRuleWidth,
   titlerule=0pt,
   boxsep=0pt,
   arc=\ZSFboxArc, outer arc=\ZSFboxArc,
@@ -236,7 +236,7 @@
   colbacktitle=\BoxTitleColor,
   colframe=\BoxFrameColor,
   coltitle=\BoxTitleTextColor,
-  boxrule=0.5pt,
+  boxrule=\ZSFboxRuleWidth,
   titlerule=0pt,
   boxsep=0pt,
   arc=\ZSFboxArc,
@@ -283,13 +283,13 @@
 % Randlose Tabelle mit Titelleiste (volle Box-Breite, kein Innenrand)
 \newtcolorbox{fulltablebox}[2][]{
   zsfpanelbox,
-  colframe=black!20,
+  colframe=NeutralBoxFrameColor,
   breakable=false,
   title={#1},
   boxsep=0pt, left=0pt, right=0pt, top=\ZSFtextMinPad, bottom=\ZSFtextMinPad,
   tabularx*={\arrayrulecolor{\ZSFtableRuleColor}\setlength{\arrayrulewidth}{\ZSFtableRuleWidth}}{#2},
   zsftitlebar,
-  boxrule=0.5pt
+  boxrule=\ZSFboxRuleWidth
 }
 
 % Randlose Box ohne Titel (volle Breite, zentriert)
@@ -320,7 +320,7 @@
   colbacktitle=\FormulaboxBackColor,
   colframe=black,
   coltitle=TextVorBoxColor,
-  boxrule=0.5pt,
+  boxrule=\ZSFboxRuleWidth,
   titlerule=0pt,
   fonttitle=\ZSFfontBoxTitle,
   halign title=center,
@@ -352,7 +352,7 @@
 % Duenne, graue Trennlinie zwischen Formeln in einer formulabox
 \newcommand{\formulasep}{%
   \par\vspace{-\parskip}\vspace{\ZSFspaceSep}%
-  \noindent\textcolor{black!30}{\rule{\linewidth}{0.5pt}}%
+  \noindent\textcolor{FormulaSeparatorColor}{\rule{\linewidth}{\ZSFboxRuleWidth}}%
   \par\vspace{-\parskip}\vspace{\ZSFspaceSep}%
   \penalty-50%
 }
@@ -361,7 +361,7 @@
 \newcommand{\ZSFItemHeading}[1]{%
   \par\vspace{-\parskip}\vspace{\ZSFspaceM}%
   {\centering\textbf{#1}\par}\vspace{-\parskip}\vspace{\ZSFspaceS}%
-  \noindent\rule{\linewidth}{0.5pt}\par\vspace{-\parskip}\vspace{\ZSFspaceS}%
+  \noindent\rule{\linewidth}{\ZSFboxRuleWidth}\par\vspace{-\parskip}\vspace{\ZSFspaceS}%
 }
 
 % ------------------------------------------------------------
@@ -380,7 +380,7 @@
 \newcommand{\ZSFfigcaption}[1]{%
   \if\relax\detokenize{#1}\relax\else
     \par\vspace{\ZSFspaceXS}%
-    {\ZSFfontNote\color{black!60}#1\par}%
+    {\ZSFfontNote\color{MutedTextColor}#1\par}%
   \fi
 }
 
@@ -470,15 +470,15 @@
 % procedure: nummerierte Schritt-Liste in einer statementbox.
 \NewDocumentEnvironment{procedure}{O{}}
   {\begin{statementbox}[#1]%
-   \begin{enumerate}[leftmargin=1.6em,labelsep=0.4em,itemsep=\ZSFprocItemSep,topsep=0pt,parsep=0pt,partopsep=0pt]}
+   \begin{enumerate}[leftmargin=\ZSFprocLeftMargin,labelsep=\ZSFlistLabelSep,itemsep=\ZSFprocItemSep,topsep=0pt,parsep=0pt,partopsep=0pt]}
   {\end{enumerate}\end{statementbox}}
 \newcommand{\ProcStep}[2]{\item {\bfseries #1}\\[\ZSFprocStepGap]#2}
 
 % factlist: rahmenlose Liste von Definitions-/Eigenschaftsfakten.
 \NewDocumentEnvironment{factlist}{}
   {\begin{itemize}[
-     leftmargin=1.2em,
-     labelsep=0.4em,
+     leftmargin=\ZSFlistLeftMargin,
+     labelsep=\ZSFlistLabelSep,
      label={\textcolor{\StatementBarColor}{\textbullet}},
      itemsep=\ZSFprocItemSep,
      topsep=\ZSFspaceXS,
@@ -491,8 +491,8 @@
 % propertylist: factlist innerhalb einer statementbox (mit optionalem Titel)
 \NewDocumentEnvironment{propertylist}{O{}}
   {\begin{statementbox}[#1]\begin{itemize}[
-     leftmargin=1.2em,
-     labelsep=0.4em,
+     leftmargin=\ZSFlistLeftMargin,
+     labelsep=\ZSFlistLabelSep,
      itemsep=\ZSFprocItemSep,
      topsep=0pt,
      parsep=0pt,
@@ -518,21 +518,21 @@
 
 \newtcbox{\GoalConditionBox}{%
   on line, enhanced,
-  boxrule=1.5pt,
-  colback=white,
-  colframe=\chaptercolorlight!22,
-  borderline={0.2pt}{0pt}{black},
-  arc=1pt,
+  boxrule=\ZSFgoalConditionRuleWidth,
+  colback=\GoalConditionBackColor,
+  colframe=\GoalConditionFrameColor,
+  borderline={\ZSFgoalConditionBorderlineWidth}{0pt}{black},
+  arc=\ZSFboxArc,
   left=\ZSFspaceXS, right=\ZSFspaceXS, top=\ZSFspaceXS, bottom=\ZSFspaceXS,
   nobeforeafter,
   tcbox raise base,
 }
 \newtcbox{\GoalTargetBox}{%
   on line, enhanced,
-  boxrule=0.5pt,
-  colback=\chaptercolorlight!22,
-  colframe=\chaptercolor,
-  arc=1pt,
+  boxrule=\ZSFboxRuleWidth,
+  colback=\GoalTargetBackColor,
+  colframe=\GoalTargetFrameColor,
+  arc=\ZSFboxArc,
   left=\ZSFspaceXS, right=\ZSFspaceXS, top=\ZSFspaceXS, bottom=\ZSFspaceXS,
   nobeforeafter,
   tcbox raise base,
@@ -566,10 +566,10 @@
 
 % Inline-Danger-Tag (rotes Pill-Label für Stolperfallen im Fliesstext)
 \newtcbox{\ZSFdanger}{
-  colback=red!80!black, colframe=red!80!black, coltext=white,
+  colback=DangerTagColor, colframe=DangerTagColor, coltext=white,
   on line, boxsep=\ZSFspaceXS,
   left=\ZSFspaceS, right=\ZSFspaceS, top=\ZSFspaceXS, bottom=\ZSFspaceXS,
-  boxrule=0pt, arc=1pt,
+  boxrule=0pt, arc=\ZSFboxArc,
   fontupper=\sffamily\bfseries
 }
 
@@ -578,16 +578,16 @@
 % ------------------------------------------------------------
 \newtcolorbox{compactgridbox}[1][]{
   zsfpanelbox,
-  colframe=black!20,
+  colframe=NeutralBoxFrameColor,
   breakable=false,
   title={#1},
   boxsep=0pt, left=0pt, right=0pt, top=\ZSFtextMinPad, bottom=\ZSFtextMinPad,
   zsftitlebar,
-  boxrule=0.5pt
+  boxrule=\ZSFboxRuleWidth
 }
 \newcommand{\ZSFvaluegridCommon}{
-  colsep=4pt,
-  rowsep=3pt,
+  colsep=\ZSFvaluegridColSep,
+  rowsep=\ZSFvaluegridRowSep,
   hlines,
   vlines,
   rows={valign=m}

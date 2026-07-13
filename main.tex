@@ -1,4 +1,7 @@
 \documentclass[8pt]{extarticle}
+% TEMPLATE-SHOWCASE: aktiviert alle optionalen Module für diese Living
+% Documentation. scripts/init_project.sh entfernt den Marker im Fach-Fork.
+\newcommand{\ZSFShowcaseMode}{}
 \input{preamble}
 
 % ============================================================
@@ -10,7 +13,8 @@
 \begin{multicols*}{4}
 
 % Hier neue Kapitel als \input{chapters/NN_name} einbinden.
-% Spaltenumbrueche ggf. mit \columnbreak (oder \StartChapterOnNewColumn).
+% Kapitel mit \StartChapterOnNewColumn, Abschnitte mit
+% \SubsectionBarOnNewColumn bewusst auf einer neuen Spalte beginnen.
 \input{chapters/ch00_palette_front}
 \input{chapters/ch01_beispiel}
 \input{chapters/ch02_palette_slot}

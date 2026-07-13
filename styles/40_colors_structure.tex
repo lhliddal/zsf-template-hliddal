@@ -104,6 +104,12 @@
 \definecolor{StaticBoxTitleText}{HTML}{0F172A}
 \definecolor{StaticSubBoxBack}{HTML}{F8FAFC}
 \definecolor{StaticSubBoxBorder}{HTML}{CBD5E1}
+\colorlet{NeutralBoxFrameColor}{black!20}
+\colorlet{FormulaSeparatorColor}{black!30}
+\colorlet{MutedTextColor}{black!60}
+\colorlet{TableRuleDefaultColor}{black!70}
+\colorlet{IdentityMarkerColor}{black!10}
+\colorlet{DangerTagColor}{red!80!black}
 
 % ------------------------------------------------------------
 % Aktive Kapitelfarben (per Kapitel-Index automatisch umgeschaltet)
@@ -120,6 +126,9 @@
 \newcommand{\SubsubsectionBarColor}{\chaptercolorlight!78!white}
 \newcommand{\SubsubsectionTitleColor}{\chaptercolor!72!black}
 \newcommand{\FormulaboxBackColor}{\chaptercolorlight!40}
+\newcommand{\TableZebraColor}{\chaptercolorlight!70}
+\newcommand{\ScriptRefColor}{\ChapterBarTextColor!80}
+\newcommand{\TitleHeaderBylineColor}{ChapterColor0Text!88}
 
 \newcommand{\BoxTitleColor}{\chaptercolorlight}
 \newcommand{\BoxTitleTextColor}{TextVorBoxColor}
@@ -129,10 +138,10 @@
 % Für statementbox / GoalCard (semantische Aussage- und Ziel-Boxen)
 \newcommand{\StatementBarColor}{\chaptercolor}
 \newcommand{\StatementTitleColor}{\chaptercolor}
-\newcommand{\GoalConditionBackColor}{StaticSubBoxBack}
-\newcommand{\GoalConditionFrameColor}{StaticSubBoxBorder}
-\newcommand{\GoalTargetBackColor}{StaticBoxTitleBack}
-\newcommand{\GoalTargetFrameColor}{StaticSubBoxBorder}
+\newcommand{\GoalConditionBackColor}{white}
+\newcommand{\GoalConditionFrameColor}{\chaptercolorlight!22}
+\newcommand{\GoalTargetBackColor}{\chaptercolorlight!22}
+\newcommand{\GoalTargetFrameColor}{\chaptercolor}
 
 % ------------------------------------------------------------
 % Index-basierte Palette (automatisch via \StartChapter)

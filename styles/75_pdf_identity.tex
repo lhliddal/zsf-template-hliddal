@@ -61,10 +61,10 @@
   \ifZSFVisibleMarker
     \AddToHook{shipout/firstpage}{
       \AtPageLowerLeft{
-        \raisebox{2mm}[0pt][0pt]{%
+        \raisebox{\ZSFidentityMarkerInset}[0pt][0pt]{%
           \makebox[0pt][l]{%
-            \hspace{2mm}%
-            {\color[gray]{0.90}\fontsize{4}{4}\selectfont
+            \hspace{\ZSFidentityMarkerInset}%
+            {\color{IdentityMarkerColor}\ZSFfontIdentityMarker
             id:\ZSFOwnerID\space|\space rel:\ZSFReleaseID}%
           }%
         }%

@@ -2,8 +2,8 @@
 % 66_index.tex — OPTIONALES Stichwortverzeichnis (alphabetischer Index)
 % ============================================================
 % Opt-in: in preamble.tex einkommentieren, wenn die ZSF ein
-% Stichwortverzeichnis bekommen soll. Voraussetzungen (zentral schon
-% vorhanden): makeidx (00_packages), \ZSF@refExtractChap + \ZSFkeyword
+% Stichwortverzeichnis bekommen soll. Das Modul lädt makeidx selbst.
+% Weitere Voraussetzungen: \ZSF@refExtractChap + \ZSFkeyword
 % (50_typography_semantics), \ZSFspace* (30_layout_spacing),
 % \ZSFfontBoxTitle (50). makeindex-Style: styles/zsfindex.ist
 % (Makefile übergibt ihn via INDEXSTYLE + $makeindex an latexmk).
@@ -34,6 +34,7 @@
 %   \ZSFindexsee{Synonym}{Ziel} — Verweis "Synonym, siehe Ziel 6.2"
 %                                 (mit farbcodierter Zielnummer, Ein-Hop)
 
+\RequirePackage{makeidx}
 \makeindex
 \renewcommand{\seename}{siehe}
 
@@ -104,15 +105,15 @@
 % article-Default macht \twocolumn — illegal in multicols*. Stattdessen
 % einfache hängende Liste im laufenden 4-Spalten-Fluss.
 \makeatletter
-\newcommand{\ZSF@idxitem}{\par\hangindent 1.2em\relax}
-\newcommand{\ZSF@idxsubitem}{\par\hangindent 2em\hspace*{1em}}
-\newcommand{\ZSF@idxsubsubitem}{\par\hangindent 2.6em\hspace*{1.8em}}
+\newcommand{\ZSF@idxitem}{\par\hangindent\ZSFindexItemIndent\relax}
+\newcommand{\ZSF@idxsubitem}{\par\hangindent\ZSFindexSubitemIndent\hspace*{\ZSFindexSubitemOffset}}
+\newcommand{\ZSF@idxsubsubitem}{\par\hangindent\ZSFindexSubsubitemIndent\hspace*{\ZSFindexSubsubitemOffset}}
 \newcommand{\ZSF@idxspace}{\par\addvspace{\ZSFspaceM}}
 \renewenvironment{theindex}{%
   \begingroup
   \RaggedRight
   \setlength{\parindent}{0pt}%
-  \setlength{\parskip}{0pt plus 0.3pt}%
+  \setlength{\parskip}{0pt plus \ZSFindexParStretch}%
   \let\item\ZSF@idxitem
   \let\subitem\ZSF@idxsubitem
   \let\subsubitem\ZSF@idxsubsubitem

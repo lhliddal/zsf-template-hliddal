@@ -46,6 +46,9 @@
 \newlength{\ZSFsubsectionAfterGap}\setlength{\ZSFsubsectionAfterGap}{\ZSFspaceXS}
 \newlength{\ZSFchapterBarAfterSkip}\setlength{\ZSFchapterBarAfterSkip}{2pt}
 \newlength{\ZSFboxArc}\setlength{\ZSFboxArc}{\ZSFspaceXS}
+\newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
+\newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
+\newlength{\ZSFgoalConditionBorderlineWidth}\setlength{\ZSFgoalConditionBorderlineWidth}{0.2pt}
 \newcommand{\ZSFtableArrayStretch}{1.04}
 
 % Maximale Höhe für Bilder in figboxen (verhindert überhohe Aspect-Ratios).
@@ -56,6 +59,9 @@
 \newlength{\ZSFstatementLeftPad} \setlength{\ZSFstatementLeftPad}{\ZSFspaceM}
 \newlength{\ZSFprocStepGap}      \setlength{\ZSFprocStepGap}{\ZSFspaceXS}
 \newlength{\ZSFprocItemSep}      \setlength{\ZSFprocItemSep}{\ZSFspaceXS}
+\newlength{\ZSFprocLeftMargin}   \setlength{\ZSFprocLeftMargin}{1.6em}
+\newlength{\ZSFlistLeftMargin}   \setlength{\ZSFlistLeftMargin}{1.2em}
+\newlength{\ZSFlistLabelSep}     \setlength{\ZSFlistLabelSep}{0.4em}
 
 % Padding für cellspace (siehe styles/20_tables.tex Konvention)
 \newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFspaceXS}
@@ -79,6 +85,23 @@
 \newlength{\ZSFcodeCommentMaxWidth} \setlength{\ZSFcodeCommentMaxWidth}{\ZSFcodeCommentMaxWidthDefault}
 \newlength{\ZSFcodeCommentThreshold}\setlength{\ZSFcodeCommentThreshold}{\ZSFcodeCommentThresholdDefault}
 \newlength{\ZSFcodeCommentGap}      \setlength{\ZSFcodeCommentGap}{\ZSFspaceM}
+
+% Valuegrid, Index, Readability und dokumentweite Overlays
+\newlength{\ZSFvaluegridColSep}       \setlength{\ZSFvaluegridColSep}{\ZSFspaceS}
+\newlength{\ZSFvaluegridRowSep}       \setlength{\ZSFvaluegridRowSep}{\ZSFspaceSep}
+\newlength{\ZSFreadabilityEmergencyStretch}\setlength{\ZSFreadabilityEmergencyStretch}{2.5em}
+\newlength{\ZSFindexItemIndent}       \setlength{\ZSFindexItemIndent}{1.2em}
+\newlength{\ZSFindexSubitemIndent}    \setlength{\ZSFindexSubitemIndent}{2em}
+\newlength{\ZSFindexSubitemOffset}    \setlength{\ZSFindexSubitemOffset}{1em}
+\newlength{\ZSFindexSubsubitemIndent} \setlength{\ZSFindexSubsubitemIndent}{2.6em}
+\newlength{\ZSFindexSubsubitemOffset} \setlength{\ZSFindexSubsubitemOffset}{1.8em}
+\newlength{\ZSFindexParStretch}       \setlength{\ZSFindexParStretch}{0.3pt}
+\newlength{\ZSFfooterBottomInset}     \setlength{\ZSFfooterBottomInset}{1mm}
+\newlength{\ZSFfooterRightInset}      \setlength{\ZSFfooterRightInset}{2mm}
+\newlength{\ZSFitemizeLeftMargin}     \setlength{\ZSFitemizeLeftMargin}{3mm}
+\newlength{\ZSFenumerateLeftMargin}   \setlength{\ZSFenumerateLeftMargin}{4mm}
+\newlength{\ZSFidentityMarkerInset}   \setlength{\ZSFidentityMarkerInset}{2mm}
+\newlength{\ZSFtabColumnGap}          \setlength{\ZSFtabColumnGap}{1.5em}
 
 % ============================================================
 % TEXT-BOX-BINDUNGEN
@@ -130,7 +153,7 @@
   \par
   \begingroup
   \setlength{\parskip}{0pt}%
-  \noindent\raggedright\textcolor{black!60}{\textbf{#1}}\par
+  \noindent\raggedright\textcolor{MutedTextColor}{\textbf{#1}}\par
   \endgroup
   \vspace{\ZSFspaceXS}%
   \centering
@@ -142,7 +165,7 @@
   \vspace{\ZSFspaceXS}%
   \begingroup
   \setlength{\parskip}{0pt}%
-  \noindent\raggedright\textcolor{black!60}{\small #1}\par
+  \noindent\raggedright\textcolor{MutedTextColor}{\small #1}\par
   \endgroup
   \centering
 }
@@ -156,4 +179,4 @@
 \newcommand{\ZSFgapM}{\vspace{\ZSFspaceM}}
 \newcommand{\ZSFgapL}{\vspace{\ZSFspaceL}}
 \newcommand{\ZSFmanualColumnBreak}{\columnbreak}
-\newcommand{\ZSFtabColGap}{\hspace{1.5em}}
+\newcommand{\ZSFtabColGap}{\hspace{\ZSFtabColumnGap}}

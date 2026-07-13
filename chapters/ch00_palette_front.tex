@@ -1,4 +1,35 @@
-% Palette-Demo: zeigt ChapterColor0 über dem Frontchapter.
-\StartFrontChapter{Palette Slot 0}
+% Living Showcase: Einstieg und Navigationsübersicht (Palette Slot 0).
+\ZSFTitleHeader{ZSF Template}{Loris Einar Kristjan Hliddal}
+\StartFrontChapter{Living Showcase}
 
-\input{chapters/_palette_demo_content}
+\begin{runintext}
+  Diese Ausgabe ist zugleich Präsentation, Bauteilkatalog und visueller
+  Regressionstest. Sie zeigt die stabile Kapitel-API, optionale Module und
+  vorläufige Kompatibilitätsbausteine in ihrer echten Darstellung.
+\end{runintext}
+
+\SubsectionBar*{Schnellzugriff}
+
+\begin{tablebox}[Funktionsfamilien\ZSFTitleTag{Übersicht}]
+  \begin{ZSFtable}{Y{1.35} Z{0.35} Y{1.30}}
+    \ZSFheaderRow \ZSFhead{Bereich} & \ZSFhead{Kap.} & \ZSFhead{Enthält} \\
+    Aussagen & \ZSFsectionref{ch:boxes} & Definition, Warnung \\
+    Verfahren & \ZSFsectionref{ch:lists} & Schritte, Listen \\
+    Formeln & \ZSFsectionref{ch:math} & Math, Zielketten \\
+    Tabellen & \ZSFsectionref{ch:tables} & drei Stile, Grids \\
+    Visuals & \ZSFsectionref{ch:figures} & Bilder, Plot, Split \\
+    Navigation & \ZSFsectionref{ch:semantics} & Marker, Verweise \\
+    Code & \ZSFsectionref{ch:code} & Listings, Kommentare \\
+    Kompatibilität & \ZSFsectionref{ch:compat} & vorläufige API
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{statementbox}[Lesart]
+  Der rechts gesetzte Titel-Tag nennt jeweils die verwendete Umgebung. So
+  lassen sich Varianten bei einem Rework direkt vergleichen und auswählen.
+\end{statementbox}
+
+\begin{warnbox}[Showcase statt Fachinhalt]
+  Die Beispiele sind bewusst kurz und fachübergreifend. Bewertet wird hier
+  das System, nicht die Vollständigkeit eines einzelnen Fachs.
+\end{warnbox}

@@ -11,11 +11,11 @@
 % (overlay, layout-neutral). \ZSFReleaseID wird im Release-Workflow gesetzt.
 \AddToShipoutPictureFG{%
   \AtPageLowerLeft{%
-    \put(\dimexpr\paperwidth/2\relax,1mm){%
-      \makebox(0,0)[b]{\sffamily\bfseries\fontsize{9.5pt}{9.5pt}\selectfont\color{black}\ZSFReleaseID}%
+    \put(\dimexpr\paperwidth/2\relax,\ZSFfooterBottomInset){%
+      \makebox(0,0)[b]{\ZSFfontFooter\color{black}\ZSFReleaseID}%
     }%
-    \put(\dimexpr\paperwidth-2mm\relax,1mm){%
-      \makebox(0,0)[rb]{\sffamily\bfseries\fontsize{9.5pt}{9.5pt}\selectfont\color{black}\thepage}%
+    \put(\dimexpr\paperwidth-\ZSFfooterRightInset\relax,\ZSFfooterBottomInset){%
+      \makebox(0,0)[rb]{\ZSFfontFooter\color{black}\thepage}%
     }%
   }%
 }
@@ -31,8 +31,8 @@
 
 % Kompakte Listen (wie Analysis: kein überschüssiges Whitespace)
 \setlist{nosep, itemsep=0pt, parsep=0pt, topsep=\ZSFspaceXS, partopsep=0pt}
-\setlist[itemize]{leftmargin=3mm}
-\setlist[enumerate]{leftmargin=4mm}
+\setlist[itemize]{leftmargin=\ZSFitemizeLeftMargin}
+\setlist[enumerate]{leftmargin=\ZSFenumerateLeftMargin}
 
 % Tabellen-Zellenabstand einheitlich
 \setlength{\tabcolsep}{\ZSFspaceM}

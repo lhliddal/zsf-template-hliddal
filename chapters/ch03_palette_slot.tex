@@ -1,4 +1,63 @@
-% Palette-Demo: zeigt ChapterColor3.
-\StartChapter{Palette Slot 3}
+% Living Showcase: Formeln, Math-API und Goal-System (Palette Slot 3).
+\StartChapterOnNewColumn[ch:math]{Formeln und Zielketten}
 
-\input{chapters/_palette_demo_content}
+\SubsectionBar[sec:math-base]{Basis-Mathematik}
+\ZSFindex{Formelbox}
+
+\textVorBox{Kontext kann direkt an die folgende Formelbox gebunden werden.}
+\begin{formulabox}[title={Grundmengen und Operatoren\ZSFTitleTag{formulabox}}]
+  \textVorFormel{Basis-Makros:}
+  \[
+    x\in\R,\quad z\in\C,\quad n\in\N,\quad k\in\Z,\quad q\in\Q
+  \]
+  \formulasep
+  \[
+    \dd x,\quad \norm{\vect v},\quad \abs{x},\quad \sgn(x),\quad
+    \grad f,\quad \divg \vect F,\quad \rot \vect F
+  \]
+  \formulasep
+  \ZSFItemHeading{Automatische Summen und Limites}
+  \[
+    \ZSFsumAuto{i=1}{n} i,\quad \ZSFlimAuto{x\to0}\frac{\sin x}{x}
+  \]
+  \textNachFormel{Stack-/Side-Modus bleibt zentral umschaltbar.}
+  \formulanote{Separator und Note gruppieren zusammengehörige Formeln.}
+\end{formulabox}
+\textNachBox{Nachtext bleibt optisch an die Formelbox gebunden.}
+
+\begin{formulabox}[title={Semantische Verbindung}]
+  \[
+    \ZSFmhlA{a^2}+2\ZSFmhlB{ab}+\ZSFmhlD{b^2}
+    =\ZSFmhlC{(a+b)^2}
+  \]
+  \formulasep
+  \[
+    \ZSFbraceunder{x^2+2x+1}{Ausgangsform}
+    =\ZSFbraceover{(x+1)^2}{Ziel}
+  \]
+\end{formulabox}
+
+\SubsectionBar[sec:goal]{Bedingung, Schritt, Ziel}
+\ZSFindex{Zielkette}
+
+\begin{goalbox}[Fallunterscheidung\ZSFTitleTag{goalbox}]
+  \ZSFDerivationInlineCase{$x\geq0$}{\sqrt{x^2}}{x}
+  \formulasep
+  \ZSFDerivationCase{$x<0$}{\sqrt{x^2}}{-x}
+\end{goalbox}
+
+\begin{statementbox}[Advanced Math\ZSFTitleTag{11\_math\_advanced}]
+  \begin{longformula}
+    &\Ker A,\quad \rang A,\quad \Spur A,\quad \diag(A),\\
+    &\spanop(v_1,v_2),\quad \eig(A),\quad \proj_U(v),\\
+    &\sig(A),\quad \Adj(A),\quad \Re z,\quad \Im z,\quad
+      \asterisk,\quad \oasterisk.
+  \end{longformula}
+  \[
+    \tikzmark[xshift=-\ZSFspaceXS]{showcase-brace-left}
+    a+b+c
+    \tikzmark[xshift=\ZSFspaceXS]{showcase-brace-right}
+    \drawbrace[brace mirrored]{showcase-brace-left}{showcase-brace-right}
+    \annote[yshift=-\ZSFspaceM]{brace-\thebrace}{\ZSFfontNote Summe}
+  \]
+\end{statementbox}

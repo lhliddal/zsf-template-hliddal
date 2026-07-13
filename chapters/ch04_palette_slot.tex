@@ -1,4 +1,57 @@
-% Palette-Demo: zeigt ChapterColor4.
-\StartChapter{Palette Slot 4}
+% Living Showcase: semantische Tabellen und kompakte Grids (Palette Slot 4).
+\StartChapterOnNewColumn[ch:tables]{Tabellen und Grids}
 
-\input{chapters/_palette_demo_content}
+\SubsectionBar[sec:table-header]{Header und Zebra}
+\ZSFindex{Tabelle}
+
+\begin{tablebox}[Physikalische Grössen\ZSFTitleTag{tablebox + ZSFtable}]
+  \begin{ZSFtable}{Y{0.55} Y{1.55} Q{0.90}}
+    \ZSFheaderRow \ZSFhead{Symbol} & \ZSFhead{Bedeutung} & \ZSFhead{SI} \\
+    $m$ & Masse & \si{kg} \\
+    $v$ & Geschwindigkeit & \si{m/s} \\
+    $E$ & Energie & \si{J}
+  \end{ZSFtable}
+\end{tablebox}
+
+\SubsectionBar[sec:table-variants]{Ohne Header oder Zebra}
+
+\begin{tablebox}[Zebra ab erster Zeile\ZSFTitleTag{ZSFtableFlat}]
+  \begin{ZSFtableFlat}{L R}
+    links & rechts \\
+    Alpha & 10 \\
+    Beta & 20
+  \end{ZSFtableFlat}
+\end{tablebox}
+
+\begin{tablebox}[Ruhige Vergleichstabelle\ZSFTitleTag{ZSFtablePlain}]
+  \begin{ZSFtablePlain}{Y{1.25} Z{0.75}}
+    stetig & ja \\
+    differenzierbar & nicht zwingend
+  \end{ZSFtablePlain}
+\end{tablebox}
+
+\begin{tablebox}[Ausrichtung und Formelspalte\ZSFTitleTag{L/C/R/F}]
+  \begin{ZSFtablePlain}{L C R F{1}}
+    links & Mitte & rechts & x^2+1
+  \end{ZSFtablePlain}
+\end{tablebox}
+
+\ZSFindex{Valuegrid}
+\begin{valuegridtwo}[Naturkonstanten\ZSFTitleTag{compactgridbox + valuegridtwo}]
+  Grösse & Wert & Einheit \\
+  $g$ & $9{,}81$ & \si{m/s^2} \\
+  $c$ & $2{,}998\cdot10^8$ & \si{m/s}
+\end{valuegridtwo}
+
+\begin{runintext}
+  Die Wrapper \ZSFkeyword*{valuegridtwo} bis \ZSFkeyword*{valuegridseven}
+  decken zwei bis sieben Datenspalten ab; \ZSFkeyword*{valuegrid} nimmt die
+  Anzahl direkt entgegen.
+\end{runintext}
+
+\ZSFindex{Compactgrid}
+\begin{compactgridbox}[Direkte Kompakt-Shell\ZSFTitleTag{compactgridbox}]
+  \begin{ZSFtablePlain}{C C}
+    minimal & frei befüllbar
+  \end{ZSFtablePlain}
+\end{compactgridbox}

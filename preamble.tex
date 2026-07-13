@@ -5,9 +5,12 @@
 % ── Opt-in-Schalter ──────────────────────────────────────────────────
 % Fachspezifische Module sind mitgeliefert, aber standardmässig AUS.
 % Pro Fach hier (und NUR hier) einkommentieren, was gebraucht wird:
+% Ausnahme: main.tex setzt im Template-Repository ZSFShowcaseMode, damit die
+% Living Showcase alles rendert. init_project.sh entfernt diesen Marker.
 %   11_math_advanced  → mathe-lastige Fächer (LinAlg, Analysis):
 %                       Operatoren (Ker, rang, Spur, proj, …), Im/Re,
 %                       TikZ-Klammern (\drawbrace/\tikzmark), Pfeil-Fix.
+%   12_plots          → pgfplots für echte Plot-/Diagramm-Inhalte.
 %   65_code_style     → code-lastige Fächer (Informatik): lstlisting +
 %                       CodeExpert-Style + Code-Container (codebox).
 %   66_index          → Stichwortverzeichnis am Dokumentende (\printindex);
@@ -19,15 +22,27 @@
 
 \input{styles/00_packages}
 \input{styles/10_math}
-% \input{styles/11_math_advanced}   % opt-in: LinAlg/Analysis
+\ifdefined\ZSFShowcaseMode
+  \input{styles/11_math_advanced}
+  \input{styles/12_plots}
+\else
+  % \input{styles/11_math_advanced} % opt-in: LinAlg/Analysis
+  % \input{styles/12_plots}         % opt-in: pgfplots-Diagramme
+\fi
 \input{styles/20_tables}
 \input{styles/30_layout_spacing}
 \input{styles/40_colors_structure}
 \input{styles/50_typography_semantics}
 \input{styles/55_readability}
 \input{styles/60_boxes}
-% \input{styles/65_code_style}      % opt-in: Informatik
-% \input{styles/66_index}           % opt-in: Stichwortverzeichnis
-% \input{styles/67_code_comments}   % opt-in: Informatik (nach 65_code_style)
+\ifdefined\ZSFShowcaseMode
+  \input{styles/65_code_style}
+  \input{styles/66_index}
+  \input{styles/67_code_comments}
+\else
+  % \input{styles/65_code_style}    % opt-in: Informatik
+  % \input{styles/66_index}         % opt-in: Stichwortverzeichnis
+  % \input{styles/67_code_comments} % opt-in: Informatik (nach 65_code_style)
+\fi
 \input{styles/75_pdf_identity}
 \input{styles/70_document_settings}

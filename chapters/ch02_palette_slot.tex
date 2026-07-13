@@ -1,4 +1,31 @@
-% Palette-Demo: zeigt ChapterColor2.
-\StartChapter{Palette Slot 2}
+% Living Showcase: Verfahren und Listen (Palette Slot 2).
+\StartChapterOnNewColumn[ch:lists]{Verfahren und Listen}
 
-\input{chapters/_palette_demo_content}
+\SubsectionBar[sec:procedure]{Stabile Schrittfolge}
+\ZSFindex{Verfahren}
+
+\begin{procedure}[Extremstellen bestimmen\ZSFTitleTag{procedure}]
+  \ProcStep{Definitionsbereich prüfen}{Ränder, Lücken und Pole notieren.}
+  \ProcStep{Kandidaten finden}{Ableitung nullsetzen und Randpunkte ergänzen.}
+  \ProcStep{Klassifizieren}{Vorzeichenwechsel oder zweite Ableitung prüfen.}
+\end{procedure}
+
+\SubsectionBar[sec:lists]{Fakten ohne und mit Rahmen}
+\ZSFindex{Faktenliste}
+\ZSFindex{Eigenschaftsliste}
+
+\begin{factlist}
+  \ZSFFact{Konvergenz}{Eine Folge nähert sich einem eindeutigen Grenzwert.}
+  \ZSFFact{Monotonie}{Die Folgenglieder bewegen sich nur in eine Richtung.}
+  \ZSFFact{Beschränktheit}{Alle Werte bleiben innerhalb fester Schranken.}
+\end{factlist}
+
+\begin{propertylist}[Kompaktes Intervall\ZSFTitleTag{propertylist}]
+  \ZSFFact{Stetigkeit}{Sichert Maximum, Minimum und Zwischenwerte.}
+  \ZSFFact{Abgeschlossenheit}{Alle Randpunkte gehören zur Menge.}
+\end{propertylist}
+
+\begin{runintext}
+  \ZSFkeyword*{factlist} bleibt rahmenlos; \ZSFkeyword*{propertylist} bindet
+  dieselbe Faktenlogik an eine dezente Statement-Box.
+\end{runintext}

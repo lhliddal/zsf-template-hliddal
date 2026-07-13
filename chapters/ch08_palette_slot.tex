@@ -1,4 +1,52 @@
-% Palette-Demo: zeigt ChapterColor8.
-\StartChapter{Palette Slot 8}
+% Living Showcase: vorläufig beibehaltene Kompatibilitäts-API (Palette Slot 8).
+\StartChapterOnNewColumn[ch:compat]{Kompatibilitätsbausteine}
 
-\input{chapters/_palette_demo_content}
+\begin{runintext}
+  Diese Varianten bleiben funktionsfähig, sind für neue Kapitel aber nicht
+  bevorzugt. Die Galerie erleichtert eine spätere Behalten-/Entfernen-Entscheidung.
+\end{runintext}
+
+\SubsectionBar[sec:compat-boxes]{Tabellen- und Formelvarianten}
+\ZSFindex[Kompatibilitat]{Kompatibilität}
+
+\begin{fulltablebox}[Volle Tabellenbreite\ZSFTitleTag{fulltablebox}]{L R}
+  Alpha & 10 \\
+  Beta & 20
+\end{fulltablebox}
+
+\begin{fulllessbox}{L R}
+  rahmenlos & \ZSFkeyword*{fulllessbox} \\
+  zentriert & volle Breite
+\end{fulllessbox}
+
+\begin{formulabox}[title={Mehrzeilige Altform\ZSFTitleTag{longformula}}]
+  \begin{longformula}
+    (a+b)^2 &= a^2+2ab+b^2,\\
+    (a-b)^2 &= a^2-2ab+b^2.
+  \end{longformula}
+\end{formulabox}
+
+\begin{valuegridcustom}{l c c}[Freie Spaltenwahl\ZSFTitleTag{valuegridcustom}]
+  Fall & links & rechts \\
+  A & 1 & 2 \\
+  B & 3 & 4
+\end{valuegridcustom}
+
+\SubsectionBar[sec:compat-goals]{Goal-Komfortmakros}
+\ZSFindex{GoalCard}
+
+\GoalCard[Einzelkarte\ZSFTitleTag{GoalCard}]{$x>0$}{\GoalStep{x^2}}{x}
+
+\GoalPair
+  {Fall A}{$x\geq0$}{\GoalStep{\sqrt{x^2}}}{x}
+  {Fall B}{$x<0$}{\GoalStep{\sqrt{x^2}}}{-x}
+
+\begin{figbox}[Platzhalter\ZSFTitleTag{PlaceholderGraphic}]
+  \PlaceholderGraphic{später durch ZSFfig ersetzen}
+\end{figbox}
+
+\begin{factlist}
+  \ZSFFact{Layout}{ZSFmanualColumnBreak und ZSFtabColGap.}
+  \ZSFFact{Tabellenregeln}{SetZSFtableRuleColor und SetZSFtableRuleWidth.}
+  \ZSFFact{Zeilenfarbe}{ZSFrowColor sowie begin/end TableRuleStyle.}
+\end{factlist}

@@ -1,4 +1,41 @@
-% Palette-Demo: zeigt ChapterColor6.
-\StartChapter{Palette Slot 6}
+% Living Showcase: Struktur, Navigation und Inline-Semantik (Palette Slot 6).
+\StartChapterOnNewColumn[ch:semantics]{Navigation und Semantik}
 
-\input{chapters/_palette_demo_content}
+\SubsectionBar[sec:markers]{Scan-Anker im Inhalt}
+\ZSFindex{Scan-Anker}
+\ZSFindex{Fernverweis}
+
+\begin{runintext}
+  Ein \ZSFkeyword{Schlagwort} ist der primäre Scan-Anker. Die
+  \ZSFhl{prüfungskritischste Aussage} darf zusätzlich hervorgehoben werden.
+  \ZSFdanger{Vorzeichen prüfen} markiert eine lokale Gefahr.
+  \ZSFconclusion{Das Resultat ist sofort auffindbar.}
+\end{runintext}
+
+\begin{defbox}[Navigierbarer Titel\ZSFTitleTag{ZSFTitleTag}]
+  Fernverweis zur Tabellenübersicht: \ZSFref{sec:table-header}. Kompakte
+  Zielnummer: \ZSFsectionref{sec:goal}. Ein Skriptverweis bleibt rechtsbündig.
+  \ZSFScriptRef{42}
+\end{defbox}
+
+\SubsectionBar*{Unnummerierte Struktur}
+
+\begin{statementbox}[Sternvariante]
+  \ZSFkeyword*{SubsectionBar*} schafft Orientierung ohne neuen Locator.
+\end{statementbox}
+
+\SubsubsectionBar*{Unnummerierte dritte Ebene}
+
+\begin{runintext}
+  Nummerierte Kapitel, Abschnitte und Unterabschnitte liefern Labels für
+  papierfeste Verweise; Sternvarianten bleiben rein visuell.
+\end{runintext}
+
+\SubsectionBar[sec:readability]{Lesbarkeit in schmalen Spalten}
+\ZSFindex{Lesbarkeit}
+
+\begin{runintext}
+  Flattersatz, Umbruch-Penalties und Microtype wirken automatisch. Mit
+  \ZSFkeyword*{ZSFbreak}, \ZSFkeyword*{ZSFnobreak} und
+  \ZSFkeyword*{ZSFallowbreak} bleiben gezielte Ausnahmen möglich.
+\end{runintext}

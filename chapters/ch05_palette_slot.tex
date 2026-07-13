@@ -1,4 +1,40 @@
-% Palette-Demo: zeigt ChapterColor5.
-\StartChapter{Palette Slot 5}
+% Living Showcase: Abbildungen, Plots und Side-by-side (Palette Slot 5).
+\StartChapterOnNewColumn[ch:figures]{Abbildungen und Layout}
 
-\input{chapters/_palette_demo_content}
+\SubsectionBar[sec:fig-helpers]{Bild-Makros}
+\ZSFindex{Abbildung}
+
+\ZSFfig[0.34]{example-image-a}{Externe Abbildung\ZSFTitleTag{ZSFfig}}%
+  {Optionale Caption, zentrale Breitensteuerung und Höhenbegrenzung.}
+
+\ZSFfigside[0.27]{example-image-a}{Bild mit Erklärung\ZSFTitleTag{ZSFfigside}}{%
+  Kleine Abbildung links, prüfungsrelevante Erklärung rechts.}
+
+\SubsectionBar[sec:plot]{Vektorplot ohne externe Datei}
+\ZSFindex{Plot}
+
+\begin{figbox}[Funktionsverlauf\ZSFTitleTag{figbox + pgfplots}]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=\linewidth,
+      height=\ZSFfigMaxHeight,
+      axis lines=middle,
+      xmin=-2.2, xmax=2.2,
+      ymin=-0.3, ymax=4.5,
+      samples=40,
+      ticks=none
+    ]
+      \addplot[color=\chaptercolor, very thick, domain=-2:2]{x^2};
+    \end{axis}
+  \end{tikzpicture}
+  \ZSFfigcaption{Das optionale Modul 12\_plots lädt pgfplots nur im Showcase.}
+\end{figbox}
+
+\begin{splitbox}[0.34][sidebyside align=center]
+  \ZSFindex{Splitbox}
+  \centering $\displaystyle f'(x)$
+  \tcblower
+  \ZSFkeyword*{splitbox} ordnet zwei beliebige Inhaltsblöcke ohne sichtbaren
+  Rahmen nebeneinander an.
+\end{splitbox}
