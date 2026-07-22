@@ -178,7 +178,7 @@ jobs:
             (.presentation | type == "object") and
             (.presentation.drawingNumber | type == "string" and length > 0) and
             (.presentation.description | type == "string" and length > 0) and
-            (.presentation.stage == "in-progress" or .presentation.stage == "content-complete" or .presentation.stage == "layout-final") and
+            (.presentation.stage == "coming-soon" or .presentation.stage == "outline" or .presentation.stage == "in-progress" or .presentation.stage == "final-stretch" or .presentation.stage == "nearly-complete" or .presentation.stage == "layout-final") and
             (.presentation.diagram == "physics" or .presentation.diagram == "informatics" or .presentation.diagram == "analysis" or .presentation.diagram == "linalg" or .presentation.diagram == "design" or .presentation.diagram == "mechanics" or .presentation.diagram == "thermo" or .presentation.diagram == "fluids" or .presentation.diagram == "controls" or .presentation.diagram == "materials" or .presentation.diagram == "statistics" or .presentation.diagram == "template") and
             (.presentation.statusLabel == null or (.presentation.statusLabel | type == "string")) and
             (.presentation.credits == null or (.presentation.credits | type == "string"))
