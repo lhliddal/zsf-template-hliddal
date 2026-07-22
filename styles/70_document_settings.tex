@@ -7,12 +7,12 @@
 % unabhängig von der aktiven Kapitelfarbe.
 \hypersetup{colorlinks=true, linkcolor=ChapterColor0, urlcolor=ChapterColor4}
 
-% Öffentliche GitHub-Release-Version unten mittig, Seitenzahl unten rechts
-% (overlay, layout-neutral). \ZSFReleaseID wird im Release-Workflow gesetzt.
+% Build-Kennung unten mittig, Seitenzahl unten rechts (overlay, layout-neutral).
+% Lokal automatisch DEV + Datum; im Release-Workflow der SemVer-Tag.
 \AddToShipoutPictureFG{%
   \AtPageLowerLeft{%
     \put(\dimexpr\paperwidth/2\relax,\ZSFfooterBottomInset){%
-      \makebox(0,0)[b]{\ZSFfontFooter\color{ReleaseFooterColor}\ZSFReleaseID}%
+      \makebox(0,0)[b]{{\transparent{0.5}\ZSFfontFooter\color{ReleaseFooterColor}\ZSFReleaseLabel}}%
     }%
     \put(\dimexpr\paperwidth-\ZSFfooterRightInset\relax,\ZSFfooterBottomInset){%
       \makebox(0,0)[rb]{\ZSFfontFooter\color{black}\thepage}%

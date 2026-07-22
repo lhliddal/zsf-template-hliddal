@@ -109,10 +109,23 @@
 \colorlet{MutedTextColor}{black!60}
 \colorlet{TableRuleDefaultColor}{black!70}
 \colorlet{IdentityMarkerColor}{black!10}
-\colorlet{ReleaseFooterColor}{black!50}
+\colorlet{ReleaseFooterColor}{black}
 \colorlet{DangerTagColor}{red!80!black}
 
 % ------------------------------------------------------------
+% Dokumenttitel-Masthead: bewusst unabhängig von der Kapitelrotation.
+\colorlet{ZSFDocumentTitleBarColor}{ChapterColor0}
+\colorlet{ZSFDocumentTitleTextColor}{ChapterColor0Text}
+\colorlet{ZSFDocumentTitleBylineColor}{ChapterColor0Text!88}
+
+% Schlusswörter in eingebetteten Kapiteln: ETH-Palette für den Inhalt,
+% aber dieselbe klare Leistenfarbe wie der Dokumenttitel.
+\newcommand{\ZSFStartClosingSubsection}{%
+  \ZSFSetChapterPaletteByIndex{0}%
+  \renewcommand{\SubsectionBarColor}{ZSFDocumentTitleBarColor}%
+  \renewcommand{\SubsectionBarTextColor}{ZSFDocumentTitleTextColor}%
+}
+
 % Aktive Kapitelfarben (per Kapitel-Index automatisch umgeschaltet)
 % ------------------------------------------------------------
 \newcommand{\chaptercolor}{ChapterColor1}
@@ -129,7 +142,6 @@
 \newcommand{\FormulaboxBackColor}{\chaptercolorlight!40}
 \newcommand{\TableZebraColor}{\chaptercolorlight!70}
 \newcommand{\ScriptRefColor}{\ChapterBarTextColor!80}
-\newcommand{\TitleHeaderBylineColor}{ChapterColor0Text!88}
 
 \newcommand{\BoxTitleColor}{\chaptercolorlight}
 \newcommand{\BoxTitleTextColor}{TextVorBoxColor}

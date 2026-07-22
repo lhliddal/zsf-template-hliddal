@@ -58,8 +58,8 @@
 \newtcolorbox{zsftitleheader}[1][]{
   enhanced jigsaw,
   breakable=false,
-  colback=ChapterColor0,
-  colframe=ChapterColor0,
+  colback=ZSFDocumentTitleBarColor,
+  colframe=ZSFDocumentTitleBarColor,
   boxrule=0pt,
   boxsep=0pt,
   left=\ZSFspaceM,
@@ -75,9 +75,9 @@
   \penalty-500
   \begin{zsftitleheader}
     \sffamily
-    {\color{ChapterColor0Text}\ZSFfontTitleHeader #1\par}%
+    {\color{ZSFDocumentTitleTextColor}\ZSFfontTitleHeader #1\par}%
     \vspace{\ZSFspaceXS}%
-    {\color{\TitleHeaderBylineColor}\ZSFfontNote von~#2\par}%
+    {\color{ZSFDocumentTitleBylineColor}\ZSFfontNote von~#2\par}%
   \end{zsftitleheader}
   \penalty10000
 }
@@ -261,7 +261,7 @@
   bottom=0pt,
   colback=white,
   clip upper,
-  before upper={},
+  before upper={\ZSFReadableAuto},
 }}
 
 % ------------------------------------------------------------
@@ -431,6 +431,8 @@
     before={\ZSFConsumeAfterSubsectionBar},
     before skip=\ZSFspaceS,
     after skip=\ZSFspaceS,
+    before upper={\ZSFReadableAuto},
+    before lower={\ZSFReadableAuto},
     boxsep=0pt, left=0pt, right=0pt, top=0pt, bottom=0pt,
     #2
   ]%
@@ -458,6 +460,7 @@
   before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFspaceS,
   before={\ZSFConsumeAfterSubsectionBar},
+  before upper={\ZSFReadableAuto},
 }}
 
 \NewDocumentEnvironment{statementbox}{O{}}

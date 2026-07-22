@@ -9,11 +9,14 @@
 % Kernbausteine:
 %   \ZSFReadableParams : feingetunte TeX-Penalties (Flattersatz-kompatibel)
 %   \ZSFReadableOn     : aktiviert RaggedRight + Parameter im aktuellen Scope
+%   \ZSFReadableAuto   : respektiert den globalen Schalter
 %   ZSFReadable        : Environment für lokale Anwendung
 %   \ZSFbreak / \ZSFnobreak / \ZSFallowbreak : semantische Feinsteuerung
 %   \ifZSFReadableBody : globaler Schalter (Standard: an)
 %
-% Wird in runintext / defbox / warnbox automatisch angewendet.
+% Dokumentweite Regel: Direkt nach \begin{multicols*} aktiviert
+% \ZSFReadableAuto den Flattersatz für den gesamten Spalteninhalt.
+% Lokale Anwendungen in Boxen bleiben erlaubt und sind unschädlich.
 % ============================================================
 
 % ------------------------------------------------------------
@@ -47,6 +50,8 @@
 %   - rightskip hat etwas Flexibilität, damit kein "Waterfall"-Look entsteht.
 % ------------------------------------------------------------
 \newcommand{\ZSFReadableOn}{%
+  % Schmale Flatterzone: natürliche Wortabstände, aber gut gefüllte Spalten.
+  \setlength{\RaggedRightRightskip}{\ZSFreadabilityRaggedRightskip}%
   \RaggedRight
   \ZSFReadableParams
 }

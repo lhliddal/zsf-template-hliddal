@@ -90,6 +90,10 @@
 \newlength{\ZSFvaluegridColSep}       \setlength{\ZSFvaluegridColSep}{\ZSFspaceS}
 \newlength{\ZSFvaluegridRowSep}       \setlength{\ZSFvaluegridRowSep}{\ZSFspaceSep}
 \newlength{\ZSFreadabilityEmergencyStretch}\setlength{\ZSFreadabilityEmergencyStretch}{2.5em}
+% Flatterzone im Fliesstext: schmaler als der ragged2e-Standard (0pt plus 2em),
+% damit die schmalen 4 Spalten gut gefüllt bleiben. Wirkt nur über
+% \ZSFReadableOn — Tabellen-Spalten (L/Y) und Index behalten den Standard.
+\newlength{\ZSFreadabilityRaggedRightskip}\setlength{\ZSFreadabilityRaggedRightskip}{0pt plus 1em}
 \newlength{\ZSFindexItemIndent}       \setlength{\ZSFindexItemIndent}{1.2em}
 \newlength{\ZSFindexSubitemIndent}    \setlength{\ZSFindexSubitemIndent}{2em}
 \newlength{\ZSFindexSubitemOffset}    \setlength{\ZSFindexSubitemOffset}{1em}

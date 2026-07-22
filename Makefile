@@ -14,10 +14,15 @@ endif
 
 # Identity (Forks überschreiben diese; müssen zu styles/75_pdf_identity.tex passen).
 SUBJECT_TITLE ?= ZSF Template
-RELEASE_ID    ?= R0000.00
+LOCAL_BUILD_DATE ?= $(shell date +%Y-%m-%d)
+RELEASE_ID ?= DEV-$(LOCAL_BUILD_DATE)
+RELEASE_LABEL = $(subst DEV-,DEV\space\textperiodcentered\space ,$(RELEASE_ID))
 BUILD_STAMP ?= $(shell date -u +%Y%m%dT%H%M%SZ)
 GIT_COMMIT ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo nogit)
-LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_ID)}\def\ZSFBuildStamp{$(BUILD_STAMP)}\def\ZSFGitCommit{$(GIT_COMMIT)}
+LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_ID)}\def\ZSFReleaseLabel{$(RELEASE_LABEL)}\def\ZSFBuildStamp{$(BUILD_STAMP)}\def\ZSFGitCommit{$(GIT_COMMIT)}
+IDENTITY_STAMP := $(BUILD_DIR)/.zsf-identity
+IDENTITY_KEY := $(RELEASE_ID)|$(GIT_COMMIT)
+IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTITY_STAMP)")" != "$(IDENTITY_KEY)" ]; then printf '%s' '-g'; fi)
 
 # Optional local-only automation; Makefile.local is gitignored.
 -include Makefile.local
@@ -30,11 +35,12 @@ LATEX_DEFS := \def\ZSFSubjectTitle{$(SUBJECT_TITLE)}\def\ZSFReleaseID{$(RELEASE_
 
 build:
 	INDEXSTYLE="$(CURDIR)/styles:" \
-	latexmk $(LATEXMK_FORCE) $(LATEXMK_FLAGS) -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
+	latexmk $(LATEXMK_FORCE) $(IDENTITY_FORCE) $(LATEXMK_FLAGS) -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
 		-e '$$makeindex = q{makeindex -r -s zsfindex.ist %O -o %D %S};' \
 		-pdflatex="pdflatex %O '$(LATEX_DEFS)\input{%S}'" $(MAIN)
 	@cp $(BUILD_DIR)/main.pdf "$(OUTPUT_PDF)"
 	@if [ "$(SYNCTEX)" = "1" ] && [ -f "$(BUILD_DIR)/main.synctex.gz" ]; then cp "$(BUILD_DIR)/main.synctex.gz" "$(OUTPUT_SYNC)"; fi
+	@printf '%s\n' "$(IDENTITY_KEY)" > "$(IDENTITY_STAMP)"
 
 rebuild: LATEXMK_FORCE := -g
 rebuild: build
