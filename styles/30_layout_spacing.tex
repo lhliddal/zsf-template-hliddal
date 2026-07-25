@@ -184,3 +184,8 @@
 \newcommand{\ZSFgapL}{\vspace{\ZSFspaceL}}
 \newcommand{\ZSFmanualColumnBreak}{\columnbreak}
 \newcommand{\ZSFtabColGap}{\hspace{\ZSFtabColumnGap}}
+% Trenner-Abstand um den Mittelpunkt im Index-Locator "6.2 · (S. 4)" (66_index).
+% Bewusst als Makro statt \newlength: das em soll an der Verwendungsstelle in der
+% Index-Schrift ausgewertet werden. Eine Länge würde es in der Präambel-Schrift
+% einfrieren und den Abstand dadurch messbar verschieben.
+\newcommand{\ZSFindexLocatorSep}{\hspace{0.2em}}

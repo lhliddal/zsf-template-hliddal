@@ -130,7 +130,7 @@
   {
     \bool_if:NF \l__zsf_index_locator_multiple_bool
       {\tl_if_empty:NF \l__zsf_index_pending_section_tl
-        {\mbox{\exp_args:NV \ZSF@idxrendersection \l__zsf_index_pending_section_tl\hspace{.2em}\textperiodcentered\hspace{.2em}(S.~\tl_use:N \l__zsf_index_pending_page_tl)}}}
+        {\mbox{\exp_args:NV \ZSF@idxrendersection \l__zsf_index_pending_section_tl\ZSFindexLocatorSep\textperiodcentered\ZSFindexLocatorSep(S.~\tl_use:N \l__zsf_index_pending_page_tl)}}}
     \tl_clear:N \l__zsf_index_pending_section_tl
     \tl_clear:N \l__zsf_index_pending_page_tl
   }
