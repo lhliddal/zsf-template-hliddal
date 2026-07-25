@@ -210,6 +210,12 @@
 % Schiebt das Tag per \hfill an den rechten Titelrand. Schrift: \ZSFfontTitleTag.
 \newcommand{\ZSFTitleTag}[1]{\hfill{\ZSFfontTitleTag #1}}
 
+% Zum "before"-Schlüssel in allen Box-Stilen unten: das führende \par ist Pflicht.
+% "before" ERSETZT die Default-Aktion von tcolorbox (die selbst ein \par enthält) —
+% es hängt nicht an. Ohne \par wird eine Box, vor der roher Fliesstext ohne
+% Leerzeile steht, inline an den offenen Absatz gehängt: sie bekommt keine
+% Spaltenbreite und ragt sichtbar in die Nachbarspalte. Im vertikalen Modus ist
+% \par ein No-op, der Zusatz ist also folgenlos, wo ohnehin alles korrekt war.
 \tcbset{zsfpanelbox/.style={
   enhanced jigsaw,
   colback=white,
@@ -222,7 +228,7 @@
   arc=\ZSFboxArc, outer arc=\ZSFboxArc,
   before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFspaceS,
-  before={\ZSFConsumeAfterSubsectionBar},
+  before={\par\ZSFConsumeAfterSubsectionBar},
   zsftitlebar,
 }}
 
@@ -247,7 +253,7 @@
   bottom=\ZSFspaceS,
   before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFspaceS,
-  before={\ZSFConsumeAfterSubsectionBar},
+  before={\par\ZSFConsumeAfterSubsectionBar},
   zsftitlebar,
   before upper={\parskip=\ZSFspaceS\relax\ZSFReadableAuto},
 }}
@@ -334,7 +340,7 @@
   bottom=\ZSFspaceS,
   before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFspaceS,
-  before={\ZSFConsumeAfterSubsectionBar},
+  before={\par\ZSFConsumeAfterSubsectionBar},
   before upper={\parskip=\ZSFspaceS\centering},
   after upper={\par},
   middle=\ZSFspaceSep,
@@ -428,7 +434,7 @@
     sidebyside gap=\ZSFspaceM,
     lefthand width=#1\linewidth,
     lower separated=false,
-    before={\ZSFConsumeAfterSubsectionBar},
+    before={\par\ZSFConsumeAfterSubsectionBar},
     before skip=\ZSFspaceS,
     after skip=\ZSFspaceS,
     before upper={\ZSFReadableAuto},
@@ -459,7 +465,7 @@
   bottom=\ZSFspaceXS,
   before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFspaceS,
-  before={\ZSFConsumeAfterSubsectionBar},
+  before={\par\ZSFConsumeAfterSubsectionBar},
   before upper={\ZSFReadableAuto},
 }}
 
