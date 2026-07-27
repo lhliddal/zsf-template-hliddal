@@ -1,31 +1,28 @@
 % Living Showcase: Verfahren und Listen (Palette Slot 2).
 \StartChapterOnNewColumn[ch:lists]{Verfahren und Listen}
 
-\SubsectionBar[sec:procedure]{Stabile Schrittfolge}
-\ZSFindex{Verfahren}
+\SubsectionBar[sec:procedure]{Nummerierte Schrittfolge}
 
-\begin{procedure}[Extremstellen bestimmen\ZSFTitleTag{procedure}]
-  \ProcStep{Definitionsbereich prüfen}{Ränder, Lücken und Pole notieren.}
-  \ProcStep{Kandidaten finden}{Ableitung nullsetzen und Randpunkte ergänzen.}
-  \ProcStep{Klassifizieren}{Vorzeichenwechsel oder zweite Ableitung prüfen.}
+\begin{procedure}[Schritte mit Marke und Text\ZSFTitleTag{procedure}]
+  \ProcStep{Automatisch gezählt}{Die Nummerierung kommt aus der Umgebung.}
+  \ProcStep{Zweiteiliger Schritt}{Fette Marke oben, Erklärung darunter.}
+  \ProcStep{Nur bei stabiler Folge}{Sonst ist eine Liste die bessere Wahl.}
 \end{procedure}
 
-\SubsectionBar[sec:lists]{Fakten ohne und mit Rahmen}
-\ZSFindex{Faktenliste}
-\ZSFindex{Eigenschaftsliste}
+\SubsectionBar[sec:lists]{Faktenliste ohne und mit Rahmen}
 
 \begin{factlist}
-  \ZSFFact{Konvergenz}{Eine Folge nähert sich einem eindeutigen Grenzwert.}
-  \ZSFFact{Monotonie}{Die Folgenglieder bewegen sich nur in eine Richtung.}
-  \ZSFFact{Beschränktheit}{Alle Werte bleiben innerhalb fester Schranken.}
+  \ZSFFact{factlist}{Ohne Titelargument rahmenlos und ohne Kopfzeile.}
+  \ZSFFact{ZSFFact}{Jeder Eintrag ist ein Paar aus Marke und Erklärung.}
+  \ZSFFact{Farbiger Punkt}{Das Aufzählungszeichen trägt die Kapitelfarbe.}
 \end{factlist}
 
-\begin{propertylist}[Kompaktes Intervall\ZSFTitleTag{propertylist}]
-  \ZSFFact{Stetigkeit}{Sichert Maximum, Minimum und Zwischenwerte.}
-  \ZSFFact{Abgeschlossenheit}{Alle Randpunkte gehören zur Menge.}
-\end{propertylist}
+\begin{factlist}[Dieselbe Liste mit Titel\ZSFTitleTag{factlist mit Titel}]
+  \ZSFFact{Ein Argument}{Der Titel bindet die Liste in eine Statement-Box.}
+  \ZSFFact{Gleiche Einträge}{Marke und Aufzählungszeichen bleiben identisch.}
+\end{factlist}
 
 \begin{runintext}
-  \ZSFkeyword*{factlist} bleibt rahmenlos; \ZSFkeyword*{propertylist} bindet
-  dieselbe Faktenlogik an eine dezente Statement-Box.
+  Eine Liste, zwei Erscheinungsformen: \ZSFkeyword{factlist} entscheidet
+  über den Titel, nicht über den Namen der Umgebung.
 \end{runintext}

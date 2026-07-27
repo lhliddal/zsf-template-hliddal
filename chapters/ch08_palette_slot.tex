@@ -1,52 +1,67 @@
-% Living Showcase: vorläufig beibehaltene Kompatibilitäts-API (Palette Slot 8).
-\StartChapterOnNewColumn[ch:compat]{Kompatibilitätsbausteine}
+% Living Showcase: Stilmittel mit Nutzen (Palette Slot 8).
+\StartChapterOnNewColumn[ch:stilmittel]{Stilmittel}
 
 \begin{runintext}
-  Diese Varianten bleiben funktionsfähig, sind für neue Kapitel aber nicht
-  bevorzugt. Die Galerie erleichtert eine spätere Behalten-/Entfernen-Entscheidung.
+  Diese Mittel kosten keinen Platz, sparen aber Lesezeit. Sie lohnen sich
+  überall dort, wo eine Umformung sonst Zeile für Zeile nachvollzogen
+  werden müsste.
 \end{runintext}
 
-\SubsectionBar[sec:compat-boxes]{Tabellen- und Formelvarianten}
-\ZSFindex[Kompatibilitat]{Kompatibilität}
+\SubsectionBar[sec:mhl]{Terme über Umformungen verfolgen}
+\ZSFindex{Term-Einfärbung}
 
-\begin{fulltablebox}[Volle Tabellenbreite\ZSFTitleTag{fulltablebox}]{L R}
-  Alpha & 10 \\
-  Beta & 20
-\end{fulltablebox}
-
-\begin{fulllessbox}{L R}
-  rahmenlos & \ZSFkeyword*{fulllessbox} \\
-  zentriert & volle Breite
-\end{fulllessbox}
-
-\begin{formulabox}[title={Mehrzeilige Altform\ZSFTitleTag{longformula}}]
-  \begin{longformula}
-    (a+b)^2 &= a^2+2ab+b^2,\\
-    (a-b)^2 &= a^2-2ab+b^2.
-  \end{longformula}
+\begin{formulabox}[title={Wohin wandert welcher Koeffizient?}]
+  \[
+    \ZSFmhlA{a}x^2 + \ZSFmhlB{b}x + \ZSFmhlD{c} = 0
+  \]
+  \formulasep
+  \[
+    \ZSFmhlC{x_{1,2}} = \frac{-\ZSFmhlB{b} \pm
+      \sqrt{\ZSFmhlB{b}^2 - 4\,\ZSFmhlA{a}\,\ZSFmhlD{c}}}{2\,\ZSFmhlA{a}}
+  \]
+  \formulanote{Drei Gegebene, fünf Fundstellen im Resultat — mit Farbe ist
+  die Zuordnung sofort da, ohne Farbe muss man sie jedes Mal nachlesen.}
 \end{formulabox}
 
-\begin{valuegridcustom}{l c c}[Freie Spaltenwahl\ZSFTitleTag{valuegridcustom}]
-  Fall & links & rechts \\
-  A & 1 & 2 \\
-  B & 3 & 4
-\end{valuegridcustom}
-
-\SubsectionBar[sec:compat-goals]{Goal-Komfortmakros}
-\ZSFindex{GoalCard}
-
-\GoalCard[Einzelkarte\ZSFTitleTag{GoalCard}]{$x>0$}{\GoalStep{x^2}}{x}
-
-\GoalPair
-  {Fall A}{$x\geq0$}{\GoalStep{\sqrt{x^2}}}{x}
-  {Fall B}{$x<0$}{\GoalStep{\sqrt{x^2}}}{-x}
-
-\begin{figbox}[Platzhalter\ZSFTitleTag{PlaceholderGraphic}]
-  \PlaceholderGraphic{später durch ZSFfig ersetzen}
-\end{figbox}
-
 \begin{factlist}
-  \ZSFFact{Layout}{ZSFmanualColumnBreak und ZSFtabColGap.}
-  \ZSFFact{Tabellenregeln}{SetZSFtableRuleColor und SetZSFtableRuleWidth.}
-  \ZSFFact{Zeilenfarbe}{ZSFrowColor sowie begin/end TableRuleStyle.}
+  \ZSFFact{ZSFmhlA/B/D}{Die gegebenen Grössen, je ein Strang.}
+  \ZSFFact{ZSFmhlC}{Das Ziel — immer die Endform oder das Resultat.}
+  \ZSFFact{Gleiche Farbe}{bedeutet immer dieselbe Grösse, nie blosse Betonung.}
 \end{factlist}
+
+\SubsectionBar[sec:brace]{Formelteile benennen}
+\ZSFindex{Klammer-Annotation}
+
+\begin{formulabox}[title={Der Name steht am Teil, nicht daneben}]
+  \[
+    \ZSFbraceunder{x^2+2x+1}{Ausgangsform}
+    = \ZSFbraceover{(x+1)^2}{faktorisiert}
+  \]
+  \formulasep
+  \[
+    \ZSFsumAuto{k=1}{n} k
+    = \ZSFbraceover{\frac{n(n+1)}{2}}{geschlossene Form}
+  \]
+  \formulanote{Eine Note unter der Box müsste erst sagen, welcher Teil
+  gemeint ist. Die Klammer zeigt direkt darauf.}
+\end{formulabox}
+
+\SubsectionBar[sec:kombi]{Zusammenspiel}
+
+\begin{formulabox}[title={Farbe, Klammer und Hervorhebung zusammen}]
+  \[
+    \begin{aligned}
+      \ZSFbraceunder{\ZSFmhlA{u}\,\ZSFmhlB{v}}{Produkt}\ '
+      &= \ZSFmhlC{\ZSFmhlA{u}'\,\ZSFmhlB{v}} \\
+      &\quad + \ZSFmhlC{\ZSFmhlA{u}\,\ZSFmhlB{v}'}
+    \end{aligned}
+  \]
+  \ZSFhl{Farbe trägt die Zuordnung, die Klammer den Namen, die
+  Hervorhebung die Kernaussage.}
+\end{formulabox}
+
+\begin{warnbox}[Wann es sich nicht lohnt]
+  Farbe nur setzen, wenn die Zuordnung mathematisch eindeutig ist. Zur
+  blossen Betonung eines Terms ist sie falsch — dafür gibt es
+  \ZSFdanger{ZSFdanger} und ZSFhl. Im Zweifel keine Farbe.
+\end{warnbox}

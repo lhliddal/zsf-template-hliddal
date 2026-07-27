@@ -12,6 +12,13 @@ ifeq ($(SYNCTEX),1)
 LATEXMK_FLAGS += -synctex=1
 endif
 
+# Legacy-Modus für BESTEHENDE ZSF, die nicht auf den aktuellen Stand umgebaut
+# werden: ZSF_LEGACY = 1 stuft Kapitel-Regelbefunde zu Hinweisen herab, damit
+# der Build grün bleibt. Die Befunde bleiben sichtbar und werden gezählt.
+# Im Template und in jeder neu aufgebauten ZSF bleibt der Wert 0.
+ZSF_LEGACY ?= 0
+export ZSF_LEGACY
+
 # Identity (Forks überschreiben diese; müssen zu styles/75_pdf_identity.tex passen).
 SUBJECT_TITLE ?= ZSF Template
 LOCAL_BUILD_DATE ?= $(shell date +%Y-%m-%d)
@@ -29,7 +36,7 @@ IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTI
 
 .PHONY: build rebuild check clean all \
         check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules check-init-project \
-        check-root-clean check-pdf-identity check-guardrails lint \
+        check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
         sync-rules check-rules check-rule-authorship \
         release-proof print-pdf-basename
 
@@ -54,7 +61,7 @@ rebuild: build
 # Läuft NICHT in CI: tests/ tools/ rules/ sind git-excluded und fehlen im Clone.
 # 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
 check: check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
-       check-root-clean check-pdf-identity check-guardrails lint \
+       check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
        check-rule-authorship check-rules
 	@echo "make check: alle Prüfungen bestanden."
 
@@ -92,6 +99,9 @@ check-pdf-identity:
 
 check-guardrails:
 	@bash tests/check_guardrails.sh
+
+check-showcase-coverage:
+	@bash tests/check_showcase_coverage.sh
 
 # chktex ist stilistischer Lint (advisory): meldet, bricht den Build aber nicht.
 # Der harte Lint-Gate auf geänderten Dateien läuft über pre-commit.

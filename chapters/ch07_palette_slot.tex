@@ -2,62 +2,58 @@
 \StartChapterOnNewColumn[ch:code]{Code und Kommentare}
 
 \SubsectionBar[sec:code-listing]{CodeExpert-Listing}
-\ZSFindex{Code-Listing}
 
-\begin{codebox}[Binäre Suche\ZSFTitleTag{codebox}]
+\begin{codebox}[Was der Listing-Stil einfärbt\ZSFTitleTag{codebox}]
 \begin{lstlisting}[style=CodeExpert]
-def binary_search(values, target):
-    lo, hi = 0, len(values) - 1
-    while lo <= hi:
-        mid = (lo + hi) // 2
-        if values[mid] == target:
-            return mid
-        if values[mid] < target:
-            lo = mid + 1
-        else:
-            hi = mid - 1
-    return -1
+# Kommentar: gruen gesetzt
+def hervorhebung(text="Zeichenkette", zahl=42):
+    if zahl > 0:
+        return text
+    return None
 \end{lstlisting}
 \end{codebox}
 
 \SubsectionBar[sec:code-split]{Teilbare Code-Gruppe}
 
-\begin{codeboxfirst}
+\begin{codeboxfirst}[Teil 1 trägt den Titel\ZSFTitleTag{codeboxfirst}]
 \begin{lstlisting}[style=CodeExpert]
-data = [2, 5, 8, 13]
+# Rahmen oben, unten offen
+werte = [1, 2, 3]
 \end{lstlisting}
 \end{codeboxfirst}
 \begin{codeboxmid}
 \begin{lstlisting}[style=CodeExpert]
-position = binary_search(data, 8)
+# codeboxmid: beide Kanten offen
+summe = sum(werte)
 \end{lstlisting}
 \end{codeboxmid}
 \begin{codeboxlast}
 \begin{lstlisting}[style=CodeExpert]
-print(position)  # 2
+# codeboxlast: Rahmen unten
+print(summe)
 \end{lstlisting}
 \end{codeboxlast}
 
 \SubsectionBar[sec:code-comments]{Smarte Zeilenkommentare}
-\ZSFindex{Code-Kommentar}
 
-\begin{statementbox}[Automatische Platzierung\ZSFTitleTag{CodeLine}]
+\begin{statementbox}[Kommentar rechts oder darüber\ZSFTitleTag{CodeLine}]
   \ttfamily
-  \CodeLine{result = values[mid]}[kurzer Kommentar]\\
-  \CodeLine{very_long_result_name = values[mid]}[zu breit: Kommentar steht darüber]\\
-  \CodeLine{limit = 10}\InlineComment{explizit rechts}\\
-  \OverlineComment{explizit vorangestellter Kommentar}
-  \CodeLine{return result}
+  \CodeLine{kurz = 1}[passt rechts daneben]\\
+  \CodeLine{sehr_langer_variablenname = 1}[zu breit, deshalb darüber]\\
+  \CodeLine{limit = 10}\InlineComment{InlineComment: erzwungen rechts}\\
+  \OverlineComment{OverlineComment: erzwungen darüber}
+  \CodeLine{fertig = True}
 \end{statementbox}
 
 \begin{codebox}
 \begin{lstlisting}[style=CodeExpert]
-# codebox funktioniert auch ohne Titel
-active = True
+# codebox ohne Titelargument: keine Kopfzeile
+titellos = True
 \end{lstlisting}
 \end{codebox}
 
 \begin{factlist}
-  \ZSFFact{Schwelle}{SetCodeCommentThreshold erzwingt früheren Umbruch.}
-  \ZSFFact{Reset}{ResetCodeCommentThreshold stellt den Standard wieder her.}
+  \ZSFFact{\ZSFkeyword{CodeLine}}{Entscheidet nach Breite, wo der Kommentar steht.}
+  \ZSFFact{SetCodeCommentThreshold}{Verschiebt die Schwelle für den Umbruch.}
+  \ZSFFact{ResetCodeCommentThreshold}{Stellt den Standard wieder her.}
 \end{factlist}

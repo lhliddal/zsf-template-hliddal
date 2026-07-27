@@ -2,18 +2,24 @@
 \StartChapterOnNewColumn[ch:figures]{Abbildungen und Layout}
 
 \SubsectionBar[sec:fig-helpers]{Bild-Makros}
-\ZSFindex{Abbildung}
+\ZSFindex{ZSFfig}
+\ZSFindex{ZSFfigside}
+\ZSFindex{ZSFfigrow}
 
-\ZSFfig[0.34]{example-image-a}{Externe Abbildung\ZSFTitleTag{ZSFfig}}%
-  {Optionale Caption, zentrale Breitensteuerung und Höhenbegrenzung.}
+\ZSFfig[0.34]{example-image-a}{Ein Bild, optional skaliert\ZSFTitleTag{ZSFfig}}%
+  {Der Breitenanteil ist optional; ohne ihn greift die zentrale Höhenbegrenzung.}
 
-\ZSFfigside[0.27]{example-image-a}{Bild mit Erklärung\ZSFTitleTag{ZSFfigside}}{%
-  Kleine Abbildung links, prüfungsrelevante Erklärung rechts.}
+\ZSFfigside[0.27]{example-image-a}{Bild links, Text rechts\ZSFTitleTag{ZSFfigside}}{%
+  Der erste Wert bestimmt den Bildanteil, der Rest gehört dem Text.}
 
-\SubsectionBar[sec:plot]{Vektorplot ohne externe Datei}
-\ZSFindex{Plot}
+\ZSFfigrow{example-image-a,example-image-b,example-image-c}%
+  {Mehrere Bilder in einer Reihe\ZSFTitleTag{ZSFfigrow}}%
+  {Gleiche Breite; die Anzahl ergibt sich aus der Pfadliste.}
 
-\begin{figbox}[Funktionsverlauf\ZSFTitleTag{figbox + pgfplots}]
+\SubsectionBar[sec:plot]{Plot ohne externe Datei}
+\ZSFindex{figbox}
+
+\begin{figbox}[Diagramm direkt im Dokument\ZSFTitleTag{figbox + pgfplots}]
   \centering
   \begin{tikzpicture}
     \begin{axis}[
@@ -26,15 +32,17 @@
       ticks=none
     ]
       \addplot[color=\chaptercolor, very thick, domain=-2:2]{x^2};
+      \node[\chaptercolor, font=\ZSFfontDiagramLabel, anchor=west]
+        at (axis cs:-2.1,4.25) {ZSFfontDiagramLabel};
     \end{axis}
   \end{tikzpicture}
-  \ZSFfigcaption{Das optionale Modul 12\_plots lädt pgfplots nur im Showcase.}
+  \ZSFfigcaption{Knotenbeschriftung über ZSFfontDiagramLabel statt lokalem
+    \textbackslash tiny; pgfplots kommt aus dem Opt-in-Modul 12\_plots.}
 \end{figbox}
 
 \begin{splitbox}[0.34][sidebyside align=center]
-  \ZSFindex{Splitbox}
-  \centering $\displaystyle f'(x)$
+  \centering linker Block
   \tcblower
-  \ZSFkeyword*{splitbox} ordnet zwei beliebige Inhaltsblöcke ohne sichtbaren
-  Rahmen nebeneinander an.
+  \ZSFkeyword{splitbox} ordnet zwei beliebige Inhaltsblöcke ohne sichtbaren
+  Rahmen nebeneinander an; der Wert legt den linken Anteil fest.
 \end{splitbox}

@@ -1,35 +1,37 @@
 % Living Showcase: Einstieg und Navigationsübersicht (Palette Slot 0).
-\ZSFTitleHeader{ZSF Template}{Loris Einar Kristjan Hliddal}
+\ZSFTitleHeader{ZSF Template}{\ZSFOwnerDisplayName}
 \StartFrontChapter{Living Showcase}
 
 \begin{runintext}
   Diese Ausgabe ist zugleich Präsentation, Bauteilkatalog und visueller
-  Regressionstest. Sie zeigt die stabile Kapitel-API, optionale Module und
-  vorläufige Kompatibilitätsbausteine in ihrer echten Darstellung.
+  Regressionstest. Jede Box zeigt sich selbst: Titel und Inhalt beschreiben,
+  welcher Baustein hier steht und was er leistet.
 \end{runintext}
 
 \SubsectionBar*{Schnellzugriff}
+\ZSFindex{Bauteilkatalog}
 
-\begin{tablebox}[Funktionsfamilien\ZSFTitleTag{Übersicht}]
-  \begin{ZSFtable}{Y{1.35} Z{0.35} Y{1.30}}
-    \ZSFheaderRow \ZSFhead{Bereich} & \ZSFhead{Kap.} & \ZSFhead{Enthält} \\
-    Aussagen & \ZSFsectionref{ch:boxes} & Definition, Warnung \\
-    Verfahren & \ZSFsectionref{ch:lists} & Schritte, Listen \\
-    Formeln & \ZSFsectionref{ch:math} & Math, Zielketten \\
-    Tabellen & \ZSFsectionref{ch:tables} & drei Stile, Grids \\
-    Visuals & \ZSFsectionref{ch:figures} & Bilder, Plot, Split \\
+\begin{tablebox}[Welcher Baustein wo\ZSFTitleTag{Übersicht}]
+  \begin{ZSFtable}{Y{1.05} Z{0.35} Y{1.60}}
+    \ZSFheaderRow \ZSFhead{Bereich} & \ZSFhead{Kap.} & \ZSFhead{Bausteine} \\
+    Aussagen & \ZSFsectionref{ch:boxes} & defbox, statementbox, warnbox \\
+    Verfahren & \ZSFsectionref{ch:lists} & procedure, factlist \\
+    Formeln & \ZSFsectionref{ch:math} & formulabox, goalbox \\
+    Tabellen & \ZSFsectionref{ch:tables} & ZSFtable, valuegrid \\
+    Visuals & \ZSFsectionref{ch:figures} & ZSFfig, figbox, splitbox \\
     Navigation & \ZSFsectionref{ch:semantics} & Marker, Verweise \\
-    Code & \ZSFsectionref{ch:code} & Listings, Kommentare \\
-    Kompatibilität & \ZSFsectionref{ch:compat} & vorläufige API
+    Code & \ZSFsectionref{ch:code} & codebox, CodeLine \\
+    Stilmittel & \ZSFsectionref{ch:stilmittel} & Farbverfolgung, Klammern
   \end{ZSFtable}
 \end{tablebox}
 
 \begin{statementbox}[Lesart]
-  Der rechts gesetzte Titel-Tag nennt jeweils die verwendete Umgebung. So
-  lassen sich Varianten bei einem Rework direkt vergleichen und auswählen.
+  Der rechts gesetzte Titel-Tag nennt jeweils die verwendete Umgebung, der
+  Titel sagt, wofür sie da ist. So lassen sich Varianten direkt vergleichen
+  und auswählen.
 \end{statementbox}
 
-\begin{warnbox}[Showcase statt Fachinhalt]
-  Die Beispiele sind bewusst kurz und fachübergreifend. Bewertet wird hier
-  das System, nicht die Vollständigkeit eines einzelnen Fachs.
+\begin{warnbox}[Kein Fachinhalt]
+  Die Beispiele tragen bewusst keinen Lernstoff. Sie zeigen ausschliesslich
+  das Verhalten der Bausteine — was hier steht, beschreibt den Baustein.
 \end{warnbox}

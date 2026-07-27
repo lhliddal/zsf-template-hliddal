@@ -2,56 +2,47 @@
 \StartChapterOnNewColumn[ch:tables]{Tabellen und Grids}
 
 \SubsectionBar[sec:table-header]{Header und Zebra}
-\ZSFindex{Tabelle}
 
-\begin{tablebox}[Physikalische Grössen\ZSFTitleTag{tablebox + ZSFtable}]
-  \begin{ZSFtable}{Y{0.55} Y{1.55} Q{0.90}}
-    \ZSFheaderRow \ZSFhead{Symbol} & \ZSFhead{Bedeutung} & \ZSFhead{SI} \\
-    $m$ & Masse & \si{kg} \\
-    $v$ & Geschwindigkeit & \si{m/s} \\
-    $E$ & Energie & \si{J}
+\begin{tablebox}[Farbiger Header, Zebra ab Zeile 2\ZSFTitleTag{tablebox + ZSFtable}]
+  \begin{ZSFtable}{Y{0.98} Y{1.32} Q{0.70}}
+    \ZSFheaderRow \ZSFhead{Element} & \ZSFhead{Wirkung} & \ZSFhead{Zeile} \\
+    \ZSFkeyword{ZSFtable} & Header und Zebra & 1 \\
+    ZSFheaderRow & färbt die Kopfzeile & 1 \\
+    ZSFhead & färbt jede Kopfzelle & 1 \\
+    Zebra & ab der zweiten Zeile & 2
   \end{ZSFtable}
 \end{tablebox}
 
 \SubsectionBar[sec:table-variants]{Ohne Header oder Zebra}
 
-\begin{tablebox}[Zebra ab erster Zeile\ZSFTitleTag{ZSFtableFlat}]
-  \begin{ZSFtableFlat}{L R}
-    links & rechts \\
-    Alpha & 10 \\
-    Beta & 20
+\begin{tablebox}[Zebra ab der ersten Zeile\ZSFTitleTag{ZSFtableFlat}]
+  \begin{ZSFtableFlat}{Y{1.2} Q{0.8}}
+    \ZSFkeyword{ZSFtableFlat} & ohne Kopfzeile \\
+    Streifen & ab Zeile 1 \\
+    Einsatz & reine Datenlisten
   \end{ZSFtableFlat}
 \end{tablebox}
 
-\begin{tablebox}[Ruhige Vergleichstabelle\ZSFTitleTag{ZSFtablePlain}]
+\begin{tablebox}[Ganz ohne Streifen\ZSFTitleTag{ZSFtablePlain}]
   \begin{ZSFtablePlain}{Y{1.25} Z{0.75}}
-    stetig & ja \\
-    differenzierbar & nicht zwingend
+    \ZSFkeyword{ZSFtablePlain} & kein Zebra \\
+    Einsatz & sehr kurze Tabellen
   \end{ZSFtablePlain}
 \end{tablebox}
 
-\begin{tablebox}[Ausrichtung und Formelspalte\ZSFTitleTag{L/C/R/F}]
+\begin{tablebox}[Spaltentypen im Vergleich\ZSFTitleTag{L/C/R/F}]
   \begin{ZSFtablePlain}{L C R F{1}}
-    links & Mitte & rechts & x^2+1
+    L linksbündig & C zentriert & R rechtsbündig & F{1}: x^2+1
   \end{ZSFtablePlain}
 \end{tablebox}
 
-\ZSFindex{Valuegrid}
-\begin{valuegridtwo}[Naturkonstanten\ZSFTitleTag{compactgridbox + valuegridtwo}]
-  Grösse & Wert & Einheit \\
-  $g$ & $9{,}81$ & \si{m/s^2} \\
-  $c$ & $2{,}998\cdot10^8$ & \si{m/s}
-\end{valuegridtwo}
+\begin{valuegrid}{2}[Kompaktes Wertegitter\ZSFTitleTag{valuegrid}]
+  \ZSFkeyword{valuegrid} & Spalte 1 & Spalte 2 \\
+  Argument & Anzahl & Datenspalten \\
+  Erste Spalte & immer & Beschriftung
+\end{valuegrid}
 
 \begin{runintext}
-  Die Wrapper \ZSFkeyword*{valuegridtwo} bis \ZSFkeyword*{valuegridseven}
-  decken zwei bis sieben Datenspalten ab; \ZSFkeyword*{valuegrid} nimmt die
-  Anzahl direkt entgegen.
+  Alle Spaltenbreiten sind proportional: die Faktoren einer Tabelle müssen
+  zur Anzahl X-Spalten summieren, dann füllt sie die Spalte exakt aus.
 \end{runintext}
-
-\ZSFindex{Compactgrid}
-\begin{compactgridbox}[Direkte Kompakt-Shell\ZSFTitleTag{compactgridbox}]
-  \begin{ZSFtablePlain}{C C}
-    minimal & frei befüllbar
-  \end{ZSFtablePlain}
-\end{compactgridbox}

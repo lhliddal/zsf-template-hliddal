@@ -1,39 +1,36 @@
-% Living Showcase: grundlegende Aussagen- und Hinweisboxen (Palette Slot 1).
+% Living Showcase: Aussagen- und Hinweisboxen (Palette Slot 1).
 \StartChapterOnNewColumn[ch:boxes]{Aussagen und Hinweise}
 
 \SubsectionBar[sec:box-core]{Titelboxen}
-\ZSFindex{Definition}
-\ZSFindex{Aussage}
 
 \begin{runintext}
-  \ZSFkeyword*{runintext} ist der ruhige Fliesstext-Baustein zwischen
+  \ZSFkeyword{runintext} ist der ruhige Fliesstext-Baustein zwischen
   strukturierten Elementen. Er übernimmt automatisch die Lesbarkeitsregeln
   für schmale Spalten.
 \end{runintext}
 
-\begin{defbox}[Injektive Abbildung\ZSFTitleTag{defbox}]
-  Eine Abbildung $f\colon A\to B$ heisst
-  \ZSFkeyword[Injektivitat@Injektivität]{injektiv}, wenn
-  $f(x_1)=f(x_2)$ stets $x_1=x_2$ impliziert.
-  \ZSFhl{Gleiche Bilder erzwingen gleiche Urbilder.}
+\begin{defbox}[Titelleiste und freier Inhalt\ZSFTitleTag{defbox}]
+  \ZSFkeyword{defbox} trägt eine farbige Titelleiste und beliebigen Inhalt —
+  gedacht für Definitionen und gewichtige Sätze.
+  \ZSFhl{So sieht die hervorgehobene Kernaussage einer Box aus.}
 \end{defbox}
 
-\begin{statementbox}[Extremwertsatz\ZSFTitleTag{statementbox}]
-  Jede stetige Funktion auf einem kompakten Intervall nimmt ein Maximum und
-  ein Minimum an.
+\begin{statementbox}[Nur ein linker Farbbalken\ZSFTitleTag{statementbox}]
+  \ZSFkeyword{statementbox} kommt ohne Titelleiste aus und markiert kompakte
+  Aussagen mit einem dezenten Balken. Leichter als die defbox.
 \end{statementbox}
 
-\begin{warnbox}[Definitionsbereich\ZSFTitleTag{warnbox}]
-  \ZSFindex{Warnung}
-  \ZSFindexsee{Stolperfalle}{Warnung}
-  Vor dem Umformen Nullstellen von Nennern und negative Radikanden prüfen.
-  \ZSFdanger{Nicht blind kürzen.}
+\begin{warnbox}[Stolperfalle mit eigenem Block\ZSFTitleTag{warnbox}]
+  \ZSFindexsee{Achtung}{warnbox}
+  \ZSFkeyword{warnbox} ist der eigenständige Block für eine Warnung, die
+  Raum braucht. Ohne Titelargument lautet die Leiste automatisch »Achtung«.
+  \ZSFdanger{ZSFdanger ist die Inline-Pille.}
 \end{warnbox}
 
 \SubsubsectionBar[sec:box-hierarchy]{Dritte Lookup-Ebene}
-\ZSFindex{Subsubsection}
 
 \begin{statementbox}
-  Die Subsubsection ist für echte fachliche Tiefe reserviert; diese Box zeigt
-  zugleich die titellose Variante von \ZSFkeyword*{statementbox}.
+  Der \ZSFkeyword{SubsubsectionBar} ist die optionale dritte Ebene, sichtbar
+  kleiner und heller. Diese Box zeigt zugleich: ohne Titelargument entfällt
+  die Kopfzeile ganz — dieselbe Box, ein Argument weniger.
 \end{statementbox}

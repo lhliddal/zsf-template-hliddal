@@ -5,9 +5,9 @@
 **Template-PDF:** [template_fs0000_hliddal.pdf herunterladen](https://github.com/lhliddal/zsf-template-hliddal/releases/latest/download/template_fs0000_hliddal.pdf)
 
 Wenn du nur sehen willst, wie das Template aussieht, reicht diese PDF. Sie ist
-als dreiseitige Living Showcase aufgebaut: stabile Boxen und Makros, optionale
-Module, vorläufige Kompatibilitätsbausteine, alle 18 Kapitel-Farben und das
-Stichwortverzeichnis werden direkt vergleichbar dargestellt. Den LaTeX-Code
+als Living Showcase aufgebaut: stabile Boxen und Makros, optionale
+Module, alle 18 Kapitel-Farben und das Stichwortverzeichnis werden direkt
+vergleichbar dargestellt. Den LaTeX-Code
 brauchst du, wenn du damit eine eigene Zusammenfassung bauen willst.
 
 ## Persönlicher Hinweis
@@ -32,4 +32,4 @@ Nutzung, Anpassung und Weitergabe sind willkommen. Bitte die im PDF ausgewiesene
 make build
 ```
 
-Die Quellen liegen in `main.tex`, `preamble.tex`, `chapters/`, `styles/` und den benötigten Grafikordnern. Der Build erzeugt `template_fs0000_hliddal.pdf` lokal im Repository-Root. Diese Build-Datei wird nicht versioniert; die oben verlinkte PDF im GitHub Release ist die veröffentlichte Fassung.
+Die Quellen liegen in `main.tex`, `preamble.tex`, `chapters/`, `styles/` und den benötigten Grafikordnern. Der Build erzeugt `template_fs0000_hliddal.pdf` im Repository-Root. Diese Datei wird mitversioniert, damit der aktuelle Stand direkt im Repository sichtbar ist; verbindlich veröffentlicht ist die oben verlinkte PDF im GitHub Release.
