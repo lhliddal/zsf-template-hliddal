@@ -22,14 +22,6 @@
 % styles/40_colors_structure.tex. Schadlos wenn das Modul deaktiviert ist.
 \newcommand{\ZSFfontCodeComment}{\ttfamily\color{ce_green}}
 
-% Tabellen-Hilfsmakros
-\newcommand{\TableCellNote}[1]{{\ZSFfontNote #1}}
-\newcommand{\TableTitleBreak}{\newline}
-\newcommand{\TableTitle}[2][]{%
-  \textbf{#2}%
-  \if\relax\detokenize{#1}\relax\else\TableTitleBreak\TableCellNote{#1}\fi
-}
-
 % Semantische Tabellen-Fontgrössen
 % (werden als optionales Argument an ZSFtable/ZSFtableFlat/ZSFtablePlain
 %  übergeben — siehe styles/20_tables.tex).
@@ -37,6 +29,12 @@
 % knapper Inhalt) \ZSFfontTableDense verwenden.
 \newcommand{\ZSFfontTable}{\normalsize}
 \newcommand{\ZSFfontTableDense}{\footnotesize}
+
+% Beschriftung IN Diagrammen: TikZ-Knoten, Achsen-/Kurvenlabels und
+% Annotationen an Formelteilen. Ersetzt lokales \tiny/\scriptsize an
+% genau diesen Stellen — Diagramm-Inhalt ist Inhalt, seine Schriftgrösse
+% ist Gestaltung und gehört deshalb hierher.
+\newcommand{\ZSFfontDiagramLabel}{\sffamily\fontsize{5.8bp}{6.4bp}\selectfont}
 
 % Semantische Inhaltsmakros (konsistente Skalierung und einfache Anpassung)
 %
@@ -61,7 +59,13 @@
 %   * Stolperfalle/kritische Ausnahme -> \ZSFdanger
 %   * Folgerung                      -> \ZSFconclusion
 %   * sonst die EINE Schlüsselaussage -> \ZSFhl
-\newcommand{\ZSFhl}[1]{\underline{\textbf{#1}}}
+% \uline statt \underline: \underline steckt seinen Inhalt in eine
+% unzerbrechliche Box — jede Hervorhebung, die länger als eine Zeile ist,
+% sprengt damit die 50-mm-Spalte. \ZSFhl markiert aber laut Zweck eine ganze
+% Aussage, nicht ein Wort. \uline bricht mit dem Absatz um.
+% Fett als Deklaration, nicht als Argument von \uline: ein \textbf{...} als
+% Argument macht den Inhalt für ulem wieder zu einer Einheit.
+\newcommand{\ZSFhl}[1]{{\bfseries\uline{#1}}}
 
 % Papierorientierte Referenzrollen:
 %   * \ZSFref{label}: hilfreicher Querverweis mit farbiger Abschnittsnummer.
@@ -108,15 +112,3 @@
   \par\vspace{-\parskip}\vspace{\ZSFspaceS}%
 }
 
-% Tabellen-Styling (benötigt [table]{xcolor} und array)
-\newcommand{\ZSFrowColor}{\rowcolor{\FormulaboxBackColor}}
-\newcommand{\ZSFtableRuleColor}{TableRuleDefaultColor}
-\newcommand{\SetZSFtableRuleColor}[1]{\renewcommand{\ZSFtableRuleColor}{#1}}
-\newcommand{\ZSFtableRuleWidth}{\ZSFboxRuleWidth}
-\newcommand{\SetZSFtableRuleWidth}[1]{\renewcommand{\ZSFtableRuleWidth}{#1}}
-\newcommand{\ZSFbeginTableRuleStyle}{%
-  \begingroup
-  \arrayrulecolor{\ZSFtableRuleColor}%
-  \setlength{\arrayrulewidth}{\ZSFtableRuleWidth}%
-}
-\newcommand{\ZSFendTableRuleStyle}{\endgroup}

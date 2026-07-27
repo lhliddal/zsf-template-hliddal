@@ -2,18 +2,15 @@
 % 60_boxes.tex — tcolorbox-Stile, Balken, Boxen, Formelnoten, Listen
 % ============================================================
 
-\newcommand{\BreakIfNotEnoughSpace}{%
-  \par\penalty0\vspace{0pt plus \ZSFbreakThreshold}\penalty-100\vspace{0pt plus -\ZSFbreakThreshold}\relax
+% Platzreserve vor einem Titelbalken: Ist weniger als #1 frei, bricht die
+% Spalte davor um. Genau eine Implementierung — die drei Balkenebenen
+% unterscheiden sich nur im Schwellwert (rules/30_spacing).
+\newcommand{\ZSFReserveSpace}[1]{%
+  \par\penalty0\vspace{0pt plus #1}\penalty-100\vspace{0pt plus -#1}\relax
 }
-
-% Strenger Break-Trigger für ChapterBar: grössere Mindesthöhe verhindert,
-% dass ein neues Kapitel direkt am Spalten-/Seitenende beginnt.
-\newcommand{\BreakIfNotEnoughSpaceChapter}{%
-  \par\penalty0\vspace{0pt plus \ZSFbreakThresholdChapter}\penalty-100\vspace{0pt plus -\ZSFbreakThresholdChapter}\relax
-}
-\newcommand{\BreakIfNotEnoughSpaceSubsubsection}{%
-  \par\penalty0\vspace{0pt plus \ZSFbreakThresholdSubsubsection}\penalty-100\vspace{0pt plus -\ZSFbreakThresholdSubsubsection}\relax
-}
+\newcommand{\BreakIfNotEnoughSpace}{\ZSFReserveSpace{\ZSFbreakThreshold}}
+\newcommand{\BreakIfNotEnoughSpaceChapter}{\ZSFReserveSpace{\ZSFbreakThresholdChapter}}
+\newcommand{\BreakIfNotEnoughSpaceSubsubsection}{\ZSFReserveSpace{\ZSFbreakThresholdSubsubsection}}
 
 % Einheitlicher Top-Spacing-Kontrakt für Titelbalken.
 % Reihenfolge ist kritisch: \addvspace MUSS vor \BreakIfNotEnoughSpace stehen,
@@ -27,19 +24,30 @@
 }
 
 % ------------------------------------------------------------
-% Chapter-Bar
+% Titelbalken — gemeinsame Basis
 % ------------------------------------------------------------
+% Alle vier Balken (Kapitel, Dokumenttitel, Abschnitt, Unterabschnitt) teilen
+% denselben Rahmenlos-Kontrakt. Sie setzen nur noch, worin sie sich wirklich
+% unterscheiden: Farbe, vertikale Polsterung, Skips und Schrift.
+% Der Balken-Ton ist immer Fläche = Rahmen, deshalb ein Schlüssel dafür.
+\tcbset{
+  zsfbarcolor/.style={colback=#1, colframe=#1},
+  zsfbar/.style={
+    enhanced jigsaw,
+    breakable=false,
+    boxrule=0pt,
+    boxsep=0pt,
+    left=\ZSFboxPadX,
+    right=\ZSFboxPadX,
+    before skip=0pt,
+  },
+}
+
 \newtcolorbox{chapterbar}[1][]{
-  enhanced jigsaw,
-  breakable=false,
-  colback=\ChapterBarColor,
-  colframe=\ChapterBarColor,
-  boxrule=0pt,
-  boxsep=0pt,
-  left=\ZSFspaceS,
-  right=\ZSFspaceS,
-  top=\ZSFspaceS,
-  bottom=\ZSFspaceS,
+  zsfbar,
+  zsfbarcolor=\ChapterBarColor,
+  top=\ZSFbarPadY,
+  bottom=\ZSFbarPadY,
   before skip=\ZSFspaceL,
   after skip=\ZSFchapterBarAfterSkip,
   fontupper=\ZSFfontChapter,
@@ -56,17 +64,12 @@
 % Dokument-Titel-Masthead — einmalig vor dem Front-Chapter
 % ------------------------------------------------------------
 \newtcolorbox{zsftitleheader}[1][]{
-  enhanced jigsaw,
-  breakable=false,
-  colback=ZSFDocumentTitleBarColor,
-  colframe=ZSFDocumentTitleBarColor,
-  boxrule=0pt,
-  boxsep=0pt,
-  left=\ZSFspaceM,
-  right=\ZSFspaceM,
-  top=\ZSFspaceS,
-  bottom=\ZSFspaceS,
-  before skip=0pt,
+  zsfbar,
+  zsfbarcolor=ZSFDocumentTitleBarColor,
+  left=\ZSFboxPadXBar,
+  right=\ZSFboxPadXBar,
+  top=\ZSFbarPadY,
+  bottom=\ZSFbarPadY,
   after skip=\ZSFspaceXS,
   halign=center,
   #1
@@ -86,106 +89,70 @@
 % Subsection-Bar (+ unnummerierte Star-Variante)
 % ------------------------------------------------------------
 \newtcolorbox{subsectionbar}[1][]{
-  enhanced jigsaw,
-  breakable=false,
-  colback=\SubsectionBarColor,
-  colframe=\SubsectionBarColor,
-  boxrule=0pt,
-  boxsep=0pt,
-  left=\ZSFspaceS,
-  right=\ZSFspaceS,
-  top=\ZSFspaceS,
-  bottom=\ZSFspaceS,
-  before skip=0pt,
+  zsfbar,
+  zsfbarcolor=\SubsectionBarColor,
+  top=\ZSFbarPadY,
+  bottom=\ZSFbarPadY,
   after skip=\ZSFsubsectionAfterGap,
   fontupper=\ZSFfontSection,
   #1
 }
 \newtcolorbox{subsubsectionbar}[1][]{
-  enhanced jigsaw,
-  breakable=false,
-  colback=\SubsubsectionBarColor,
-  colframe=\SubsubsectionBarColor,
-  boxrule=0pt,
-  boxsep=0pt,
-  left=\ZSFspaceS,
-  right=\ZSFspaceS,
-  top=\ZSFspaceXS,
-  bottom=\ZSFspaceXS,
-  before skip=0pt,
+  zsfbar,
+  zsfbarcolor=\SubsubsectionBarColor,
+  top=\ZSFbarPadYTight,
+  bottom=\ZSFbarPadYTight,
   after skip=\ZSFsubsectionAfterGap,
   fontupper=\ZSFfontSubsubsection,
   #1
 }
 \makeatletter
+% Pro Ebene EIN Rumpf. Die Varianten liefern nur noch das Nummernpräfix
+% (leer bei der Sternvariante) — vorher stand derselbe Rumpf viermal da.
+%   #1 = Label (leer erlaubt)   #2 = Nummernpräfix   #3 = Titel
+\newcommand{\ZSF@subsectionBarBody}[3]{%
+  \ZSFTitleBarTopSpacing{\ZSFsubsectionBarBeforeSkip}%
+  \penalty-500
+  \ZSFCollapseAfterChapterBar
+  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
+  \begin{subsectionbar}
+    \textcolor{\SubsectionBarTextColor}{#2#3}
+  \end{subsectionbar}
+  \penalty10000
+  \ZSFMarkAfterSubsectionBar
+}
+\newcommand{\ZSF@subsubsectionBarBody}[3]{%
+  \BreakIfNotEnoughSpaceSubsubsection
+  \par\addvspace{\ZSFsubsubsectionBarBeforeSkip}%
+  \penalty-300
+  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
+  \begin{subsubsectionbar}
+    \textcolor{\SubsubsectionTitleColor}{#2#3}
+  \end{subsubsectionbar}
+  \penalty10000
+  \ZSFMarkAfterSubsectionBar
+}
+
 \newcommand{\SubsectionBar}{\@ifstar{\SubsectionBarStar}{\SubsectionBarNumbered}}
 \newcommand{\SubsectionBarNumbered}[2][]{%
-  \ZSFTitleBarTopSpacing{\ZSFsubsectionBarBeforeSkip}
-  \penalty-500
-  \ZSFCollapseAfterChapterBar
-  \refstepcounter{subsection}
-  \setcounter{subsubsection}{0}
-  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
-  \begin{subsectionbar}
-    \textcolor{\SubsectionBarTextColor}{\thesubsection. #2}
-  \end{subsectionbar}
-  \penalty10000
-  \ZSFMarkAfterSubsectionBar
-}
-\newcommand{\SubsectionBarStar}[2][]{%
-  \ZSFTitleBarTopSpacing{\ZSFsubsectionBarBeforeSkip}
-  \penalty-500
-  \ZSFCollapseAfterChapterBar
-  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
-  \begin{subsectionbar}
-    \textcolor{\SubsectionBarTextColor}{#2}
-  \end{subsectionbar}
-  \penalty10000
-  \ZSFMarkAfterSubsectionBar
-}
-% Variante: Abschnitt auf neuer Spalte beginnen (ersetzt rohes \columnbreak)
-\newcommand{\SubsectionBarOnNewColumn}{\@ifstar{\SubsectionBarOnNewColumnStar}{\SubsectionBarOnNewColumnNumbered}}
-\newcommand{\SubsectionBarOnNewColumnNumbered}[2][]{%
-  \columnbreak
-  \SubsectionBarNumbered[#1]{#2}%
-}
-\newcommand{\SubsectionBarOnNewColumnStar}[2][]{%
-  \columnbreak
-  \SubsectionBarStar[#1]{#2}%
-}
+  \refstepcounter{subsection}\setcounter{subsubsection}{0}%
+  \ZSF@subsectionBarBody{#1}{\thesubsection. }{#2}}
+\newcommand{\SubsectionBarStar}[2][]{\ZSF@subsectionBarBody{#1}{}{#2}}
+
 \newcommand{\SubsubsectionBar}{\@ifstar{\SubsubsectionBarStar}{\SubsubsectionBarNumbered}}
 \newcommand{\SubsubsectionBarNumbered}[2][]{%
-  \BreakIfNotEnoughSpaceSubsubsection
-  \par\addvspace{\ZSFsubsubsectionBarBeforeSkip}%
-  \penalty-300
   \refstepcounter{subsubsection}%
-  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
-  \begin{subsubsectionbar}
-    \textcolor{\SubsubsectionTitleColor}{\thesubsubsection. #2}
-  \end{subsubsectionbar}
-  \penalty10000
-  \ZSFMarkAfterSubsectionBar
-}
-\newcommand{\SubsubsectionBarStar}[2][]{%
-  \BreakIfNotEnoughSpaceSubsubsection
-  \par\addvspace{\ZSFsubsubsectionBarBeforeSkip}%
-  \penalty-300
-  \if\relax\detokenize{#1}\relax\else\label{#1}\fi
-  \begin{subsubsectionbar}
-    \textcolor{\SubsubsectionTitleColor}{#2}
-  \end{subsubsectionbar}
-  \penalty10000
-  \ZSFMarkAfterSubsectionBar
-}
+  \ZSF@subsubsectionBarBody{#1}{\thesubsubsection. }{#2}}
+\newcommand{\SubsubsectionBarStar}[2][]{\ZSF@subsubsectionBarBody{#1}{}{#2}}
+
+% Variante auf neuer Spalte: nur ein \columnbreak davor (ersetzt rohes
+% \columnbreak im Kapitel). Kein eigener Rumpf.
+\newcommand{\SubsectionBarOnNewColumn}{\@ifstar{\SubsectionBarOnNewColumnStar}{\SubsectionBarOnNewColumnNumbered}}
+\newcommand{\SubsectionBarOnNewColumnNumbered}[2][]{\columnbreak\SubsectionBarNumbered[#1]{#2}}
+\newcommand{\SubsectionBarOnNewColumnStar}[2][]{\columnbreak\SubsectionBarStar[#1]{#2}}
 \newcommand{\SubsubsectionBarOnNewColumn}{\@ifstar{\SubsubsectionBarOnNewColumnStar}{\SubsubsectionBarOnNewColumnNumbered}}
-\newcommand{\SubsubsectionBarOnNewColumnNumbered}[2][]{%
-  \columnbreak
-  \SubsubsectionBarNumbered[#1]{#2}%
-}
-\newcommand{\SubsubsectionBarOnNewColumnStar}[2][]{%
-  \columnbreak
-  \SubsubsectionBarStar[#1]{#2}%
-}
+\newcommand{\SubsubsectionBarOnNewColumnNumbered}[2][]{\columnbreak\SubsubsectionBarNumbered[#1]{#2}}
+\newcommand{\SubsubsectionBarOnNewColumnStar}[2][]{\columnbreak\SubsubsectionBarStar[#1]{#2}}
 \makeatother
 
 % ------------------------------------------------------------
@@ -216,8 +183,19 @@
 % Leerzeile steht, inline an den offenen Absatz gehängt: sie bekommt keine
 % Spaltenbreite und ragt sichtbar in die Nachbarspalte. Im vertikalen Modus ist
 % \par ein No-op, der Zusatz ist also folgenlos, wo ohnehin alles korrekt war.
-\tcbset{zsfpanelbox/.style={
+% Gemeinsamer Grundvertrag aller Inhaltsboxen. Was hier steht, gilt fuer jede
+% Box — die einzelnen Stile setzen nur noch ihre Unterschiede. Besonders das
+% before-Hook ist Pflicht (Begruendung im Kommentar oben) und darf deshalb
+% nicht pro Box wiederholt werden, wo man es vergessen kann.
+\tcbset{zsfbox/.style={
   enhanced jigsaw,
+  before skip=\ZSFBoxBeforeSkip,
+  after skip=\ZSFBoxAfterSkip,
+  before={\par\ZSFConsumeAfterSubsectionBar},
+}}
+
+\tcbset{zsfpanelbox/.style={
+  zsfbox,
   colback=white,
   colbacktitle=\BoxTitleColor,
   colframe=\BoxTitleColor,
@@ -226,9 +204,6 @@
   titlerule=0pt,
   boxsep=0pt,
   arc=\ZSFboxArc, outer arc=\ZSFboxArc,
-  before skip=\ZSFBoxBeforeSkip,
-  after skip=\ZSFspaceS,
-  before={\par\ZSFConsumeAfterSubsectionBar},
   zsftitlebar,
 }}
 
@@ -236,7 +211,7 @@
 % left/right/top/bottom HIER setzen, damit \linewidth in jeder Titelbox
 % identisch ist (sonst variierende Tabellen-Breiten je Box-Typ).
 \tcbset{zsftitlebox/.style={
-  enhanced jigsaw,
+  zsfbox,
   breakable=false,
   colback=\BoxBackColor,
   colbacktitle=\BoxTitleColor,
@@ -247,13 +222,10 @@
   boxsep=0pt,
   arc=\ZSFboxArc,
   outer arc=\ZSFboxArc,
-  left=\ZSFspaceS,
-  right=\ZSFspaceS,
-  top=\ZSFspaceS,
-  bottom=\ZSFspaceS,
-  before skip=\ZSFBoxBeforeSkip,
-  after skip=\ZSFspaceS,
-  before={\par\ZSFConsumeAfterSubsectionBar},
+  left=\ZSFboxPadX,
+  right=\ZSFboxPadX,
+  top=\ZSFboxPadY,
+  bottom=\ZSFboxPadY,
   zsftitlebar,
   before upper={\parskip=\ZSFspaceS\relax\ZSFReadableAuto},
 }}
@@ -286,42 +258,14 @@
   title=#1,
 }
 
-% Randlose Tabelle mit Titelleiste (volle Box-Breite, kein Innenrand)
-\newtcolorbox{fulltablebox}[2][]{
-  zsfpanelbox,
-  colframe=NeutralBoxFrameColor,
-  breakable=false,
-  title={#1},
-  boxsep=0pt, left=0pt, right=0pt, top=\ZSFtextMinPad, bottom=\ZSFtextMinPad,
-  tabularx*={\arrayrulecolor{\ZSFtableRuleColor}\setlength{\arrayrulewidth}{\ZSFtableRuleWidth}}{#2},
-  zsftitlebar,
-  boxrule=\ZSFboxRuleWidth
-}
-
-% Randlose Box ohne Titel (volle Breite, zentriert)
-\newtcolorbox{fulllessbox}[1]{
-  enhanced jigsaw,
-  breakable=false,
-  colback=white,
-  colframe=white,
-  boxrule=0pt,
-  arc=0pt, outer arc=0pt,
-  before skip=\ZSFspaceS,
-  after skip=\ZSFspaceS,
-  boxsep=0pt, left=0pt, right=0pt, top=\ZSFtextMinPad, bottom=\ZSFtextMinPad,
-  tabularx*={\arrayrulecolor{\ZSFtableRuleColor}\setlength{\arrayrulewidth}{\ZSFtableRuleWidth}}{#1},
-  boxrule=0pt
-}
-
 % ------------------------------------------------------------
-% Formula-Box + Longformula
+% Formula-Box
 % ------------------------------------------------------------
-\newenvironment{longformula}{\[\begin{aligned}}{\end{aligned}\]}
 % Das optionale Argument bleibt eine tcolorbox-Optionsliste. Dadurch bleiben
 % bestehende Aufrufe wie \begin{formulabox}[breakable] kompatibel; ein Titel
 % wird explizit als \begin{formulabox}[title={Titel}] gesetzt.
 \tcbset{zsfformulastyle/.style={
-  enhanced jigsaw,
+  zsfbox,
   colback=\FormulaboxBackColor,
   colbacktitle=\FormulaboxBackColor,
   colframe=black,
@@ -330,17 +274,14 @@
   titlerule=0pt,
   fonttitle=\ZSFfontBoxTitle,
   halign title=center,
-  lefttitle=\ZSFspaceS,
-  righttitle=\ZSFspaceS,
+  lefttitle=\ZSFboxPadX,
+  righttitle=\ZSFboxPadX,
   toptitle=\ZSFspaceXS,
   bottomtitle=0pt,
-  left=\ZSFspaceS,
-  right=\ZSFspaceS,
-  top=\ZSFspaceS,
-  bottom=\ZSFspaceS,
-  before skip=\ZSFBoxBeforeSkip,
-  after skip=\ZSFspaceS,
-  before={\par\ZSFConsumeAfterSubsectionBar},
+  left=\ZSFboxPadX,
+  right=\ZSFboxPadX,
+  top=\ZSFboxPadY,
+  bottom=\ZSFboxPadY,
   before upper={\parskip=\ZSFspaceS\centering},
   after upper={\par},
   middle=\ZSFspaceSep,
@@ -354,6 +295,12 @@
   \par\vspace{-\parskip}\vspace{\ZSFspaceS}%
 }
 \let\formulanoteabove\formulanote
+% \ZSFformulaline{<mathe>}{<Anmerkung>} — Formelzeile mit rechtsbündiger
+% Kurz-Anmerkung auf derselben Höhe (Gültigkeitsbereich, Einheit, Fallname).
+% \formulanote setzt die Anmerkung darunter; diese Form hält sie auf Zeile.
+\newcommand{\ZSFformulaline}[2]{%
+  \par\noindent$\displaystyle #1$\hfill{\ZSFfontNote #2}\par
+}
 
 % Duenne, graue Trennlinie zwischen Formeln in einer formulabox
 \newcommand{\formulasep}{%
@@ -378,10 +325,6 @@
   \par\addvspace{\ZSFspaceS}\noindent\ZSFReadableAuto\ignorespaces
 }{\par}
 
-\newcommand{\PlaceholderGraphic}[1]{
-  \fbox{\parbox{0.9\linewidth}{\centering\small [Grafik: #1]}}
-}
-
 % Dezente Bildunterschrift (leerer Text -> nichts)
 \newcommand{\ZSFfigcaption}[1]{%
   \if\relax\detokenize{#1}\relax\else
@@ -404,6 +347,35 @@
     \ZSFfigcaption{#4}%
   \end{figbox}%
 }
+
+% \ZSFfigrow{pfad1,pfad2,...}{Titel}{Caption} — mehrere Abbildungen
+% gleicher Breite nebeneinander in EINER figbox. Die Breite ergibt sich
+% aus der Anzahl Pfade; der Rest verteilt sich als Zwischenraum.
+% Ersetzt handgebaute \includegraphics-Reihen mit \hfill.
+\makeatletter
+\newcounter{ZSF@figrowNum}
+\newlength{\ZSF@figrowWidth}
+\newcommand{\ZSFfigrow}[3]{%
+  \begin{figbox}[{#2}]%
+    \setcounter{ZSF@figrowNum}{0}%
+    \@for\ZSF@figrowItem:=#1\do{\stepcounter{ZSF@figrowNum}}%
+    \setlength{\ZSF@figrowWidth}{%
+      \dimexpr0.97\linewidth/\value{ZSF@figrowNum}\relax}%
+    \noindent
+    \@for\ZSF@figrowItem:=#1\do{%
+      \begin{minipage}[c]{\ZSF@figrowWidth}%
+        \centering
+        \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,%
+          keepaspectratio]{\ZSF@figrowItem}%
+      \end{minipage}%
+      \hfill
+    }%
+    \unskip
+    \par
+    \ZSFfigcaption{#3}%
+  \end{figbox}%
+}
+\makeatother
 
 % \ZSFfigside[Bildanteil]{pfad}{Titel}{Inhalt rechts} — Bild links,
 % Inhalt rechts. Der Anteil wird erst am Einsatzort gegen die dortige
@@ -451,7 +423,7 @@
 % ------------------------------------------------------------
 % statementbox: dezent, linker Farbbalken in Kapitelfarbe.
 \tcbset{zsfstatementstyle/.style={
-  enhanced jigsaw,
+  zsfbox,
   breakable=false,
   colback=white,
   colframe=white,
@@ -459,13 +431,10 @@
   borderline west={\ZSFstatementBarWidth}{0pt}{\StatementBarColor},
   boxrule=0pt,
   arc=0pt, outer arc=0pt,
-  left=\ZSFstatementLeftPad,
-  right=\ZSFspaceS,
-  top=\ZSFspaceXS,
-  bottom=\ZSFspaceXS,
-  before skip=\ZSFBoxBeforeSkip,
-  after skip=\ZSFspaceS,
-  before={\par\ZSFConsumeAfterSubsectionBar},
+  left=\ZSFboxPadXBar,
+  right=\ZSFboxPadX,
+  top=\ZSFboxPadYTight,
+  bottom=\ZSFboxPadYTight,
   before upper={\ZSFReadableAuto},
 }}
 
@@ -483,31 +452,29 @@
   {\end{enumerate}\end{statementbox}}
 \newcommand{\ProcStep}[2]{\item {\bfseries #1}\\[\ZSFprocStepGap]#2}
 
-% factlist: rahmenlose Liste von Definitions-/Eigenschaftsfakten.
-\NewDocumentEnvironment{factlist}{}
-  {\begin{itemize}[
-     leftmargin=\ZSFlistLeftMargin,
-     labelsep=\ZSFlistLabelSep,
-     label={\textcolor{\StatementBarColor}{\textbullet}},
-     itemsep=\ZSFprocItemSep,
-     topsep=\ZSFspaceXS,
-     parsep=0pt,
-     partopsep=0pt
-   ]}
-  {\end{itemize}}
+% factlist: Liste von Definitions-/Eigenschaftsfakten, Einträge via \ZSFFact.
+% Ohne Titel rahmenlos, mit Titel in einer statementbox — dieselbe Liste,
+% eine Option statt zweier Environments. Das Aufzählungszeichen bleibt in
+% beiden Fällen identisch; früher unterschieden sie sich hier grundlos.
+\makeatletter
+\newif\ifZSF@factlistBoxed
+\newcommand{\ZSF@factlistOpen}[1]{%
+  \begin{itemize}[
+    leftmargin=\ZSFlistLeftMargin,
+    labelsep=\ZSFlistLabelSep,
+    label={\textcolor{\StatementBarColor}{\textbullet}},
+    itemsep=\ZSFprocItemSep,
+    topsep=#1,
+    parsep=0pt,
+    partopsep=0pt
+  ]}
+\NewDocumentEnvironment{factlist}{o}
+  {\IfNoValueTF{#1}%
+     {\ZSF@factlistBoxedfalse\ZSF@factlistOpen{\ZSFspaceXS}}%
+     {\ZSF@factlistBoxedtrue\begin{statementbox}[#1]\ZSF@factlistOpen{0pt}}}
+  {\end{itemize}\ifZSF@factlistBoxed\end{statementbox}\fi} % chktex 9
+\makeatother
 \newcommand{\ZSFFact}[2]{\item \textbf{#1}\,---\,#2}
-
-% propertylist: factlist innerhalb einer statementbox (mit optionalem Titel)
-\NewDocumentEnvironment{propertylist}{O{}}
-  {\begin{statementbox}[#1]\begin{itemize}[
-     leftmargin=\ZSFlistLeftMargin,
-     labelsep=\ZSFlistLabelSep,
-     itemsep=\ZSFprocItemSep,
-     topsep=0pt,
-     parsep=0pt,
-     partopsep=0pt
-   ]}
-  {\end{itemize}\end{statementbox}}
 
 % ------------------------------------------------------------
 % Goal-System: Bedingung -> Umformung -> Ziel (Inline + Card)
@@ -559,20 +526,6 @@
   \GoalCondition{#1}%
   \GoalStep{#2 = \GoalTargetBox{$\displaystyle #3$}}%
 }
-\newcommand{\GoalCard}[4][]{%
-  \begin{goalbox}[#1]
-    \GoalCondition{#2}
-    #3
-    \GoalTarget{#4}
-  \end{goalbox}%
-}
-\newcommand{\GoalPair}[8]{%
-  \begin{tcbraster}[raster columns=2, raster column skip=\ZSFspaceM, raster row skip=0pt, raster equal height]
-    \GoalCard[#1]{#2}{#3}{#4}
-    \GoalCard[#5]{#6}{#7}{#8}
-  \end{tcbraster}%
-}
-
 % Inline-Danger-Tag (rotes Pill-Label für Stolperfallen im Fliesstext)
 \newtcbox{\ZSFdanger}{
   colback=DangerTagColor, colframe=DangerTagColor, coltext=white,
@@ -585,17 +538,18 @@
 % ------------------------------------------------------------
 % Valuegrid: kompakte (tabularray-)Wertegrids in einer Panel-Box
 % ------------------------------------------------------------
-\newtcolorbox{compactgridbox}[1][]{
+% Interner Panel-Rahmen des Valuegrids — kein öffentlicher Baustein.
+% Kapitel greifen ausschliesslich über \begin{valuegrid}{n}[Titel] zu.
+\tcbset{zsfvaluegridshell/.style={
   zsfpanelbox,
   colframe=NeutralBoxFrameColor,
   breakable=false,
-  title={#1},
   boxsep=0pt, left=0pt, right=0pt, top=\ZSFtextMinPad, bottom=\ZSFtextMinPad,
   zsftitlebar,
   boxrule=\ZSFboxRuleWidth
-}
+}}
 \newcommand{\ZSFvaluegridCommon}{
-  colsep=\ZSFvaluegridColSep,
+  colsep=\ZSFtableEdgePad,
   rowsep=\ZSFvaluegridRowSep,
   hlines,
   vlines,
@@ -603,18 +557,36 @@
 }
 % \begin{valuegrid}{<n_datacols>}[<title>] — Spec wird automatisch generiert.
 \NewDocumentEnvironment{valuegrid}{m O{}}
-  {\begin{compactgridbox}[#2]\begin{tblr}{colspec={l *{#1}{c}},\ZSFvaluegridCommon}}
-  {\end{tblr}\end{compactgridbox}}
-% Freie colspec-Variante
-\NewDocumentEnvironment{valuegridcustom}{m O{}}
-  {\begin{compactgridbox}[#2]\begin{tblr}{colspec={#1},\ZSFvaluegridCommon}}
-  {\end{tblr}\end{compactgridbox}}
+  {\begin{tcolorbox}[zsfvaluegridshell, title={#2}]%
+   \begin{tblr}{colspec={l *{#1}{c}},\ZSFvaluegridCommon}}
+  {\end{tblr}\end{tcolorbox}}
 
-% Komfort-Wrapper für feste Spaltenzahlen — sparen das Zählen der Datenspalten.
-% \begin{valuegridthree}[Titel] ... \end{valuegridthree}  == valuegrid{3}[Titel]
-\NewDocumentEnvironment{valuegridtwo}{O{}}{\begin{valuegrid}{2}[#1]}{\end{valuegrid}}
-\NewDocumentEnvironment{valuegridthree}{O{}}{\begin{valuegrid}{3}[#1]}{\end{valuegrid}}
-\NewDocumentEnvironment{valuegridfour}{O{}}{\begin{valuegrid}{4}[#1]}{\end{valuegrid}}
-\NewDocumentEnvironment{valuegridfive}{O{}}{\begin{valuegrid}{5}[#1]}{\end{valuegrid}}
-\NewDocumentEnvironment{valuegridsix}{O{}}{\begin{valuegrid}{6}[#1]}{\end{valuegrid}}
-\NewDocumentEnvironment{valuegridseven}{O{}}{\begin{valuegrid}{7}[#1]}{\end{valuegrid}}
+% ------------------------------------------------------------
+% Pack-Modus für Anhang-artige Kapitel
+% ------------------------------------------------------------
+% Ersetzen rohes \tcbset und \renewcommand im Kapitel — beides ist
+% Systemumbau und bricht den Linter (rules/02_ai_mandate). Am Anfang des
+% betreffenden Kapitels aufrufen; die Wirkung endet mit dessen Gruppe.
+%
+% Wichtig: Ein globales \tcbset{breakable} im Kapitel hätte ohnehin nicht
+% gewirkt — die Basisstile setzen breakable=false in ihrer eigenen
+% Optionsliste und gewinnen damit gegen den Default. Deshalb hängen diese
+% Schalter die Option an die Stile selbst an.
+%
+% Bewusst NICHT breakable: figbox, valuegrid, goalbox und die Balken.
+% Ein Umbruch mitten in Bild, Wertegrid oder Zielkette ergibt keinen Sinn.
+\newcommand{\ZSFBoxesBreakableOn}{%
+  \tcbset{zsftitlebox/.append style={breakable},
+          zsfstatementstyle/.append style={breakable}}%
+}
+\newcommand{\ZSFBoxesBreakableOff}{%
+  \tcbset{zsftitlebox/.append style={breakable=false},
+          zsfstatementstyle/.append style={breakable=false}}%
+}
+% Hebt die Platzreserven vor Boxen und Überschriften auf, damit ein
+% Anhang dicht packt statt früh umzubrechen.
+\newcommand{\ZSFBreakReservesOff}{%
+  \renewcommand{\BreakIfNotEnoughSpace}{}%
+  \renewcommand{\BreakIfNotEnoughSpaceChapter}{}%
+  \renewcommand{\BreakIfNotEnoughSpaceSubsubsection}{}%
+}

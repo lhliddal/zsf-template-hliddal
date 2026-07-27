@@ -19,6 +19,7 @@ jobs:
             texlive-fonts-extra \
             texlive-science \
             texlive-lang-german \
+            texlive-plain-generic \
             poppler-utils
       # Hinweis: der Verifier `make check` läuft NICHT in CI, weil das
       # Harness (tests/ tools/ rules/) bewusst git-excluded ist (.git/info/exclude)

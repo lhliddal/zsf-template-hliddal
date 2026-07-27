@@ -16,10 +16,19 @@
 % ------------------------------------------------------------
 % SPACING-SKALA (4 Stufen) — die einzige Quelle für Abstände
 % ------------------------------------------------------------
-\newlength{\ZSFspaceXS}\setlength{\ZSFspaceXS}{1pt}
-\newlength{\ZSFspaceS} \setlength{\ZSFspaceS}{4pt}
-\newlength{\ZSFspaceM} \setlength{\ZSFspaceM}{7pt}
-\newlength{\ZSFspaceL} \setlength{\ZSFspaceL}{10pt}
+% ── Dichte: die globale Stellschraube pro ZSF ────────────────────────
+% Standard 1 = Referenzdichte des Templates. Für eine dichtere ZSF in
+% preamble.tex VOR dem \input dieser Datei setzen, z.B.
+%   \def\ZSFDensityFactor{0.85}
+% Skaliert die vier Basisregister; sämtliche abgeleiteten Masse folgen
+% automatisch (Box-Paddings, Section-Gaps, \tabcolsep, Display-Skips),
+% weil sie aus diesen Registern berechnet werden.
+% Ersetzt das lokale Überschreiben von \ZSFspace* in einzelnen Kapiteln.
+\providecommand{\ZSFDensityFactor}{1}
+\newlength{\ZSFspaceXS}\setlength{\ZSFspaceXS}{\ZSFDensityFactor\dimexpr 1pt\relax}
+\newlength{\ZSFspaceS} \setlength{\ZSFspaceS}{\ZSFDensityFactor\dimexpr 4pt\relax}
+\newlength{\ZSFspaceM} \setlength{\ZSFspaceM}{\ZSFDensityFactor\dimexpr 7pt\relax}
+\newlength{\ZSFspaceL} \setlength{\ZSFspaceL}{\ZSFDensityFactor\dimexpr 10pt\relax}
 
 % Outer (Text-Box-Bindung) und Sep (Trennlinien)
 \newlength{\ZSFspaceOuter}\setlength{\ZSFspaceOuter}{7pt}
@@ -35,8 +44,13 @@
 % ------------------------------------------------------------
 % Schwellwerte und Titelbalken-Hilfsgrössen
 % ------------------------------------------------------------
-\newlength{\ZSFbreakThreshold}\setlength{\ZSFbreakThreshold}{3\baselineskip}
-\newlength{\ZSFbreakThresholdChapter}\setlength{\ZSFbreakThresholdChapter}{10\baselineskip} % Grössere Mindesthöhe für ChapterBar (verhindert Bars am Spaltenende)
+% Mindesthöhe, die vor einem Titelbalken frei sein muss — sonst bricht die
+% Spalte davor um. Die Reserve muss den Balken UND den Anfang der folgenden
+% Box tragen, sonst bleibt der Balken allein am Spaltenende stehen.
+% Deshalb staffeln sich die Werte nach der Grösse der eröffneten Einheit:
+% Kapitel > Abschnitt > Unterabschnitt.
+\newlength{\ZSFbreakThresholdChapter}\setlength{\ZSFbreakThresholdChapter}{10\baselineskip}
+\newlength{\ZSFbreakThreshold}\setlength{\ZSFbreakThreshold}{7\baselineskip}
 \newlength{\ZSFbreakThresholdSubsubsection}\setlength{\ZSFbreakThresholdSubsubsection}{5\baselineskip}
 \newlength{\ZSFpostChapterNudge}\setlength{\ZSFpostChapterNudge}{0pt}
 \newlength{\ZSFtitleBarHeight}\setlength{\ZSFtitleBarHeight}{9.2pt}
@@ -56,7 +70,6 @@
 
 % Tokens für statementbox / procedure
 \newlength{\ZSFstatementBarWidth}\setlength{\ZSFstatementBarWidth}{2pt}
-\newlength{\ZSFstatementLeftPad} \setlength{\ZSFstatementLeftPad}{\ZSFspaceM}
 \newlength{\ZSFprocStepGap}      \setlength{\ZSFprocStepGap}{\ZSFspaceXS}
 \newlength{\ZSFprocItemSep}      \setlength{\ZSFprocItemSep}{\ZSFspaceXS}
 \newlength{\ZSFprocLeftMargin}   \setlength{\ZSFprocLeftMargin}{1.6em}
@@ -65,6 +78,34 @@
 
 % Padding für cellspace (siehe styles/20_tables.tex Konvention)
 \newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFspaceXS}
+
+% ── Horizontaler Innenabstand: eine Stellschraube für alle Inhaltsboxen ──
+% Vorher stand an jeder Box ein eigener Wert (0pt/XS/S/M). Wer die Ränder
+% ändern wollte, musste jede Box einzeln anfassen — genau der Fall, in dem
+% eine KI repariert statt anzupassen.
+%
+% \ZSFboxPadX        — Standard-Rand zwischen Boxkante und Inhalt.
+% \ZSFboxPadXBar     — für Boxen mit linkem Farbbalken: der Inhalt muss den
+%                      Balken zusätzlich freihalten, deshalb links mehr.
+% \ZSFtableEdgePad   — für Boxen, deren Hintergrund bis an die Kante laufen
+%                      soll (Zebra, Wertegitter). Dort trägt nicht die Box
+%                      den Abstand, sondern die äusserste Tabellenzelle.
+\newlength{\ZSFboxPadX}      \setlength{\ZSFboxPadX}{\ZSFspaceS}
+\newlength{\ZSFboxPadXBar}   \setlength{\ZSFboxPadXBar}{\ZSFspaceM}
+\newlength{\ZSFtableEdgePad} \setlength{\ZSFtableEdgePad}{\ZSFspaceM}
+
+% Vertikal dasselbe: Innenabstand oben/unten und der Abstand NACH einer Box.
+% \ZSFBoxBeforeSkip gab es schon, das Gegenstück fehlte — deshalb stand
+% "after skip=\ZSFspaceS" fünfmal einzeln im Code.
+\newlength{\ZSFboxPadY}      \setlength{\ZSFboxPadY}{\ZSFspaceS}
+\newlength{\ZSFboxPadYTight} \setlength{\ZSFboxPadYTight}{\ZSFspaceXS}
+\newlength{\ZSFBoxAfterSkip} \setlength{\ZSFBoxAfterSkip}{\ZSFspaceS}
+
+% Balken haben ihren eigenen vertikalen Rhythmus — bewusst getrennt vom
+% Box-Innenabstand, damit sich Balkenhoehe und Boxpolsterung unabhaengig
+% einstellen lassen.
+\newlength{\ZSFbarPadY}      \setlength{\ZSFbarPadY}{\ZSFspaceS}
+\newlength{\ZSFbarPadYTight} \setlength{\ZSFbarPadYTight}{\ZSFspaceXS}
 
 % ------------------------------------------------------------
 % Code-Längen — nur für die optionalen Code-Module benötigt
@@ -87,7 +128,6 @@
 \newlength{\ZSFcodeCommentGap}      \setlength{\ZSFcodeCommentGap}{\ZSFspaceM}
 
 % Valuegrid, Index, Readability und dokumentweite Overlays
-\newlength{\ZSFvaluegridColSep}       \setlength{\ZSFvaluegridColSep}{\ZSFspaceS}
 \newlength{\ZSFvaluegridRowSep}       \setlength{\ZSFvaluegridRowSep}{\ZSFspaceSep}
 \newlength{\ZSFreadabilityEmergencyStretch}\setlength{\ZSFreadabilityEmergencyStretch}{2.5em}
 % Flatterzone im Fliesstext: schmaler als der ragged2e-Standard (0pt plus 2em),
@@ -105,7 +145,6 @@
 \newlength{\ZSFitemizeLeftMargin}     \setlength{\ZSFitemizeLeftMargin}{3mm}
 \newlength{\ZSFenumerateLeftMargin}   \setlength{\ZSFenumerateLeftMargin}{4mm}
 \newlength{\ZSFidentityMarkerInset}   \setlength{\ZSFidentityMarkerInset}{2mm}
-\newlength{\ZSFtabColumnGap}          \setlength{\ZSFtabColumnGap}{1.5em}
 
 % ============================================================
 % TEXT-BOX-BINDUNGEN
@@ -182,8 +221,6 @@
 \newcommand{\ZSFgapS}{\vspace{\ZSFspaceS}}
 \newcommand{\ZSFgapM}{\vspace{\ZSFspaceM}}
 \newcommand{\ZSFgapL}{\vspace{\ZSFspaceL}}
-\newcommand{\ZSFmanualColumnBreak}{\columnbreak}
-\newcommand{\ZSFtabColGap}{\hspace{\ZSFtabColumnGap}}
 % Trenner-Abstand um den Mittelpunkt im Index-Locator "6.2 · (S. 4)" (66_index).
 % Bewusst als Makro statt \newlength: das em soll an der Verwendungsstelle in der
 % Index-Schrift ausgewertet werden. Eine Länge würde es in der Präambel-Schrift

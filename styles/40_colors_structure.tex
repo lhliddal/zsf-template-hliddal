@@ -107,7 +107,6 @@
 \colorlet{NeutralBoxFrameColor}{black!20}
 \colorlet{FormulaSeparatorColor}{black!30}
 \colorlet{MutedTextColor}{black!60}
-\colorlet{TableRuleDefaultColor}{black!70}
 \colorlet{IdentityMarkerColor}{black!10}
 \colorlet{ReleaseFooterColor}{black}
 \colorlet{DangerTagColor}{red!80!black}
@@ -117,14 +116,6 @@
 \colorlet{ZSFDocumentTitleBarColor}{ChapterColor0}
 \colorlet{ZSFDocumentTitleTextColor}{ChapterColor0Text}
 \colorlet{ZSFDocumentTitleBylineColor}{ChapterColor0Text!88}
-
-% Schlusswörter in eingebetteten Kapiteln: ETH-Palette für den Inhalt,
-% aber dieselbe klare Leistenfarbe wie der Dokumenttitel.
-\newcommand{\ZSFStartClosingSubsection}{%
-  \ZSFSetChapterPaletteByIndex{0}%
-  \renewcommand{\SubsectionBarColor}{ZSFDocumentTitleBarColor}%
-  \renewcommand{\SubsectionBarTextColor}{ZSFDocumentTitleTextColor}%
-}
 
 % Aktive Kapitelfarben (per Kapitel-Index automatisch umgeschaltet)
 % ------------------------------------------------------------
@@ -148,7 +139,7 @@
 \newcommand{\BoxBackColor}{\chaptercolorlight!8}
 \newcommand{\BoxFrameColor}{\chaptercolorlight!25}
 
-% Für statementbox / GoalCard (semantische Aussage- und Ziel-Boxen)
+% Für statementbox / goalbox (semantische Aussage- und Ziel-Boxen)
 \newcommand{\StatementBarColor}{\chaptercolor}
 \newcommand{\StatementTitleColor}{\chaptercolor}
 \newcommand{\GoalConditionBackColor}{white}

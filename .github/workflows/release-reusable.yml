@@ -94,6 +94,7 @@ jobs:
             texlive-fonts-extra \
             texlive-science \
             texlive-lang-german \
+            texlive-plain-generic \
             poppler-utils
 
       - name: Resolve PDF name

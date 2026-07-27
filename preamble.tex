@@ -18,6 +18,12 @@
 %   67_code_comments  → Smart Inline/Overflow Code-Kommentare (\CodeLine);
 %                       NUR zusammen mit 65_code_style aktivieren.
 % Module nicht löschen — nur deaktivieren (siehe rules/10_architecture).
+%
+% ── Globale Stellschraube: Dichte ────────────────────────────────────
+% Skaliert alle Abstände der ZSF gemeinsam (1 = Template-Referenz).
+% Muss VOR styles/30_layout_spacing gesetzt werden. Beispiel für eine
+% dichtere ZSF:  \def\ZSFDensityFactor{0.85}
+% \def\ZSFDensityFactor{0.85}
 % ─────────────────────────────────────────────────────────────────────
 
 \input{styles/00_packages}

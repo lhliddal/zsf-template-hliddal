@@ -79,9 +79,11 @@
 }}
 \newtcolorbox{zsf@codebox@plain}{zsfcodeboxbase}
 \newtcolorbox{zsf@codebox@titled}[1]{zsfcodeboxbase, title={#1}}
+% chktex paart die bedingten \end nicht mit dem passenden \begin und
+% meldet Warnung 9 — hier ein Fehlalarm, lokal stummgeschaltet.
 \NewDocumentEnvironment{codebox}{o}
   {\IfNoValueTF{#1}{\begin{zsf@codebox@plain}}{\begin{zsf@codebox@titled}{#1}}}
-  {\IfNoValueTF{#1}{\end{zsf@codebox@plain}}{\end{zsf@codebox@titled}}}
+  {\IfNoValueTF{#1}{\end{zsf@codebox@plain}}{\end{zsf@codebox@titled}}} % chktex 9
 
 % ------------------------------------------------------------
 % Split-codebox — drei Teil-Environments für mehrteilige
@@ -105,14 +107,23 @@
   before skip=0pt,
   after skip=\ZSFspaceXS,
 }}
-\newtcolorbox{codeboxfirst}{
+% Der Anfang trägt den Titel der ganzen Gruppe — wie codebox optional.
+% Mitte und Ende bleiben titellos, sie setzen dieselbe Gruppe nur fort.
+\tcbset{zsf@codeboxfirst@shape/.style={
   zsf@codebox@split@base,
   toprule=\ZSFboxRuleWidth,
   arc=\ZSFboxArc, outer arc=\ZSFboxArc,
   sharp corners=south,
   before skip=\ZSFBoxBeforeSkip,
   before={\par\ZSFConsumeAfterSubsectionBar},
-}
+}}
+\newtcolorbox{zsf@codeboxfirst@plain}{zsf@codeboxfirst@shape}
+\newtcolorbox{zsf@codeboxfirst@titled}[1]{%
+  zsf@codeboxfirst@shape, zsftitlebar, title={#1}}
+\NewDocumentEnvironment{codeboxfirst}{o}
+  {\IfNoValueTF{#1}{\begin{zsf@codeboxfirst@plain}}%
+                   {\begin{zsf@codeboxfirst@titled}{#1}}}
+  {\IfNoValueTF{#1}{\end{zsf@codeboxfirst@plain}}{\end{zsf@codeboxfirst@titled}}} % chktex 9
 \newtcolorbox{codeboxmid}{
   zsf@codebox@split@base,
 }
