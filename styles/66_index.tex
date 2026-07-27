@@ -14,10 +14,14 @@
 % standardmässig zusätzlich auf die physische Seite. Die Abschnittsnummer
 % bleibt dabei der primäre Wegweiser und trägt die Kapitel-Palettenfarbe.
 %
-% Mechanik: Einträge werden SOFORT via \immediate\write in die .idx
-% geschrieben (Nummer per \edef eingefroren) — nicht beim Shipout, denn
-% dort wäre \thesubsection längst weitergezählt. makeindex sortiert
-% mit styles/zsfindex.ist (page_compositor ".") und merged identische
+% Mechanik: Die Abschnittsnummer wird per \edef SOFORT eingefroren —
+% beim Shipout wäre \thesubsection längst weitergezählt. Die Seitenzahl
+% dagegen MUSS verzögert bleiben (\protected@write + \noexpand\thepage):
+% \thepage ist an der Schreibstelle noch die zuletzt ausgegebene Seite,
+% nicht die, auf der das Material landet. Unter multicols* sammelt eine
+% Seite vier Spalten, wodurch ein sofort expandiertes \thepage
+% systematisch zu klein ausfällt. makeindex sortiert mit
+% styles/zsfindex.ist (page_compositor ".") und merged identische
 % Duplikate aus tabularx/tblr-Mehrfach-Trials automatisch.
 %
 % Verwendung am Dokumentende: eigenes Kapitel mit
@@ -40,7 +44,7 @@
 \ZSFIndexShowPageNumbertrue
 
 % ------------------------------------------------------------
-% Sofort-Writer
+% Writer: Nummer sofort, Seitenzahl verzögert
 % ------------------------------------------------------------
 \makeatletter
 % Tiefste aktuelle Abschnittsnummer einfrieren; vor der ersten
@@ -53,26 +57,37 @@
 % Im Seitenzahl-Modus wird ein zusammengesetzter Locator Abschnitt.Seite
 % geschrieben. makeindex kann ihn mit page_compositor "." sortieren und
 % verdichten; die Ausgabe trennt beide Teile erst am Schluss wieder.
+% Der Eintragstext liegt in Token-Registern, damit \edef nur den Locator
+% zusammensetzt und Makros im Begriff nicht vorzeitig expandiert.
 \newcommand{\ZSF@writeidx}[2]{%
   \@ifundefined{@indexfile}{}{%
     \begingroup
+      \toks0={#1}%
+      \toks1={#2}%
+      \toks2={\protected@write\@indexfile{}}%
       \edef\ZSF@num{\ZSF@idxnumnow}%
       \ifZSFIndexShowPageNumber
-        \edef\ZSF@locator{\ZSF@num.\thepage}%
-        \protected@edef\ZSF@line{\string\indexentry{#1|#2}{\ZSF@locator}}%
+        \edef\ZSF@line{%
+          \the\toks2{\string\indexentry{\the\toks0|\the\toks1}%
+            {\ZSF@num.\noexpand\thepage}}}%
       \else
-        \protected@edef\ZSF@line{\string\indexentry{#1|#2}{\ZSF@num}}%
+        \edef\ZSF@line{%
+          \the\toks2{\string\indexentry{\the\toks0|\the\toks1}{\ZSF@num}}}%
       \fi
-      \immediate\write\@indexfile{\ZSF@line}%
+      \ZSF@line
     \endgroup}}
 % «siehe»-Verweise bleiben reine Abschnitts-Wegweiser und erhalten nie
 % eine Seitenzahl.
 \newcommand{\ZSF@writeidxsee}[2]{%
   \@ifundefined{@indexfile}{}{%
     \begingroup
+      \toks0={#1}%
+      \toks1={#2}%
+      \toks2={\protected@write\@indexfile{}}%
       \edef\ZSF@num{\ZSF@idxnumnow}%
-      \protected@edef\ZSF@line{\string\indexentry{#1|see{#2}}{\ZSF@num}}%
-      \immediate\write\@indexfile{\ZSF@line}%
+      \edef\ZSF@line{%
+        \the\toks2{\string\indexentry{\the\toks0|see{\the\toks1}}{\ZSF@num}}}%
+      \ZSF@line
     \endgroup}}
 
 % ------------------------------------------------------------
