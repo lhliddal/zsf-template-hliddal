@@ -64,15 +64,17 @@
         \asterisk,\quad \oasterisk.
     \end{aligned}
   \]
+  % \drawbrace ist der Fall, den \ZSFbraceunder NICHT kann: eine Klammer über
+  % ZELLGRENZEN hinweg. Für einen zusammenhängenden Term ist \ZSFbraceunder
+  % das richtige Werkzeug (vorgeführt im Kapitel Stilmittel).
   \[
-    \tikzmark[xshift=-\ZSFspaceXS]{showcase-brace-left}
-    a+b+c
-    \tikzmark[xshift=\ZSFspaceXS]{showcase-brace-right}
-    \drawbrace[brace mirrored]{showcase-brace-left}{showcase-brace-right}
-    \annote[yshift=-\ZSFspaceM]{brace-\thebrace}{\ZSFfontNote drawbrace}
+    A=\begin{pmatrix}
+      1 & 0 & 4 \\
+      \tikzmark[xshift=-\ZSFspaceS]{showcase-brace-left}0 &
+      1\tikzmark[xshift=\ZSFspaceS]{showcase-brace-right} & 5
+    \end{pmatrix}
   \]
-  % \drawbrace/\annote zeichnen als TikZ-Overlay und belegen deshalb keine
-  % Höhe — der Platz unter dem Term muss von Hand reserviert werden, sonst
-  % läuft die Klammer in das nächste Element.
-  \ZSFgap[L]\ZSFgap[M]
+  \drawbrace[brace mirrored]{showcase-brace-left}{showcase-brace-right}
+  \annote[yshift=-\ZSFspaceM]{brace-\thebrace}{\ZSFfontNote Pivotspalten}
+  \ZSFbraceRoom
 \end{statementbox}

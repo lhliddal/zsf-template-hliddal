@@ -69,6 +69,18 @@
   \tikz[remember picture, overlay]\node[#1] at (#2) {#3};%
 }
 
+% \drawbrace und \annote zeichnen als Overlay und belegen deshalb KEINE Höhe.
+% Das ist kein Defekt, sondern die Technik: Nur so erreicht eine Klammer
+% Knoten in verschiedenen Matrixzellen. Den Platz muss folglich der Aufrufer
+% stellen — sonst läuft die Klammer in das nächste Element.
+%
+% \ZSFbraceRoom ist dafür der benannte Weg. Ohne ihn endet man bei einer Kette
+% aus \ZSFgap-Aufrufen (oder rohem \vspace, das der Linter meldet) — genau die
+% lokale Korrekturkette, die rules/30_spacing verbietet.
+% Der Wert ist aus \ZSFbraceDrop abgeleitet und folgt damit der Klammer:
+% Abstand zur Grundlinie + Klammerhöhe + Zeile für die Beschriftung.
+\newcommand{\ZSFbraceRoom}{\vspace{\dimexpr\ZSFbraceDrop+\ZSFspaceM\relax}}
+
 % --- Asterisk-Definitionen (mathabx -> amssymb) ---
 \newcommand{\asterisk}{\ast}
 \newcommand{\oasterisk}{\circledast}
