@@ -1,6 +1,7 @@
 % Living Showcase: Aussagen- und Hinweisboxen (Palette Slot 1).
-% StartChapterOnNewColumn: Kapitel bewusst auf neuer Spalte beginnen.
-\StartChapterOnNewColumn[ch:boxes]{Aussagen und Hinweise}
+% ZSFNewColumn: Kapitel bewusst auf neuer Spalte beginnen.
+\ZSFNewColumn
+\StartChapter[ch:boxes]{Aussagen und Hinweise}
 
 \SubsectionBar[sec:box-core]{Titelboxen}
 
@@ -27,6 +28,13 @@
   Raum braucht. Ohne Titelargument lautet die Leiste automatisch »Achtung«.
   \ZSFdanger{ZSFdanger ist die Inline-Pille.}
 \end{warnbox}
+
+\begin{defbox}[Dieselbe Box, anderer Ton\ZSFTitleTag{tone=neutral}][tone=neutral]
+  Jede Titelbox nimmt \ZSFkeyword*{tone} als zweites optionales Argument:
+  \ZSFkeyword*{chapter} (Default), \ZSFkeyword*{neutral} für bewusst
+  kapitelunabhängige Hinweise, \ZSFkeyword*{warn} für den Warn-Ton. Ein Regler
+  statt einer neuen Box.
+\end{defbox}
 
 \SubsubsectionBar[sec:box-hierarchy]{Dritte Lookup-Ebene}
 

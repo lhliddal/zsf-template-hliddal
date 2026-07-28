@@ -15,28 +15,37 @@
 
 \SubsectionBar[sec:table-variants]{Ohne Header oder Zebra}
 
-\begin{tablebox}[Zebra ab der ersten Zeile\ZSFTitleTag{ZSFtableFlat}]
-  \begin{ZSFtableFlat}{Y{1.2} Q{0.8}}
-    \ZSFkeyword{ZSFtableFlat} & ohne Kopfzeile \\
+\begin{tablebox}[Zebra ab der ersten Zeile\ZSFTitleTag{header=false}]
+  \begin{ZSFtable}[header=false]{Y{1.2} Q{0.8}}
+    \ZSFkeyword*{header=false} & ohne Kopfzeile \\
     Streifen & ab Zeile 1 \\
     Einsatz & reine Datenlisten
-  \end{ZSFtableFlat}
+  \end{ZSFtable}
 \end{tablebox}
 
-\begin{tablebox}[Ganz ohne Streifen\ZSFTitleTag{ZSFtablePlain}]
-  \begin{ZSFtablePlain}{Y{1.25} Z{0.75}}
-    \ZSFkeyword{ZSFtablePlain} & kein Zebra \\
+\begin{tablebox}[Ganz ohne Streifen\ZSFTitleTag{zebra=false}]
+  \begin{ZSFtable}[header=false, zebra=false]{Y{1.25} Z{0.75}}
+    \ZSFkeyword*{zebra=false} & kein Zebra \\
     Einsatz & sehr kurze Tabellen
-  \end{ZSFtablePlain}
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[Dichte Schrift für lange Tabellen\ZSFTitleTag{font=dense}]
+  \begin{ZSFtable}[font=dense]{Y{0.9} Y{1.35} Q{0.75}}
+    \ZSFheaderRow \ZSFhead{Regler} & \ZSFhead{Wirkung} & \ZSFhead{Default} \\
+    header & Kopfzeile & true \\
+    zebra & Streifen & true \\
+    font & Schriftgrösse & normal
+  \end{ZSFtable}
 \end{tablebox}
 
 \begin{tablebox}[Spaltentypen im Vergleich\ZSFTitleTag{L/C/R/F}]
-  \begin{ZSFtablePlain}{L C R F{1}}
+  \begin{ZSFtable}[header=false, zebra=false]{L C R F{1}}
     L linksbündig & C zentriert & R rechtsbündig & F{1}: x^2+1
-  \end{ZSFtablePlain}
+  \end{ZSFtable}
 \end{tablebox}
 
-\begin{valuegrid}{2}[Kompaktes Wertegitter\ZSFTitleTag{valuegrid}]
+\begin{valuegrid}[Kompaktes Wertegitter\ZSFTitleTag{valuegrid}]{2}
   \ZSFkeyword{valuegrid} & Spalte 1 & Spalte 2 \\
   Argument & Anzahl & Datenspalten \\
   Erste Spalte & immer & Beschriftung

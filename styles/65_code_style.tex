@@ -74,63 +74,63 @@
 % ------------------------------------------------------------
 \tcbset{zsfcodeboxbase/.style={
   zsftitlebox,
-  colback=white,
+  colback=\BoxPlainBackColor,
   top=0pt, bottom=0pt,
 }}
-\newtcolorbox{zsf@codebox@plain}{zsfcodeboxbase}
-\newtcolorbox{zsf@codebox@titled}[1]{zsfcodeboxbase, title={#1}}
-% chktex paart die bedingten \end nicht mit dem passenden \begin und
-% meldet Warnung 9 — hier ein Fehlalarm, lokal stummgeschaltet.
-\NewDocumentEnvironment{codebox}{o}
-  {\IfNoValueTF{#1}{\begin{zsf@codebox@plain}}{\begin{zsf@codebox@titled}{#1}}}
-  {\IfNoValueTF{#1}{\end{zsf@codebox@plain}}{\end{zsf@codebox@titled}}} % chktex 9
 
 % ------------------------------------------------------------
-% Split-codebox — drei Teil-Environments für mehrteilige
-% Code-Gruppen mit möglichem Spaltenumbruch zwischen Teilen.
-% Visuell zusammenhängend (offene Kante), physisch getrennt.
-%   codeboxfirst  — Anfang  (Rahmen oben + Seiten, unten offen)
-%   codeboxmid    — Mitte   (nur Seiten, oben und unten offen)
-%   codeboxlast   — Ende    (Rahmen unten + Seiten, oben offen)
+% Mehrteilige Code-Gruppen — eine Umgebung mit Regler
 % ------------------------------------------------------------
+% Früher vier Namen (codebox / codeboxfirst / codeboxmid / codeboxlast) für
+% eine Box mit vier Kantenformen. Jetzt ein Regler (rules/02_ai_mandate →
+% Katalog-Ökonomie):
+%
+%   \begin{codebox}[Titel]                 geschlossene Box (Default)
+%   \begin{codebox}[Titel][part=first]     Rahmen oben + Seiten, unten offen
+%   \begin{codebox}[][part=mid]            nur Seiten, oben und unten offen
+%   \begin{codebox}[][part=last]           Rahmen unten + Seiten, oben offen
+%
+% Die Teile sind visuell zusammenhängend, physisch getrennt — dazwischen darf
+% die Spalte umbrechen. Titel trägt nur der erste Teil.
+% ------------------------------------------------------------
+% Offene Kanten statt geschlossener Box: eine eigene Form, aber derselbe
+% Fluss-Vertrag wie jede andere Box (zsfbox). Die Skips sind der bewusste
+% Unterschied — die Teile müssen aneinanderstossen.
 \tcbset{zsf@codebox@split@base/.style={
-  enhanced jigsaw,
-  breakable=false,
-  colback=white,
+  zsfbox,
+  unbreakable,
+  colback=\BoxPlainBackColor,
   colframe=\BoxFrameColor,
   leftrule=\ZSFboxRuleWidth, rightrule=\ZSFboxRuleWidth,
   toprule=0pt, bottomrule=0pt,
   arc=0pt, outer arc=0pt,
   boxsep=0pt,
-  left=\ZSFspaceS, right=\ZSFspaceS,
+  left=\ZSFboxPadX, right=\ZSFboxPadX,
   top=0pt, bottom=0pt,
   before skip=0pt,
   after skip=\ZSFspaceXS,
 }}
-% Der Anfang trägt den Titel der ganzen Gruppe — wie codebox optional.
-% Mitte und Ende bleiben titellos, sie setzen dieselbe Gruppe nur fort.
-\tcbset{zsf@codeboxfirst@shape/.style={
-  zsf@codebox@split@base,
-  toprule=\ZSFboxRuleWidth,
-  arc=\ZSFboxArc, outer arc=\ZSFboxArc,
-  sharp corners=south,
-  before skip=\ZSFBoxBeforeSkip,
-  before={\par\ZSFConsumeAfterSubsectionBar},
-}}
-\newtcolorbox{zsf@codeboxfirst@plain}{zsf@codeboxfirst@shape}
-\newtcolorbox{zsf@codeboxfirst@titled}[1]{%
-  zsf@codeboxfirst@shape, zsftitlebar, title={#1}}
-\NewDocumentEnvironment{codeboxfirst}{o}
-  {\IfNoValueTF{#1}{\begin{zsf@codeboxfirst@plain}}%
-                   {\begin{zsf@codeboxfirst@titled}{#1}}}
-  {\IfNoValueTF{#1}{\end{zsf@codeboxfirst@plain}}{\end{zsf@codeboxfirst@titled}}} % chktex 9
-\newtcolorbox{codeboxmid}{
-  zsf@codebox@split@base,
+% Die vier Kantenformen als Auswahl-Schlüssel. 'whole' ist der Default und
+% liefert die geschlossene Box; die drei anderen öffnen je eine Kante.
+\tcbset{
+  part/.is choice,
+  part/whole/.style={zsfcodeboxbase},
+  part/first/.style={
+    zsf@codebox@split@base,
+    toprule=\ZSFboxRuleWidth,
+    arc=\ZSFboxArc, outer arc=\ZSFboxArc,
+    sharp corners=south,
+    before skip=\ZSFBoxBeforeSkip,
+    zsftitlebar,
+  },
+  part/mid/.style={zsf@codebox@split@base},
+  part/last/.style={
+    zsf@codebox@split@base,
+    bottomrule=\ZSFboxRuleWidth,
+    arc=\ZSFboxArc, outer arc=\ZSFboxArc,
+    sharp corners=north,
+    after skip=\ZSFspaceS,
+  },
 }
-\newtcolorbox{codeboxlast}{
-  zsf@codebox@split@base,
-  bottomrule=\ZSFboxRuleWidth,
-  arc=\ZSFboxArc, outer arc=\ZSFboxArc,
-  sharp corners=north,
-  after skip=\ZSFspaceS,
-}
+\NewDocumentEnvironment{codebox}{O{} O{}}
+  {\begin{ZSF@box}{part=whole}{#1}{#2}}{\end{ZSF@box}} % chktex 9

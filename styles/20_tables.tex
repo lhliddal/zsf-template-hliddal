@@ -50,8 +50,10 @@
 % ------------------------------------------------------------
 \newcommand{\ZSFzebraBG}{\TableZebraColor}
 \newcommand{\SetZSFzebraBG}[1]{\renewcommand{\ZSFzebraBG}{#1}}
-\newcommand{\ZSFzebra}{\rowcolors{2}{white}{\ZSFzebraBG}}          % Header in Zeile 1
-\newcommand{\ZSFzebraStart}[1]{\rowcolors{#1}{white}{\ZSFzebraBG}} % frei wählbar
+% Eine Startzeile-Variante genügt; die Umgebung leitet die Zeile aus der
+% Kopfzeilen-Option ab. Ein zusätzliches \ZSFzebra mit fest verdrahteter 2
+% wäre ein zweiter Weg zum selben Ergebnis (rules/02_ai_mandate).
+\newcommand{\ZSFzebraStart}[1]{\rowcolors{#1}{white}{\ZSFzebraBG}}
 \newcommand{\ZSFzebraOff}{\rowcolors{1}{}{}}
 
 % ------------------------------------------------------------
@@ -72,62 +74,60 @@
 \newcommand{\ZSFhead}[1]{{\color{\ZSFheaderRowFG}\bfseries #1}}
 
 % ------------------------------------------------------------
-% Semantische Tabellen-Environments (Single Point of Truth)
+% Semantische Tabellen-Umgebung (Single Point of Truth)
 % ------------------------------------------------------------
-% Signatur (alle drei Varianten):
-%   \begin{ZSFtable}[<font>]{<colspec>}       -- Header + Zebra ab Zeile 2
-%   \begin{ZSFtableFlat}[<font>]{<colspec>}   -- kein Header, Zebra ab Zeile 1
-%   \begin{ZSFtablePlain}[<font>]{<colspec>}  -- ohne Zebra
+% EINE Umgebung mit Reglern statt dreier fast gleicher Varianten
+% (rules/02_ai_mandate → Katalog-Ökonomie). Früher: ZSFtable /
+% ZSFtableFlat / ZSFtablePlain — drei Namen für zwei Ja/Nein-Fragen.
 %
-% <font> ist OPTIONAL und ein semantisches Font-Makro aus
-% styles/50_typography_semantics.tex:
-%   - \ZSFfontTable        (Default, \normalsize)
-%   - \ZSFfontTableDense   (\footnotesize — für lange/dichte Tabellen)
+%   \begin{ZSFtable}[<Optionen>]{<colspec>}
+%
+% Optionen (Komma-Liste, alles weglassbar):
+%   header      Kopfzeile vorhanden (Default). 'header=false': keine.
+%   zebra       Zebra-Streifen an (Default). 'zebra=false': aus.
+%   font=dense  eine Stufe kleiner, für lange Tabellen mit knappem
+%               Zellinhalt. Default 'font=normal'.
+%
+% Die Zebra-Startzeile folgt automatisch der Kopfzeile: mit Header ab
+% Zeile 2, ohne ab Zeile 1. Genau das war der einzige echte Unterschied
+% zwischen ZSFtable und ZSFtableFlat.
 %
 % colspec nutzt L/C/R (gleichverteilt, jeweils Faktor 1) oder
 % Y{.}/Z{.}/Q{.}/F{.} (proportional). Summe der Faktoren muss gleich
 % der Anzahl X-Spalten sein (tabularx-Konvention).
 %
-% Beispiel:
-%   \begin{ZSFtable}[\ZSFfontTableDense]{Y{0.6} Y{1.55} Y{0.85}}
-%     \ZSFheaderRow \ZSFhead{Symbol} & \ZSFhead{Bedeutung} & \ZSFhead{SI-Einheit} \\
-%     $e$ & Elementarladung & \si{C} \\
-%     ...
-%   \end{ZSFtable}
-
-\NewDocumentEnvironment{ZSFtable}{O{\ZSFfontTable} m}{%
+% Beispiele:
+%   \begin{ZSFtable}{Y{0.6} Y{1.55} Y{0.85}}            % Header + Zebra
+%   \begin{ZSFtable}[header=false]{Y{1.2} Q{0.8}}       % Zebra ab Zeile 1
+%   \begin{ZSFtable}[header=false, zebra=false]{L C}    % nackt
+%   \begin{ZSFtable}[font=dense]{Y{0.6} Y{1.55} Y{0.85}}
+\makeatletter
+\newif\ifZSF@tblHeader
+\newif\ifZSF@tblZebra
+\newcommand{\ZSF@tblFont}{\ZSFfontTable}
+\pgfkeys{
+  /zsf/table/.is family, /zsf/table,
+  header/.is if=ZSF@tblHeader,
+  zebra/.is if=ZSF@tblZebra,
+  font/.is choice,
+  font/normal/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontTable}},
+  font/dense/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontTableDense}},
+  ZSF@tblDefaults/.style={header=true, zebra=true, font=normal},
+}
+\NewDocumentEnvironment{ZSFtable}{O{} m}{%
   \begingroup
+  \pgfkeys{/zsf/table, ZSF@tblDefaults, #1}%
   \setlength{\tabcolsep}{\ZSFtableEdgePad}%
   \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
-  #1%
-  \ZSFzebra
+  \ZSF@tblFont
+  \ifZSF@tblZebra
+    \ifZSF@tblHeader\ZSFzebraStart{2}\else\ZSFzebraStart{1}\fi
+  \else
+    \ZSFzebraOff
+  \fi
   \tabularx{\linewidth}{#2}%
 }{%
   \endtabularx
   \endgroup
 }
-
-\NewDocumentEnvironment{ZSFtableFlat}{O{\ZSFfontTable} m}{%
-  \begingroup
-  \setlength{\tabcolsep}{\ZSFtableEdgePad}%
-  \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
-  #1%
-  \ZSFzebraStart{1}%
-  \tabularx{\linewidth}{#2}%
-}{%
-  \endtabularx
-  \endgroup
-}
-
-% Reine Tabelle ohne Zebra (selten; für einspaltige Zebraschäden etc.)
-\NewDocumentEnvironment{ZSFtablePlain}{O{\ZSFfontTable} m}{%
-  \begingroup
-  \setlength{\tabcolsep}{\ZSFtableEdgePad}%
-  \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
-  #1%
-  \ZSFzebraOff
-  \tabularx{\linewidth}{#2}%
-}{%
-  \endtabularx
-  \endgroup
-}
+\makeatother

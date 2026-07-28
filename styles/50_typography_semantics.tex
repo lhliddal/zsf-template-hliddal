@@ -43,13 +43,23 @@
 %   * nur in \begin{runintext}, \begin{defbox}, \begin{warnbox} und
 %     aehnlichen Text-Boxen, NIEMALS in Formeln, \formulanote oder
 %     Überschriften (\SubsubsectionBar, \SubsectionBar, \StartChapter).
-%   * sparsam einsetzen (Richtwert: 1-3 pro runintext, 4-6 im
-%     Kapitel-Intro, insgesamt ca. 10 pro Kapitel) -- es sollen echte
-%     Fachbegriffe (Gesetze, Effekte, Bauteile, zentrale Grössen)
-%     sein, keine generischen Substantive oder Verben.
+%   * sparsam einsetzen (Richtwert 1-3 pro runintext wegen der schmalen
+%     Spalten) -- es sollen echte Fachbegriffe (Gesetze, Effekte,
+%     Bauteile, zentrale Grössen) sein, keine generischen Substantive
+%     oder Verben. Die Pro-Kapitel-Dichte ist bewusst KEIN fester Wert;
+%     tests/check_index.sh warnt bei Über-Indexierung (Schwelle
+%     ZSF_INDEX_DENSITY_MAX). Massgeblich ist rules/20_boxes.md.
 % Rendering ist bewusst schlicht als \textbf{...}; Änderungen zentral
 % hier vornehmen (z.B. Farbe, Underline) -- nicht in Kapiteln.
 \newcommand{\ZSFkeyword}[1]{\textbf{#1}}
+
+% \ZSFlabel{...} — neutrale fette Beschriftung OHNE Fachbegriff-Semantik:
+% Listenköpfe, Zeilenmarken, „Links & Ressourcen:". Existiert, weil sonst
+% \ZSFkeyword* dafür zweckentfremdet wird — dessen Bedeutung ist aber
+% „Fachbegriff, aber nicht indexieren", nicht „einfach fett". Ein Marker,
+% der zwei Dinge heisst, verliert seine Aussage (rules/20_boxes).
+\newcommand{\ZSFlabel}[1]{\textbf{#1}}
+
 \newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\small (S.#1)}}
 
 % \ZSFhl{...} — Hervorhebung des EINEN prüfungskritischsten Fakts pro Box

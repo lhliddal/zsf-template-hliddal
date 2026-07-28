@@ -7,8 +7,20 @@
 % unabhängig von der aktiven Kapitelfarbe.
 \hypersetup{colorlinks=true, linkcolor=ChapterColor0, urlcolor=ChapterColor4}
 
-% Build-Kennung unten mittig, Seitenzahl unten rechts (overlay, layout-neutral).
+% Build-Kennung unten mittig, Seitenzahl unten rechts (overlay).
 % Lokal automatisch DEV + Datum; im Release-Workflow der SemVer-Tag.
+%
+% Das Overlay zeichnet ausserhalb des Textflusses und reserviert keine Höhe.
+% Der Satzspiegel muss ihm den Platz deshalb selbst freihalten, sonst
+% überdruckt der Footer die letzte Zeile einer voll gefüllten Spalte — was
+% erst auffällt, sobald eine ZSF dicht genug gesetzt ist, um eine Spalte
+% wirklich auszufüllen. Höhe wird aus der Footer-Schrift gemessen statt
+% geraten, damit sie einer Schriftänderung folgt.
+\settoheight{\ZSFfooterClearance}{\ZSFfontFooter 0}
+\addtolength{\ZSFfooterClearance}{\ZSFfooterBottomInset}
+\addtolength{\ZSFfooterClearance}{\ZSFspaceS}
+\geometry{bottom=\ZSFfooterClearance}
+
 \AddToShipoutPictureFG{%
   \AtPageLowerLeft{%
     \put(\dimexpr\paperwidth/2\relax,\ZSFfooterBottomInset){%

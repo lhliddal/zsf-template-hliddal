@@ -6,8 +6,8 @@
 \ZSFindex{Math-API}
 
 \textVorBox{textVorBox bindet Kontext an die folgende Box.}
-\begin{formulabox}[title={Was die Formelbox kann\ZSFTitleTag{formulabox}}]
-  \textVorFormel{textVorFormel — Zeile direkt über der Formel:}
+\begin{formulabox}[Was die Formelbox kann\ZSFTitleTag{formulabox}]
+  \textVorBox{textVorBox — innerhalb der Formelbox bindet es an die Formel:}
   \[
     x\in\R,\quad z\in\C,\quad n\in\N,\quad k\in\Z,\quad q\in\Q
   \]
@@ -21,12 +21,12 @@
   \[
     \ZSFsumAuto{i=1}{n} i,\quad \ZSFlimAuto{x\to0}\frac{\sin x}{x}
   \]
-  \textNachFormel{textNachFormel — Zeile direkt unter der Formel.}
+  \textNachBox{textNachBox — hier die Zeile direkt unter der Formel.}
   \formulanote{formulanote setzt die Anmerkung als eigene Zeile darunter.}
 \end{formulabox}
 \textNachBox{textNachBox bleibt optisch an der Box gebunden.}
 
-\begin{formulabox}[title={Hervorhebung, Klammer, Zeilenanmerkung}]
+\begin{formulabox}[Hervorhebung, Klammer, Zeilenanmerkung]
   \[
     \ZSFmhlA{a^2}+2\ZSFmhlB{ab}+\ZSFmhlD{b^2}
     =\ZSFmhlC{(a+b)^2}
@@ -44,7 +44,7 @@
 \ZSFindex{goalbox}
 
 \begin{goalbox}[Zielkette in zwei Schreibweisen\ZSFTitleTag{goalbox}]
-  \ZSFDerivationInlineCase{ZSFDerivationInlineCase}{\sqrt{x^2}}{x}
+  \ZSFDerivationCase*{ZSFDerivationCase* — einzeilig}{\sqrt{x^2}}{x}
   \formulasep
   \ZSFDerivationCase{ZSFDerivationCase}{\sqrt{x^2}}{-x}
   \formulasep
@@ -71,4 +71,8 @@
     \drawbrace[brace mirrored]{showcase-brace-left}{showcase-brace-right}
     \annote[yshift=-\ZSFspaceM]{brace-\thebrace}{\ZSFfontNote drawbrace}
   \]
+  % \drawbrace/\annote zeichnen als TikZ-Overlay und belegen deshalb keine
+  % Höhe — der Platz unter dem Term muss von Hand reserviert werden, sonst
+  % läuft die Klammer in das nächste Element.
+  \ZSFgap[L]\ZSFgap[M]
 \end{statementbox}

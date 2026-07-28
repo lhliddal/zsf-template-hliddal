@@ -185,6 +185,13 @@
 \newlength{\ZSFindexParStretch}       \setlength{\ZSFindexParStretch}{0.3pt}
 \newlength{\ZSFfooterBottomInset}     \setlength{\ZSFfooterBottomInset}{1mm}
 \newlength{\ZSFfooterRightInset}      \setlength{\ZSFfooterRightInset}{2mm}
+% Freiraum am Satzspiegel-Fuss für das Footer-Overlay (Release-Kennung und
+% Seitenzahl). Das Overlay zeichnet ausserhalb des Textflusses und reserviert
+% deshalb KEINE Höhe — ohne diesen Freiraum überdruckt es die letzte Zeile
+% einer voll gefüllten Spalte. Der Wert wird in 70_document_settings aus der
+% Footer-Schrift gemessen und an geometry übergeben; hier steht nur das
+% Register, damit alle Masse an einem Ort liegen.
+\newlength{\ZSFfooterClearance}
 \newlength{\ZSFitemizeLeftMargin}     \setlength{\ZSFitemizeLeftMargin}{3mm}
 \newlength{\ZSFenumerateLeftMargin}   \setlength{\ZSFenumerateLeftMargin}{4mm}
 \newlength{\ZSFidentityMarkerInset}   \setlength{\ZSFidentityMarkerInset}{2mm}
@@ -207,67 +214,76 @@
   \fi
 }
 
+% \textVorBox / \textNachBox binden einen Satz optisch an die Box davor bzw.
+% dahinter. INNERHALB einer formulabox binden dieselben zwei Makros an die
+% Formelzeile — vorher gab es dafür \textVorFormel/\textNachFormel, also vier
+% Namen für zwei Rollen (rules/02_ai_mandate → Katalog-Ökonomie).
+% Die Umschaltung hängt an \ifZSF@inFormulaBox, das die formulabox in ihrem
+% 'before upper' setzt; das Flag ist damit auf die Boxgruppe beschränkt.
+\makeatletter
+% Hier deklariert, nicht in 60_boxes: Das Flag gehört zu diesen beiden Makros
+% und muss vor ihnen existieren, egal in welcher Reihenfolge die Module
+% wachsen. Gesetzt wird es von der formulabox.
+\newif\ifZSF@inFormulaBox
 % Text der zur Box DARUNTER gehört (Einleitung)
 \newcommand{\textVorBox}[1]{%
-  \par
-  \addvspace{\ZSFspaceOuter}%
-  \begingroup
-  \setlength{\parskip}{0pt}%
-  {\small\color{TextVorBoxColor} \noindent #1\par}%
-  \endgroup
-  \nopagebreak
-  \vspace{\ZSFspaceXS}%
-  \vspace{-\ZSFspaceS}%
-  \nopagebreak
+  \ifZSF@inFormulaBox
+    \par
+    \begingroup
+    \setlength{\parskip}{0pt}%
+    \noindent\raggedright\textcolor{MutedTextColor}{\textbf{#1}}\par
+    \endgroup
+    \vspace{\ZSFspaceXS}%
+    \centering
+  \else
+    \par
+    \addvspace{\ZSFspaceOuter}%
+    \begingroup
+    \setlength{\parskip}{0pt}%
+    {\small\color{TextVorBoxColor} \noindent #1\par}%
+    \endgroup
+    \nopagebreak
+    \vspace{\ZSFspaceXS}%
+    \vspace{-\ZSFspaceS}%
+    \nopagebreak
+  \fi
 }
 
 % Text der zur Box DARÜBER gehört (Ergänzung/Folgerung)
 \newcommand{\textNachBox}[1]{%
-  \par
-  \ZSFRobustUnskip
-  \vspace{\ZSFspaceXS}%
-  \begingroup
-  \setlength{\parskip}{0pt}%
-  \nopagebreak
-  {\small\color{TextNachBoxColor} \noindent #1\par}%
-  \endgroup
-  \addvspace{\ZSFspaceOuter}%
+  \ifZSF@inFormulaBox
+    \par
+    \vspace{\ZSFspaceXS}%
+    \begingroup
+    \setlength{\parskip}{0pt}%
+    \noindent\raggedright\textcolor{MutedTextColor}{\small #1}\par
+    \endgroup
+    \centering
+  \else
+    \par
+    \ZSFRobustUnskip
+    \vspace{\ZSFspaceXS}%
+    \begingroup
+    \setlength{\parskip}{0pt}%
+    \nopagebreak
+    {\small\color{TextNachBoxColor} \noindent #1\par}%
+    \endgroup
+    \addvspace{\ZSFspaceOuter}%
+  \fi
 }
-
-% Titel/Text vor einer Formel (innerhalb der formulabox)
-\newcommand{\textVorFormel}[1]{%
-  \par
-  \begingroup
-  \setlength{\parskip}{0pt}%
-  \noindent\raggedright\textcolor{MutedTextColor}{\textbf{#1}}\par
-  \endgroup
-  \vspace{\ZSFspaceXS}%
-  \centering
-}
-
-% Erklaerungstext nach einer Formel (innerhalb der formulabox)
-\newcommand{\textNachFormel}[1]{%
-  \par
-  \vspace{\ZSFspaceXS}%
-  \begingroup
-  \setlength{\parskip}{0pt}%
-  \noindent\raggedright\textcolor{MutedTextColor}{\small #1}\par
-  \endgroup
-  \centering
-}
+\makeatother
 
 % ------------------------------------------------------------
 % Semantische Gap-Helfer für Kapitel (sparsam einsetzen)
 % ------------------------------------------------------------
-\newcommand{\ZSFgapXS}{\vspace{\ZSFspaceXS}}
-\newcommand{\ZSFgapS}{\vspace{\ZSFspaceS}}
-\newcommand{\ZSFgapM}{\vspace{\ZSFspaceM}}
-\newcommand{\ZSFgapL}{\vspace{\ZSFspaceL}}
-% \ZSFSectionGap ist der Name für den Themenwechsel und absichtlich derselbe
-% Abstand wie \ZSFgapL — deshalb hier abgeleitet statt ein zweites Mal
-% ausgeschrieben. Eine eigene Grösse daraus zu machen, ist eine Änderung an
-% genau dieser Zeile.
-\newcommand{\ZSFSectionGap}{\ZSFgapL}
+% \ZSFgap[<Stufe>] — ein Makro mit Regler statt vier Namen für eine Skala
+% (rules/02_ai_mandate → Katalog-Ökonomie). Stufe ist XS, S, M oder L;
+% ohne Angabe gilt M.
+\NewDocumentCommand{\ZSFgap}{O{M}}{\vspace{\csname ZSFspace#1\endcsname}}
+% \ZSFSectionGap bleibt als eigener Name, weil er etwas anderes ausdrückt als
+% eine Grösse: den Themenwechsel. Dass er aktuell derselbe Abstand wie
+% \ZSFgap[L] ist, ist eine Einstellung dieser Zeile, keine Verdopplung.
+\newcommand{\ZSFSectionGap}{\ZSFgap[L]}
 
 % ------------------------------------------------------------
 % Vertikaler Einschub INNERHALB einer Box

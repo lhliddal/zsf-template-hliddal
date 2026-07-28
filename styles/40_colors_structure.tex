@@ -110,6 +110,7 @@
 \colorlet{IdentityMarkerColor}{black!10}
 \colorlet{ReleaseFooterColor}{black}
 \colorlet{DangerTagColor}{red!80!black}
+\newcommand{\DangerTagTextColor}{white}
 
 % ------------------------------------------------------------
 % Dokumenttitel-Masthead: bewusst unabhängig von der Kapitelrotation.
@@ -138,6 +139,23 @@
 \newcommand{\BoxTitleTextColor}{TextVorBoxColor}
 \newcommand{\BoxBackColor}{\chaptercolorlight!8}
 \newcommand{\BoxFrameColor}{\chaptercolorlight!25}
+% Ungetönter Boxhintergrund (tablebox, goalbox, valuegrid, statementbox,
+% codebox). Als Token statt als literalem "white" in jeder Box-Definition:
+% der Grundton aller ungetönten Boxen hängt damit an einer Zeile.
+\newcommand{\BoxPlainBackColor}{white}
+
+% Warn-Box — die einzige semantisch gefärbte Box. Ihre Farben standen bisher
+% roh in der Box-Definition und waren dadurch weder auffindbar noch mit den
+% übrigen Box-Tokens gemeinsam verstellbar.
+\newcommand{\WarnboxBackColor}{WarnboxBack}
+\newcommand{\WarnboxTitleColor}{ETHRot}
+\newcommand{\WarnboxTitleTextColor}{white}
+
+% Formelbox und Zielketten-Bedingung tragen bewusst eine harte Kontur statt
+% des dezenten Kapitelrahmens; auch das ist eine Gestaltungsentscheidung und
+% gehört deshalb hierher, nicht in styles/60_boxes.tex.
+\newcommand{\FormulaboxFrameColor}{black}
+\newcommand{\GoalConditionBorderColor}{black}
 
 % Für statementbox / goalbox (semantische Aussage- und Ziel-Boxen)
 \newcommand{\StatementBarColor}{\chaptercolor}
@@ -223,11 +241,8 @@
 }
 \makeatother
 
-% Variante: Kapitel explizit auf neuer Spalte starten
-\newcommand{\StartChapterOnNewColumn}[2][]{%
-  \columnbreak
-  \StartChapter[#1]{#2}%
-}
+% Für ein Kapitel auf neuer Spalte: \ZSFNewColumn davorsetzen
+% (styles/60_boxes.tex) statt einer eigenen Kapitel-Variante.
 
 % Front-Matter-Kapitel: unnummeriert, ETH-Blau, neue Spalte ab Kapitel 2
 \newcommand{\StartFrontChapter}[1]{%

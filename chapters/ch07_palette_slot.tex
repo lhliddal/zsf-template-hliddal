@@ -15,24 +15,24 @@ def hervorhebung(text="Zeichenkette", zahl=42):
 
 \SubsectionBar[sec:code-split]{Teilbare Code-Gruppe}
 
-\begin{codeboxfirst}[Teil 1 trägt den Titel\ZSFTitleTag{codeboxfirst}]
+\begin{codebox}[Teil 1 trägt den Titel\ZSFTitleTag{part=first}][part=first]
 \begin{lstlisting}[style=CodeExpert]
 # Rahmen oben, unten offen
 werte = [1, 2, 3]
 \end{lstlisting}
-\end{codeboxfirst}
-\begin{codeboxmid}
+\end{codebox}
+\begin{codebox}[][part=mid]
 \begin{lstlisting}[style=CodeExpert]
-# codeboxmid: beide Kanten offen
+# part=mid: beide Kanten offen
 summe = sum(werte)
 \end{lstlisting}
-\end{codeboxmid}
-\begin{codeboxlast}
+\end{codebox}
+\begin{codebox}[][part=last]
 \begin{lstlisting}[style=CodeExpert]
-# codeboxlast: Rahmen unten
+# part=last: Rahmen unten
 print(summe)
 \end{lstlisting}
-\end{codeboxlast}
+\end{codebox}
 
 \SubsectionBar[sec:code-comments]{Smarte Zeilenkommentare}
 
