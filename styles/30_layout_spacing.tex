@@ -2,7 +2,6 @@
 % 30_layout_spacing.tex — Layout-Grundlagen, Spacing-Skala, Box-Bindungen
 % ============================================================
 
-\setlength{\parskip}{3.5pt plus 1pt minus 0.5pt}
 \setlength{\parindent}{0pt}
 
 \widowpenalty=10000
@@ -20,24 +19,54 @@
 % Standard 1 = Referenzdichte des Templates. Für eine dichtere ZSF in
 % preamble.tex VOR dem \input dieser Datei setzen, z.B.
 %   \def\ZSFDensityFactor{0.85}
-% Skaliert die vier Basisregister; sämtliche abgeleiteten Masse folgen
-% automatisch (Box-Paddings, Section-Gaps, \tabcolsep, Display-Skips),
-% weil sie aus diesen Registern berechnet werden.
+% Skaliert die vier Basisregister; alles, was aus ihnen berechnet wird, folgt
+% automatisch (Box-Paddings, Balken-Polsterung, Section-Gaps, \columnsep,
+% \tabcolsep, Display-Skips).
 % Ersetzt das lokale Überschreiben von \ZSFspace* in einzelnen Kapiteln.
+%
+% BEWUSST AUSSERHALB (siehe rules/30_spacing → Reichweite):
+%   \ZSFLeadingFactor  — Zeilenhöhe, eigener Regler (enthält die Schrift selbst)
+%   \columnsep         — der Steg soll beim Verdichten nicht schrumpfen
+%   \ZSFtitleBarHeight — Mindesthöhe des Titelstreifens, an die Schrift gebunden
+%   \ZSFfigMaxHeight   — Bildhöhe ist Inhalt, kein Abstand
+% Alles andere Vertikale hängt am Faktor. Wer etwas Neues hinzufügt, leitet es
+% ebenfalls aus den Basisregistern ab — nicht als roher pt-Wert.
 \providecommand{\ZSFDensityFactor}{1}
 \newlength{\ZSFspaceXS}\setlength{\ZSFspaceXS}{\ZSFDensityFactor\dimexpr 1pt\relax}
 \newlength{\ZSFspaceS} \setlength{\ZSFspaceS}{\ZSFDensityFactor\dimexpr 4pt\relax}
 \newlength{\ZSFspaceM} \setlength{\ZSFspaceM}{\ZSFDensityFactor\dimexpr 7pt\relax}
 \newlength{\ZSFspaceL} \setlength{\ZSFspaceL}{\ZSFDensityFactor\dimexpr 10pt\relax}
 
-% Outer (Text-Box-Bindung) und Sep (Trennlinien)
-\newlength{\ZSFspaceOuter}\setlength{\ZSFspaceOuter}{7pt}
-\newlength{\ZSFspaceSep}  \setlength{\ZSFspaceSep}{3pt}
+% Outer (Text-Box-Bindung) und Sep (Trennlinien) — beide folgen der Dichte.
+% Outer ist bewusst als \ZSFspaceM abgeleitet statt erneut ausgeschrieben:
+% es IST der Standard-Aussenabstand, kein eigener Wert.
+\newlength{\ZSFspaceOuter}\setlength{\ZSFspaceOuter}{\ZSFspaceM}
+\newlength{\ZSFspaceSep}  \setlength{\ZSFspaceSep}{\ZSFDensityFactor\dimexpr 3pt\relax}
+
+% Absatzabstand im Fliesstext — der grösste einzelne vertikale Posten einer
+% ZSF und deshalb der wichtigste Teil der Dichte-Stellschraube. Muss nach den
+% Basisregistern stehen, damit \ZSFDensityFactor bereits bekannt ist.
+\setlength{\parskip}{\ZSFDensityFactor\dimexpr 3.5pt\relax
+             plus \ZSFDensityFactor\dimexpr 1pt\relax
+            minus \ZSFDensityFactor\dimexpr 0.5pt\relax}
+
+% ── Zeilenhöhe: die zweite globale Stellschraube ─────────────────────
+% Bewusst NICHT an \ZSFDensityFactor gekoppelt. Abstände sind Leerraum und
+% vertragen jede Skalierung; Zeilenhöhe enthält die Schrift selbst — sie mit
+% demselben Faktor zu stauchen, lässt Formeln und Akzente kollidieren.
+% Wer zusätzlich zur Dichte enger setzen will, dreht hier separat:
+%   \def\ZSFLeadingFactor{0.92}   % in preamble.tex, vor diesem \input
+\providecommand{\ZSFLeadingFactor}{0.95}
+\linespread{\ZSFLeadingFactor}
 
 % ------------------------------------------------------------
 % Spalten-Layout
 % ------------------------------------------------------------
-\setlength{\columnsep}{\ZSFspaceL}
+% \columnsep folgt der Dichte bewusst NICHT: Beim Verdichten sollen die
+% Zeilen enger stehen, nicht die Spalten zusammenrücken — ein schmalerer
+% Steg macht die ZSF schlechter lesbar, obwohl er kaum Platz spart.
+\newlength{\ZSFcolumnSep}\setlength{\ZSFcolumnSep}{10pt}
+\setlength{\columnsep}{\ZSFcolumnSep}
 \setlength{\multicolsep}{\ZSFspaceS}
 \setlength{\emergencystretch}{2em}
 
@@ -58,7 +87,7 @@
 \newlength{\ZSFsubsubsectionBarBeforeSkip}\setlength{\ZSFsubsubsectionBarBeforeSkip}{\ZSFspaceS}
 \newlength{\ZSFsubsectionAfterChapterGap}\setlength{\ZSFsubsectionAfterChapterGap}{\ZSFspaceXS}
 \newlength{\ZSFsubsectionAfterGap}\setlength{\ZSFsubsectionAfterGap}{\ZSFspaceXS}
-\newlength{\ZSFchapterBarAfterSkip}\setlength{\ZSFchapterBarAfterSkip}{2pt}
+\newlength{\ZSFchapterBarAfterSkip}\setlength{\ZSFchapterBarAfterSkip}{\ZSFDensityFactor\dimexpr 2pt\relax}
 \newlength{\ZSFboxArc}\setlength{\ZSFboxArc}{\ZSFspaceXS}
 \newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
 \newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
@@ -68,6 +97,11 @@
 % Maximale Höhe für Bilder in figboxen (verhindert überhohe Aspect-Ratios).
 \newlength{\ZSFfigMaxHeight}\setlength{\ZSFfigMaxHeight}{2.6cm}
 
+% Abstand der TikZ-Spannklammer (\drawbrace, Opt-in 11_math_advanced) von der
+% Grundlinie des annotierten Terms. Ohne ihn läuft die Klammer als waagrechte
+% Linie mitten durch die Formel, weil die Marker auf der Grundlinie sitzen.
+\newlength{\ZSFbraceDrop}\setlength{\ZSFbraceDrop}{\ZSFspaceM}
+
 % Tokens für statementbox / procedure
 \newlength{\ZSFstatementBarWidth}\setlength{\ZSFstatementBarWidth}{2pt}
 \newlength{\ZSFprocStepGap}      \setlength{\ZSFprocStepGap}{\ZSFspaceXS}
@@ -76,7 +110,9 @@
 \newlength{\ZSFlistLeftMargin}   \setlength{\ZSFlistLeftMargin}{1.2em}
 \newlength{\ZSFlistLabelSep}     \setlength{\ZSFlistLabelSep}{0.4em}
 
-% Padding für cellspace (siehe styles/20_tables.tex Konvention)
+% Kleinstes vertikales Innenmass für Text an einer Kante: Zeilenluft in
+% Tabellen (\extrarowheight in 70_document_settings) und die knappe Polsterung
+% von goalbox/valuegrid.
 \newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFspaceXS}
 
 % ── Horizontaler Innenabstand: eine Stellschraube für alle Inhaltsboxen ──
@@ -216,11 +252,25 @@
 % ------------------------------------------------------------
 % Semantische Gap-Helfer für Kapitel (sparsam einsetzen)
 % ------------------------------------------------------------
-\newcommand{\ZSFSectionGap}{\vspace{\ZSFspaceL}}
 \newcommand{\ZSFgapXS}{\vspace{\ZSFspaceXS}}
 \newcommand{\ZSFgapS}{\vspace{\ZSFspaceS}}
 \newcommand{\ZSFgapM}{\vspace{\ZSFspaceM}}
 \newcommand{\ZSFgapL}{\vspace{\ZSFspaceL}}
+% \ZSFSectionGap ist der Name für den Themenwechsel und absichtlich derselbe
+% Abstand wie \ZSFgapL — deshalb hier abgeleitet statt ein zweites Mal
+% ausgeschrieben. Eine eigene Grösse daraus zu machen, ist eine Änderung an
+% genau dieser Zeile.
+\newcommand{\ZSFSectionGap}{\ZSFgapL}
+
+% ------------------------------------------------------------
+% Vertikaler Einschub INNERHALB einer Box
+% ------------------------------------------------------------
+% Formelnote, Trennlinie, Item-Heading und Folgerung setzen alle denselben
+% Einschub: laufenden \parskip zurücknehmen, definierten Abstand setzen.
+% Das Muster stand neunmal von Hand im Code — und jede Kopie hatte \parskip
+% fest verdrahtet, wodurch der Absatzabstand nicht an der Dichte-Stellschraube
+% hängen konnte. Eine Stelle statt neun; wer den Rhythmus ändert, ändert hier.
+\newcommand{\ZSFInterlude}[1]{\par\vspace{-\parskip}\vspace{#1}}
 % Trenner-Abstand um den Mittelpunkt im Index-Locator "6.2 · (S. 4)" (66_index).
 % Bewusst als Makro statt \newlength: das em soll an der Verwendungsstelle in der
 % Index-Schrift ausgewertet werden. Eine Länge würde es in der Präambel-Schrift

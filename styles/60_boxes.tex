@@ -2,11 +2,46 @@
 % 60_boxes.tex — tcolorbox-Stile, Balken, Boxen, Formelnoten, Listen
 % ============================================================
 
+% ------------------------------------------------------------
+% Balken-Bindung: ein Titelbalken steht nie allein am Spaltenfuss
+% ------------------------------------------------------------
+% Ein Balken ohne den Anfang seines Inhalts ist der auffälligste Layoutfehler
+% einer ZSF: Man sieht die Überschrift, aber nicht, wozu sie gehört.
+%
+% Die frühere Platzreserve allein hat das nicht verhindert, sondern verursacht.
+% Sie besteht aus \penalty0 … \penalty-100 und legt damit einen BILLIGEN
+% Umbruchpunkt an genau die Stelle, an der ein Balken gerade fertig gesetzt
+% wurde. Die zugehörige Bremse — Stretch-Glue, die einen Umbruch bei viel
+% Restplatz unattraktiv macht — trägt unter \raggedcolumns nicht mehr, weil
+% multicols den Spaltenboden ohnehin frei auffüllt. Übrig blieb die Einladung
+% zum Umbruch. Genau dort brach die Spalte.
+%
+% Deshalb zwei getrennte Aufgaben statt einer:
+%   \ZSFReserveSpace  — „lieber vorher umbrechen, wenn es eng wird" (Bremse)
+%   \ZSFTitleBarLock  — „hier NICHT umbrechen, es kam noch kein Inhalt" (Sperre)
+% Die Sperre ist die verlässliche; sie hängt an keiner Höhenschätzung.
+\newif\ifzsfTitleBarPending
+\newcommand{\ZSFTitleBarLockOn}{\global\zsfTitleBarPendingtrue}
+\newcommand{\ZSFTitleBarLockOff}{\global\zsfTitleBarPendingfalse}
+
+% Jeder Umbruchpunkt, den das Balken-System selbst setzt, läuft hierüber:
+% solange noch kein Inhalt folgte, wird daraus ein Verbot.
+\newcommand{\ZSFBarPenalty}[1]{%
+  \ifzsfTitleBarPending\penalty10000\else\penalty#1\fi
+}
+
 % Platzreserve vor einem Titelbalken: Ist weniger als #1 frei, bricht die
 % Spalte davor um. Genau eine Implementierung — die drei Balkenebenen
 % unterscheiden sich nur im Schwellwert (rules/30_spacing).
+% Direkt hinter einem Balken entfällt sie zugunsten der Sperre.
 \newcommand{\ZSFReserveSpace}[1]{%
-  \par\penalty0\vspace{0pt plus #1}\penalty-100\vspace{0pt plus -#1}\relax
+  \par
+  \ifzsfTitleBarPending
+    \penalty10000
+  \else
+    \penalty0\vspace{0pt plus #1}\penalty-100\vspace{0pt plus -#1}%
+  \fi
+  \relax
 }
 \newcommand{\BreakIfNotEnoughSpace}{\ZSFReserveSpace{\ZSFbreakThreshold}}
 \newcommand{\BreakIfNotEnoughSpaceChapter}{\ZSFReserveSpace{\ZSFbreakThresholdChapter}}
@@ -30,6 +65,18 @@
 % denselben Rahmenlos-Kontrakt. Sie setzen nur noch, worin sie sich wirklich
 % unterscheiden: Farbe, vertikale Polsterung, Skips und Schrift.
 % Der Balken-Ton ist immer Fläche = Rahmen, deshalb ein Schlüssel dafür.
+%
+% Nach einem Balken kommt zuerst das Umbruchverbot, dann erst der Abstand.
+% Die Reihenfolge ist der eigentliche Fix: tcolorbox' "after skip" setzt die
+% Glue direkt hinter die Box, und Glue nach einer Box IST ein gültiger
+% Umbruchpunkt. Ein \penalty10000, das erst danach kommt, greift zu spät.
+% Steht die Sperre davor, ist die Glue durch ein Penalty abgeschirmt und
+% damit kein Umbruchpunkt mehr. Deshalb ersetzen die Balken "after skip"
+% durch diesen Hook — "after" ersetzt die Default-Aktion von tcolorbox.
+\newcommand{\ZSFTitleBarAfter}[1]{%
+  \par\penalty10000\vskip#1\relax\ZSFTitleBarLockOn
+}
+
 \tcbset{
   zsfbarcolor/.style={colback=#1, colframe=#1},
   zsfbar/.style={
@@ -49,7 +96,7 @@
   top=\ZSFbarPadY,
   bottom=\ZSFbarPadY,
   before skip=\ZSFspaceL,
-  after skip=\ZSFchapterBarAfterSkip,
+  after={\ZSFTitleBarAfter{\ZSFchapterBarAfterSkip}},
   fontupper=\ZSFfontChapter,
   #1
 }
@@ -70,19 +117,18 @@
   right=\ZSFboxPadXBar,
   top=\ZSFbarPadY,
   bottom=\ZSFbarPadY,
-  after skip=\ZSFspaceXS,
+  after={\ZSFTitleBarAfter{\ZSFspaceXS}},
   halign=center,
   #1
 }
 \newcommand{\ZSFTitleHeader}[2]{%
-  \penalty-500
+  \ZSFBarPenalty{-500}%
   \begin{zsftitleheader}
     \sffamily
     {\color{ZSFDocumentTitleTextColor}\ZSFfontTitleHeader #1\par}%
     \vspace{\ZSFspaceXS}%
     {\color{ZSFDocumentTitleBylineColor}\ZSFfontNote von~#2\par}%
   \end{zsftitleheader}
-  \penalty10000
 }
 
 % ------------------------------------------------------------
@@ -93,7 +139,7 @@
   zsfbarcolor=\SubsectionBarColor,
   top=\ZSFbarPadY,
   bottom=\ZSFbarPadY,
-  after skip=\ZSFsubsectionAfterGap,
+  after={\ZSFTitleBarAfter{\ZSFsubsectionAfterGap}},
   fontupper=\ZSFfontSection,
   #1
 }
@@ -102,7 +148,7 @@
   zsfbarcolor=\SubsubsectionBarColor,
   top=\ZSFbarPadYTight,
   bottom=\ZSFbarPadYTight,
-  after skip=\ZSFsubsectionAfterGap,
+  after={\ZSFTitleBarAfter{\ZSFsubsectionAfterGap}},
   fontupper=\ZSFfontSubsubsection,
   #1
 }
@@ -112,24 +158,22 @@
 %   #1 = Label (leer erlaubt)   #2 = Nummernpräfix   #3 = Titel
 \newcommand{\ZSF@subsectionBarBody}[3]{%
   \ZSFTitleBarTopSpacing{\ZSFsubsectionBarBeforeSkip}%
-  \penalty-500
+  \ZSFBarPenalty{-500}%
   \ZSFCollapseAfterChapterBar
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsectionbar}
     \textcolor{\SubsectionBarTextColor}{#2#3}
   \end{subsectionbar}
-  \penalty10000
   \ZSFMarkAfterSubsectionBar
 }
 \newcommand{\ZSF@subsubsectionBarBody}[3]{%
   \BreakIfNotEnoughSpaceSubsubsection
   \par\addvspace{\ZSFsubsubsectionBarBeforeSkip}%
-  \penalty-300
+  \ZSFBarPenalty{-300}%
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsubsectionbar}
     \textcolor{\SubsubsectionTitleColor}{#2#3}
   \end{subsubsectionbar}
-  \penalty10000
   \ZSFMarkAfterSubsectionBar
 }
 
@@ -191,7 +235,7 @@
   enhanced jigsaw,
   before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFBoxAfterSkip,
-  before={\par\ZSFConsumeAfterSubsectionBar},
+  before={\par\ZSFConsumeAfterSubsectionBar\ZSFTitleBarLockOff},
 }}
 
 \tcbset{zsfpanelbox/.style={
@@ -290,9 +334,9 @@
 
 % Formel-Note (klein, kursiv, dezent) — unter oder über Formeln
 \newcommand{\formulanote}[1]{%
-  \par\vspace{-\parskip}\vspace{\ZSFspaceS}%
+  \ZSFInterlude{\ZSFspaceS}%
   \noindent{{\ZSFfontNote #1}}%
-  \par\vspace{-\parskip}\vspace{\ZSFspaceS}%
+  \ZSFInterlude{\ZSFspaceS}%
 }
 \let\formulanoteabove\formulanote
 % \ZSFformulaline{<mathe>}{<Anmerkung>} — Formelzeile mit rechtsbündiger
@@ -304,24 +348,26 @@
 
 % Duenne, graue Trennlinie zwischen Formeln in einer formulabox
 \newcommand{\formulasep}{%
-  \par\vspace{-\parskip}\vspace{\ZSFspaceSep}%
+  \ZSFInterlude{\ZSFspaceSep}%
   \noindent\textcolor{FormulaSeparatorColor}{\rule{\linewidth}{\ZSFboxRuleWidth}}%
-  \par\vspace{-\parskip}\vspace{\ZSFspaceSep}%
+  \ZSFInterlude{\ZSFspaceSep}%
   \penalty-50%
 }
 
 % Zentriertes Item-Heading mit Trennstrich — für gleichwertige Fälle in Boxen
 \newcommand{\ZSFItemHeading}[1]{%
-  \par\vspace{-\parskip}\vspace{\ZSFspaceM}%
-  {\centering\textbf{#1}\par}\vspace{-\parskip}\vspace{\ZSFspaceS}%
-  \noindent\rule{\linewidth}{\ZSFboxRuleWidth}\par\vspace{-\parskip}\vspace{\ZSFspaceS}%
+  \ZSFInterlude{\ZSFspaceM}%
+  {\centering\textbf{#1}\par}%
+  \ZSFInterlude{\ZSFspaceS}%
+  \noindent\rule{\linewidth}{\ZSFboxRuleWidth}%
+  \ZSFInterlude{\ZSFspaceS}%
 }
 
 % ------------------------------------------------------------
 % Runintext + Grafik-Helpers
 % ------------------------------------------------------------
 \newenvironment{runintext}{%
-  \ZSFConsumeAfterChapterBar
+  \ZSFConsumeAfterChapterBar\ZSFTitleBarLockOff
   \par\addvspace{\ZSFspaceS}\noindent\ZSFReadableAuto\ignorespaces
 }{\par}
 
@@ -406,7 +452,7 @@
     sidebyside gap=\ZSFspaceM,
     lefthand width=#1\linewidth,
     lower separated=false,
-    before={\par\ZSFConsumeAfterSubsectionBar},
+    before={\par\ZSFConsumeAfterSubsectionBar\ZSFTitleBarLockOff},
     before skip=\ZSFspaceS,
     after skip=\ZSFspaceS,
     before upper={\ZSFReadableAuto},

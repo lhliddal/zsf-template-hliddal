@@ -1,5 +1,5 @@
 % Living Showcase: Abbildungen, Plots und Side-by-side (Palette Slot 5).
-\StartChapterOnNewColumn[ch:figures]{Abbildungen und Layout}
+\StartChapter[ch:figures]{Abbildungen und Layout}
 
 \SubsectionBar[sec:fig-helpers]{Bild-Makros}
 \ZSFindex{ZSFfig}
@@ -32,8 +32,11 @@
       ticks=none
     ]
       \addplot[color=\chaptercolor, very thick, domain=-2:2]{x^2};
-      \node[\chaptercolor, font=\ZSFfontDiagramLabel, anchor=west]
-        at (axis cs:-2.1,4.25) {ZSFfontDiagramLabel};
+      % Relative Achsenkoordinaten statt absoluter: die Beschriftung bleibt
+      % dadurch garantiert innerhalb der Box und trifft die freie Fläche
+      % zwischen den Parabelästen, statt am Rand abgeschnitten zu werden.
+      \node[\chaptercolor, font=\ZSFfontDiagramLabel, anchor=center]
+        at (rel axis cs:0.68,0.72) {ZSFfontDiagramLabel};
     \end{axis}
   \end{tikzpicture}
   \ZSFfigcaption{Knotenbeschriftung über ZSFfontDiagramLabel statt lokalem

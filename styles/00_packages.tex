@@ -10,7 +10,8 @@
 \usepackage[sfdefault,lf]{carlito}  % Calibri-Aequivalent (Google), lf = Lining Figures
 \usepackage{sansmath}               % Mathe-Modus auch in Sans-Serif
 \sansmath
-\linespread{0.95}                   % Etwas engere Zeilen für Kompaktheit
+% Zeilenhöhe liegt als \ZSFLeadingFactor in styles/30_layout_spacing.tex —
+% sie ist Layout, nicht Paket-Setup (rules/10_architecture).
 
 \usepackage[landscape, a4paper, margin=1.5mm]{geometry}
 \usepackage{microtype}
@@ -34,9 +35,7 @@
 \usepackage{array}                  % erweiterte Spaltentypen + \arrayrulecolor
 \usepackage{tabularx}               % \linewidth-Fit + X-Spalten
 \usepackage{tabularray}             % moderne Tabellen (valuegrid)
-\usepackage[column=O]{cellspace}    % cellspace nutzt 'O', damit siunitx 'S' frei bleibt
 \usepackage{xstring}
-\usepackage{varwidth}
 \usepackage{ragged2e}               % Silbentrennung bei Flattersatz
 \usepackage[normalem]{ulem}         % umbruchfähige Unterstreichung für \ZSFhl
                                     % (normalem: \emph bleibt kursiv)
@@ -45,6 +44,6 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{tcolorbox}
-\tcbuselibrary{skins, breakable, raster}
+\tcbuselibrary{skins, breakable}
 
 \usepackage{hyperref}

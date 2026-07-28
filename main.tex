@@ -1,7 +1,9 @@
 \documentclass[8pt]{extarticle}
-% TEMPLATE-SHOWCASE: aktiviert alle optionalen Module für diese Living
-% Documentation. scripts/init_project.sh entfernt den Marker im Fach-Fork.
+% >>> TEMPLATE-ONLY (scripts/init_project.sh entfernt diesen Block) >>>
+% Living Showcase: aktiviert alle optionalen Module, damit sie real
+% dargestellt und mitgeprüft werden. Im Fach-Fork bleiben sie deaktiviert.
 \newcommand{\ZSFShowcaseMode}{}
+% <<< TEMPLATE-ONLY <<<
 \input{preamble}
 
 % ============================================================
@@ -16,8 +18,11 @@
 % Hier neue Kapitel als \input{chapters/NN_name} einbinden.
 % Kapitel mit \StartChapterOnNewColumn, Abschnitte mit
 % \SubsectionBarOnNewColumn bewusst auf einer neuen Spalte beginnen.
+% >>> TEMPLATE-ONLY (scripts/init_project.sh entfernt diesen Block) >>>
 \input{chapters/ch00_palette_front}
+% <<< TEMPLATE-ONLY <<<
 \input{chapters/ch01_beispiel}
+% >>> TEMPLATE-ONLY (scripts/init_project.sh entfernt diesen Block) >>>
 \input{chapters/ch02_palette_slot}
 \input{chapters/ch03_palette_slot}
 \input{chapters/ch04_palette_slot}
@@ -35,6 +40,7 @@
 \input{chapters/ch16_palette_slot}
 \input{chapters/ch17_palette_slot}
 \input{chapters/ch18_schlusswort}
+% <<< TEMPLATE-ONLY <<<
 
 \end{multicols*}
 \end{document}

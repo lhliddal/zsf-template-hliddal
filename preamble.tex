@@ -19,11 +19,14 @@
 %                       NUR zusammen mit 65_code_style aktivieren.
 % Module nicht löschen — nur deaktivieren (siehe rules/10_architecture).
 %
-% ── Globale Stellschraube: Dichte ────────────────────────────────────
-% Skaliert alle Abstände der ZSF gemeinsam (1 = Template-Referenz).
-% Muss VOR styles/30_layout_spacing gesetzt werden. Beispiel für eine
-% dichtere ZSF:  \def\ZSFDensityFactor{0.85}
-% \def\ZSFDensityFactor{0.85}
+% ── Globale Stellschrauben: Dichte und Zeilenhöhe ────────────────────
+% Beide gelten für die ganze ZSF und müssen VOR styles/30_layout_spacing
+% stehen. Getrennt, weil unterschiedlich riskant:
+%   Dichte  — skaliert alle Abstände (Leerraum, gefahrlos)
+%   Zeilenhöhe — enthält die Schrift selbst; nur in kleinen Schritten senken
+%                und danach das PDF auf kollidierende Formelzeilen prüfen.
+% \def\ZSFDensityFactor{0.85}   % 1    = Template-Referenz, kleiner = dichter
+% \def\ZSFLeadingFactor{0.92}   % 0.95 = Template-Referenz, kleiner = enger
 % ─────────────────────────────────────────────────────────────────────
 
 \input{styles/00_packages}

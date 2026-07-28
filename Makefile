@@ -38,7 +38,7 @@ IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTI
         check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules check-init-project \
         check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
         sync-rules check-rules check-rule-authorship \
-        release-proof print-pdf-basename
+        release-proof print-pdf-basename print-release-id
 
 build:
 	INDEXSTYLE="$(CURDIR)/styles:" \
@@ -61,7 +61,7 @@ rebuild: build
 # Läuft NICHT in CI: tests/ tools/ rules/ sind git-excluded und fehlen im Clone.
 # 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
 check: check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
-       check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
+       check-init-project check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
        check-rule-authorship check-rules
 	@echo "make check: alle Prüfungen bestanden."
 
@@ -86,10 +86,13 @@ check-styles:
 check-optional-modules:
 	@bash tests/check_optional_modules.sh
 
-# Template-spezifischer, separater E2E-Test: initialisiert und baut eine
-# temporäre Kopie, ohne den normalen Fachprojekt-Check zu verteuern.
+# E2E-Test des Fork-Generators: initialisiert und baut eine temporäre Kopie.
+# Teil von 'make check', weil ein sauberer Fork die erste Pflicht des
+# Templates ist (rules/00_meta) — ein separat aufzurufender Test dafür bleibt
+# unbemerkt rot. In einem Fach-Fork ohne scripts/ ist er ein No-op.
 check-init-project:
-	@bash tests/check_init_project.sh
+	@if [ -f scripts/init_project.sh ]; then bash tests/check_init_project.sh; \
+	else echo "check-init-project: kein Fork-Generator vorhanden — übersprungen."; fi
 
 check-root-clean:
 	@PDF_BASENAME="$(PDF_BASENAME)" bash tests/check_root_clean.sh
@@ -121,6 +124,9 @@ check-rule-authorship:
 
 print-pdf-basename:
 	@echo "$(PDF_BASENAME)"
+
+print-release-id:
+	@echo "$(RELEASE_ID)"
 
 release-proof:
 	@mkdir -p $(BUILD_DIR)

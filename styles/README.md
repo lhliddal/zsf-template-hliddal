@@ -9,7 +9,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, TikZ-Klammern (`\drawbrace`/`\tikzmark`), Pfeil-Fix |
 | `12_plots.tex` | **OPT-IN**: lädt `pgfplots` und setzt die zentrale Kompatibilitätsversion |
 | `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable*`, `\ZSFheaderRow`, `\ZSFhead`, Zebra |
-| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L samt globaler Dichte-Stellschraube `\ZSFDensityFactor`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox`/`\textVorFormel`/`\textNachFormel`, `\ZSFRobustUnskip`, Gap-Helfer |
+| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox`/`\textVorFormel`/`\textNachFormel`, `\ZSFRobustUnskip`, Gap-Helfer |
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`/`\StartChapterOnNewColumn` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), `\ZSFkeyword`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
@@ -47,20 +47,26 @@ Kapitelbefehle. Die fachliche Verwendung und Auswahl beschreiben die Regeln in
   `statementbox`, `procedure`, `factlist`, `goalbox`,
   `valuegrid`, `splitbox`, `runintext`.
 - Tabellen: `ZSFtable`, `ZSFtableFlat`, `ZSFtablePlain`, Spaltentypen
-  `L/C/R/Y/Z/Q/F`, `\ZSFheaderRow`, `\ZSFhead`.
+  `L`, `C`, `R`, `Y`, `Z`, `Q`, `F`, `\ZSFheaderRow`, `\ZSFhead`.
 - Bilder: `\ZSFfig`, `\ZSFfigside`, `\ZSFfigrow`, `\ZSFfigcaption`.
 - Semantik und Navigation: `\ZSFkeyword`, `\ZSFdanger`, `\ZSFconclusion`,
   `\ZSFhl`, `\ZSFref`, `\ZSFsectionref`, `\ZSFTitleTag`, `\ZSFItemHeading`,
   `\ProcStep`, `\ZSFFact`, `\ZSFfontDiagramLabel`.
-- Abstände in Kapiteln: `\ZSFgapXS/S/M/L`, `\ZSFSectionGap`.
+- Abstände in Kapiteln: `\ZSFgapXS`, `\ZSFgapS`, `\ZSFgapM`, `\ZSFgapL`,
+  `\ZSFSectionGap`.
+- Punktuelle Umbruchsteuerung in Kapiteln: `\ZSFbreak`, `\ZSFnobreak`,
+  `\ZSFallowbreak`.
 - Dokumentkopf und Skriptverweis: `\ZSFTitleHeader`, `\ZSFScriptRef`.
 - Globale Stellschrauben (in `preamble.tex`, nicht in Kapiteln):
-  `\ZSFDensityFactor`, `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`.
+  `\ZSFDensityFactor`, `\ZSFLeadingFactor`, `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
+  `\ZSFReadableBodyOn`, `\ZSFReadableBodyOff`, `\ZSFIndexShowPageNumber`
+  (Index-Locator mit oder ohne Seitenzahl, siehe `rules/55_index.md`).
 - Pack-Modus für Anhang-artige Kapitel (am Kapitelanfang):
   `\ZSFBoxesBreakableOn`, `\ZSFBoxesBreakableOff`, `\ZSFBreakReservesOff`.
 - Formel-API: `\R`, `\C`, `\N`, `\Z`, `\Q`, `\dd`, `\vect`, `\abs`,
   `\norm`, `\ZSFsumAuto`, `\ZSFlimAuto`, `\ZSFbraceunder`,
-  `\ZSFbraceover`, `\ZSFmhlA/B/C/D`, `\formulasep`, `\formulanote`,
+  `\ZSFbraceover`, `\ZSFmhlA`, `\ZSFmhlB`, `\ZSFmhlC`, `\ZSFmhlD`,
+  `\formulasep`, `\formulanote`,
   `\ZSFformulaline`,
   `\textVorBox`, `\textNachBox`, `\textVorFormel`, `\textNachFormel`.
 - Goal-System: `\GoalCondition`, `\GoalStep`, `\GoalTarget`,

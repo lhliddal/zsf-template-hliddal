@@ -35,16 +35,36 @@
 % --- TikZ-Klammern für Matrix-Annotationen ---
 \usetikzlibrary{decorations.pathreplacing,calc}
 \newcommand{\tikzmark}[2][-3pt]{\tikz[remember picture, overlay, baseline=-0.5ex]\node[#1](#2){};}
+% Die Marker von \tikzmark sitzen auf der GRUNDLINIE des Terms. Ohne Versatz
+% liegt die Klammer-Sehne genau dort und läuft als waagrechte Linie mitten
+% durch die Formel. Der Versatz muss an den Koordinaten hängen, nicht als
+% yshift an der Pfadoption: Knoten aus einem anderen Bild (remember picture)
+% werden absolut aufgelöst und ignorieren die Pfad-Transformation.
+%
+% Richtung und Dekoration gehören zusammen, deshalb setzt jeder Stil beides.
+% \ZSF@braceSign trägt das Vorzeichen zur Koordinate — die Optionen werden vor
+% den Koordinaten ausgewertet, der Wert steht also rechtzeitig.
+\makeatletter
+\newcommand{\ZSF@braceSign}{-}
 \tikzset{
-  brace/.style={decorate, decoration={brace}},
-  brace mirrored/.style={decorate, decoration={brace,mirror}},
+  brace/.style={decorate, decoration={brace},
+                /utils/exec=\renewcommand{\ZSF@braceSign}{}},
+  brace mirrored/.style={decorate, decoration={brace,mirror},
+                /utils/exec=\renewcommand{\ZSF@braceSign}{-}},
 }
 \newcounter{brace}
 \setcounter{brace}{0}
+% \drawbrace[stil]{marke links}{marke rechts}
+%   brace           — Klammer ÜBER dem Term (Default)
+%   brace mirrored  — Klammer UNTER dem Term
 \newcommand{\drawbrace}[3][brace]{%
   \refstepcounter{brace}%
-  \tikz[remember picture, overlay]\draw[#1] (#2.center)--(#3.center)node[pos=0.5, name=brace-\thebrace]{};%
+  \tikz[remember picture, overlay]\draw[#1]
+    ([yshift=\ZSF@braceSign\ZSFbraceDrop]#2.center)--%
+    ([yshift=\ZSF@braceSign\ZSFbraceDrop]#3.center)%
+    node[pos=0.5, name=brace-\thebrace]{};%
 }
+\makeatother
 \newcommand{\annote}[3][]{%
   \tikz[remember picture, overlay]\node[#1] at (#2) {#3};%
 }
