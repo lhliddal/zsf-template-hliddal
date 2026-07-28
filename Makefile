@@ -56,11 +56,13 @@ rebuild: build
 # 'make check' ist das lokale Feedback-Loop: Struktur-, Tabellen-, Ref-,
 # Index-, Style-Token-, Root-, PDF-Identity-, Guardrail-, Lint- und
 # Rule-Drift-Prüfung.
-# check-pdf-identity und die .ind-Prüfungen brauchen einen vorherigen Build
-# (also: `make build && make check`).
+# 'check' baut zuerst: check-pdf-identity und die .ind-Prüfungen brauchen ein
+# aktuelles PDF. Der Build ist inkrementell und damit fast gratis, wenn nichts
+# geändert wurde — dafür kann 'make check' nicht mehr an einem PDF von gestern
+# scheitern (RELEASE_ID trägt das Build-Datum).
 # Läuft NICHT in CI: tests/ tools/ rules/ sind git-excluded und fehlen im Clone.
 # 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
-check: check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
+check: build check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
        check-init-project check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
        check-rule-authorship check-rules
 	@echo "make check: alle Prüfungen bestanden."
@@ -97,7 +99,7 @@ check-init-project:
 check-root-clean:
 	@PDF_BASENAME="$(PDF_BASENAME)" bash tests/check_root_clean.sh
 
-check-pdf-identity:
+check-pdf-identity: build
 	@PDF_FILE="$(OUTPUT_PDF)" SUBJECT_TITLE="$(SUBJECT_TITLE)" RELEASE_ID="$(RELEASE_ID)" bash tests/check_pdf_identity.sh
 
 check-guardrails:

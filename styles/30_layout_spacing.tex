@@ -81,6 +81,13 @@
 \newlength{\ZSFbreakThresholdChapter}\setlength{\ZSFbreakThresholdChapter}{10\baselineskip}
 \newlength{\ZSFbreakThreshold}\setlength{\ZSFbreakThreshold}{7\baselineskip}
 \newlength{\ZSFbreakThresholdSubsubsection}\setlength{\ZSFbreakThresholdSubsubsection}{5\baselineskip}
+% Feinjustierung des Abstands direkt nach einem Kapitelbalken. Steht auf 0pt und
+% sieht dadurch nach totem Code aus — ist es nicht: Das zugehörige
+% \ZSFPostChapterSpacing (40_colors_structure) setzt ein \vspace*, und ein
+% \vspace* ist auch bei 0pt nicht verwerfbar. Es erzwingt den Übergang in den
+% vertikalen Modus und verankert den Absatzanfang nach dem Balken. Entfernt man
+% es, verschiebt sich der Satz messbar (geprüft: alle drei Seiten ändern sich).
+% Der Wert darf verstellt werden, die Zeile nicht wegfallen.
 \newlength{\ZSFpostChapterNudge}\setlength{\ZSFpostChapterNudge}{0pt}
 \newlength{\ZSFtitleBarHeight}\setlength{\ZSFtitleBarHeight}{9.2pt}
 \newlength{\ZSFsubsectionBarBeforeSkip}\setlength{\ZSFsubsectionBarBeforeSkip}{\ZSFspaceL}
