@@ -7,10 +7,8 @@
 % Verantwortung dieser Datei ist nur die Platzierung; Längen,
 % Farben und Schrift werden aus den Style-Modulen bezogen:
 %
-%   \ZSFcodeCommentMaxWidth        -> 30_layout_spacing
 %   \ZSFcodeCommentThreshold       -> 30_layout_spacing
 %   \ZSFcodeCommentGap             -> 30_layout_spacing
-%   \ZSFcodeCommentMaxWidthDefault -> 30_layout_spacing (immutabel)
 %   \ZSFcodeCommentThresholdDefault-> 30_layout_spacing (immutabel)
 %   \ZSFfontCodeComment            -> 50_typography_semantics
 %   ce_green                       -> 40_colors_structure
@@ -145,7 +143,6 @@
 }
 
 \newcommand{\ResetCodeCommentThreshold}{%
-  \setlength{\ZSFcodeCommentMaxWidth}{\ZSFcodeCommentMaxWidthDefault}%
   \setlength{\ZSFcodeCommentThreshold}{\ZSFcodeCommentThresholdDefault}%
 }
 

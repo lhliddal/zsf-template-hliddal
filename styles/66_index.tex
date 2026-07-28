@@ -103,10 +103,13 @@
     {\ZSF@writeidxsee{#2}{#3}}%
     {\ZSF@writeidxsee{#1@#2}{#3}}}
 
-% \ZSFkeyword (Basisdefinition in 50_typography_semantics) indexiert
-% jetzt automatisch mit — Rendering bleibt \textbf.
+% \ZSFkeyword (Basisdefinition in 50_typography_semantics) indexiert jetzt
+% automatisch mit. Die SIGNATUR ist identisch zur Basis — dieses Modul ergänzt
+% nur das Schreiben, es ändert die Aufrufform nicht. Das Rendering läuft
+% weiterhin über \ZSFkeywordStyle, damit ein Fork die Darstellung an einer
+% Stelle ändern kann, unabhängig davon, ob der Index aktiv ist.
 \RenewDocumentCommand{\ZSFkeyword}{s o m}{%
-  \textbf{#3}%
+  \ZSFkeywordStyle{#3}%
   \IfBooleanF{#1}{%
     \IfNoValueTF{#2}{\ZSFindex{#3}}{\ZSFindex{#2}}}}
 \makeatother

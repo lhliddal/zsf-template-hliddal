@@ -36,14 +36,14 @@ print(summe)
 
 \SubsectionBar[sec:code-comments]{Smarte Zeilenkommentare}
 
-\begin{statementbox}[Kommentar rechts oder darüber\ZSFTitleTag{CodeLine}]
+\begin{defbox}[Kommentar rechts oder darüber\ZSFTitleTag{CodeLine}][weight=quiet]
   \ttfamily
   \CodeLine{kurz = 1}[passt rechts daneben]\\
   \CodeLine{sehr_langer_variablenname = 1}[zu breit, deshalb darüber]\\
   \CodeLine{limit = 10}\InlineComment{InlineComment: erzwungen rechts}\\
   \OverlineComment{OverlineComment: erzwungen darüber}
   \CodeLine{fertig = True}
-\end{statementbox}
+\end{defbox}
 
 \begin{codebox}
 \begin{lstlisting}[style=CodeExpert]
@@ -52,8 +52,8 @@ titellos = True
 \end{lstlisting}
 \end{codebox}
 
-\begin{factlist}
-  \ZSFFact{\ZSFkeyword{CodeLine}}{Entscheidet nach Breite, wo der Kommentar steht.}
-  \ZSFFact{SetCodeCommentThreshold}{Verschiebt die Schwelle für den Umbruch.}
-  \ZSFFact{ResetCodeCommentThreshold}{Stellt den Standard wieder her.}
-\end{factlist}
+\begin{ZSFlist}
+  \ZSFItem{\ZSFkeyword{CodeLine}}{Entscheidet nach Breite, wo der Kommentar steht.}
+  \ZSFItem{SetCodeCommentThreshold}{Verschiebt die Schwelle für den Umbruch.}
+  \ZSFItem{ResetCodeCommentThreshold}{Stellt den Standard wieder her.}
+\end{ZSFlist}

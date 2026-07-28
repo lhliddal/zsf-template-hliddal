@@ -15,8 +15,8 @@
 \begin{tablebox}[Welcher Baustein wo\ZSFTitleTag{Übersicht}]
   \begin{ZSFtable}{Y{1.05} Z{0.35} Y{1.60}}
     \ZSFheaderRow \ZSFhead{Bereich} & \ZSFhead{Kap.} & \ZSFhead{Bausteine} \\
-    Aussagen & \ZSFsectionref{ch:boxes} & defbox, statementbox, warnbox \\
-    Verfahren & \ZSFsectionref{ch:lists} & procedure, factlist \\
+    Aussagen & \ZSFsectionref{ch:boxes} & defbox (weight, tone), warnbox \\
+    Verfahren & \ZSFsectionref{ch:lists} & ZSFlist (ordered) \\
     Formeln & \ZSFsectionref{ch:math} & formulabox, goalbox \\
     Tabellen & \ZSFsectionref{ch:tables} & ZSFtable, valuegrid \\
     Visuals & \ZSFsectionref{ch:figures} & ZSFfig, figbox, splitbox \\
@@ -26,11 +26,11 @@
   \end{ZSFtable}
 \end{tablebox}
 
-\begin{statementbox}[Lesart]
+\begin{defbox}[Lesart][weight=quiet]
   Der rechts gesetzte Titel-Tag nennt jeweils die verwendete Umgebung, der
   Titel sagt, wofür sie da ist. So lassen sich Varianten direkt vergleichen
   und auswählen.
-\end{statementbox}
+\end{defbox}
 
 \begin{warnbox}[Kein Fachinhalt]
   Die Beispiele tragen bewusst keinen Lernstoff. Sie zeigen ausschliesslich

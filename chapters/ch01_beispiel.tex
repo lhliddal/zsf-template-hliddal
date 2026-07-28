@@ -17,10 +17,10 @@
   \ZSFhl{So sieht die hervorgehobene Kernaussage einer Box aus.}
 \end{defbox}
 
-\begin{statementbox}[Nur ein linker Farbbalken\ZSFTitleTag{statementbox}]
-  \ZSFkeyword{statementbox} kommt ohne Titelleiste aus und markiert kompakte
-  Aussagen mit einem dezenten Balken. Leichter als die defbox.
-\end{statementbox}
+\begin{defbox}[Dieselbe Box, leiser\ZSFTitleTag{weight=quiet}][weight=quiet]
+  \ZSFkeyword*{weight=quiet} tauscht die Kopfzeile gegen einen dezenten linken
+  Balken — für kompakte Aussagen. Kein zweiter Baustein, ein Regler.
+\end{defbox}
 
 \begin{warnbox}[Stolperfalle mit eigenem Block\ZSFTitleTag{warnbox}]
   \ZSFindexsee{Achtung}{warnbox}
@@ -30,16 +30,22 @@
 \end{warnbox}
 
 \begin{defbox}[Dieselbe Box, anderer Ton\ZSFTitleTag{tone=neutral}][tone=neutral]
-  Jede Titelbox nimmt \ZSFkeyword*{tone} als zweites optionales Argument:
+  Jede Box nimmt \ZSFkeyword*{tone} als zweites optionales Argument:
   \ZSFkeyword*{chapter} (Default), \ZSFkeyword*{neutral} für bewusst
   kapitelunabhängige Hinweise, \ZSFkeyword*{warn} für den Warn-Ton. Ein Regler
   statt einer neuen Box.
 \end{defbox}
 
+\begin{defbox}[Derselbe Regler, rahmenlos\ZSFTitleTag{tone=neutral}][weight=quiet, tone=neutral]
+  Der Ton wirkt auch dort, wo es keine Kopfzeile gibt: Balken, Titelzeile und
+  Aufzählungszeichen folgen ihm. Im Kapitelton bleibt die Fläche ungetönt,
+  damit die Box dezent bleibt — erst ein gewählter Ton färbt sie.
+\end{defbox}
+
 \SubsubsectionBar[sec:box-hierarchy]{Dritte Lookup-Ebene}
 
-\begin{statementbox}
+\begin{defbox}[][weight=quiet]
   Der \ZSFkeyword{SubsubsectionBar} ist die optionale dritte Ebene, sichtbar
   kleiner und heller. Diese Box zeigt zugleich: ohne Titelargument entfällt
   die Kopfzeile ganz — dieselbe Box, ein Argument weniger.
-\end{statementbox}
+\end{defbox}

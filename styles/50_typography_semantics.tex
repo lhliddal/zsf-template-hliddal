@@ -48,17 +48,39 @@
 %     Bauteile, zentrale Grössen) sein, keine generischen Substantive
 %     oder Verben. Die Pro-Kapitel-Dichte ist bewusst KEIN fester Wert;
 %     tests/check_index.sh warnt bei Über-Indexierung (Schwelle
-%     ZSF_INDEX_DENSITY_MAX). Massgeblich ist rules/20_boxes.md.
+%     ZSF_INDEX_DENSITY_MAX). Massgeblich ist rules/25_structure_markers.md.
 % Rendering ist bewusst schlicht als \textbf{...}; Änderungen zentral
 % hier vornehmen (z.B. Farbe, Underline) -- nicht in Kapiteln.
-\newcommand{\ZSFkeyword}[1]{\textbf{#1}}
+%
+% Die Signatur ist INVARIANT gegenüber der Modulwahl: Stern und optionales
+% Argument existieren immer, auch ohne 66_index. Sonst schluckt das Makro in
+% einer ZSF ohne Index den Stern als Pflichtargument und \ZSFkeyword*{X}
+% rendert als fettes "*" gefolgt vom Klartext "X" — ohne Fehler, ohne Warnung
+% und ohne Linter-Treffer. Ein Baustein, dessen Aufrufform von einem Schalter
+% abhängt, den der Kapitelautor nicht sieht, ist keine stabile API
+% (rules/02_ai_mandate → gleiche Sache, gleiche Bedienung).
+% 66_index ersetzt nur den Rumpf und ergänzt das Schreiben; die Form bleibt.
+\NewDocumentCommand{\ZSFkeyword}{s o m}{\ZSFkeywordStyle{#3}}
 
 % \ZSFlabel{...} — neutrale fette Beschriftung OHNE Fachbegriff-Semantik:
 % Listenköpfe, Zeilenmarken, „Links & Ressourcen:". Existiert, weil sonst
 % \ZSFkeyword* dafür zweckentfremdet wird — dessen Bedeutung ist aber
 % „Fachbegriff, aber nicht indexieren", nicht „einfach fett". Ein Marker,
-% der zwei Dinge heisst, verliert seine Aussage (rules/20_boxes).
-\newcommand{\ZSFlabel}[1]{\textbf{#1}}
+% der zwei Dinge heisst, verliert seine Aussage (rules/25_structure_markers).
+\newcommand{\ZSFlabel}[1]{\ZSFlabelStyle{#1}}
+
+% Die beiden Darstellungs-Hooks der Marker. Sie sind absichtlich getrennt und
+% absichtlich gleich vorbelegt:
+%   getrennt, weil \ZSFkeyword und \ZSFlabel verschiedene Dinge bedeuten und
+%     eine ZSF den Unterschied sichtbar machen können soll, ohne ein einziges
+%     Kapitel anzufassen;
+%   gleich vorbelegt, weil die Template-Referenz keine Gestaltungsentscheidung
+%     vorwegnimmt, die niemand getroffen hat.
+% Wer den Scan-Anker abheben will (er ist laut rules/25_structure_markers der PRIMÄRE
+% Anker, sieht aber heute aus wie jede andere Fettung), ändert genau diese
+% eine Zeile — pro ZSF in preamble.tex per \renewcommand, nie im Kapitel.
+\newcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
+\newcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
 \newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\small (S.#1)}}
 

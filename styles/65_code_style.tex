@@ -72,7 +72,7 @@
 %   aber weisser Hintergrund und zero top/bottom padding, da
 %   lstlisting eigene above/belowskips mitbringt.
 % ------------------------------------------------------------
-\tcbset{zsfcodeboxbase/.style={
+\tcbset{preset/code/.style={
   zsftitlebox,
   colback=\BoxPlainBackColor,
   top=0pt, bottom=0pt,
@@ -114,7 +114,7 @@
 % liefert die geschlossene Box; die drei anderen öffnen je eine Kante.
 \tcbset{
   part/.is choice,
-  part/whole/.style={zsfcodeboxbase},
+  part/whole/.style={preset/code},
   part/first/.style={
     zsf@codebox@split@base,
     toprule=\ZSFboxRuleWidth,

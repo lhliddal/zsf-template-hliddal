@@ -139,7 +139,7 @@
 \newcommand{\BoxTitleTextColor}{TextVorBoxColor}
 \newcommand{\BoxBackColor}{\chaptercolorlight!8}
 \newcommand{\BoxFrameColor}{\chaptercolorlight!25}
-% Ungetönter Boxhintergrund (tablebox, goalbox, valuegrid, statementbox,
+% Ungetönter Boxhintergrund (tablebox, goalbox, valuegrid, leise Boxen,
 % codebox). Als Token statt als literalem "white" in jeder Box-Definition:
 % der Grundton aller ungetönten Boxen hängt damit an einer Zeile.
 \newcommand{\BoxPlainBackColor}{white}
@@ -157,9 +157,39 @@
 \newcommand{\FormulaboxFrameColor}{black}
 \newcommand{\GoalConditionBorderColor}{black}
 
-% Für statementbox / goalbox (semantische Aussage- und Ziel-Boxen)
-\newcommand{\StatementBarColor}{\chaptercolor}
-\newcommand{\StatementTitleColor}{\chaptercolor}
+% ── Ton-Tokens: wie der `tone`-Regler in den zwei Box-Familien landet ──
+% Ein Ton wirkt auf Titelboxen anders als auf rahmenlose Boxen, weil die
+% beiden verschiedene Träger haben: die Titelbox eine Kopfzeile und eine
+% getönte Fläche, die rahmenlose Box einen Akzent und eine ruhige Fläche.
+% Derselbe Regler, zwei Landepunkte — statt zweier Regler oder eines Reglers,
+% der auf halber Strecke stehenbleibt (rules/02_ai_mandate).
+%
+% Akzent: linker Balken der leisen Box, ihre Titelzeile, das
+% Aufzählungszeichen der ZSFlist.
+\newcommand{\ZSFtoneAccentChapter}{\chaptercolor}
+\newcommand{\ZSFtoneAccentNeutral}{StaticBoxTitleText}
+\newcommand{\ZSFtoneAccentWarn}{ETHRot}
+
+% Ruhige Fläche: die Füllung rahmenloser Boxen. Im Kapitelton bewusst
+% ungetönt — die leise Box soll dezent bleiben und sich nicht der
+% Titelbox angleichen. Erst ein bewusst gewählter Ton färbt sie, und genau
+% dann ist die Färbung das Signal ("gehört nicht zum Kapitel" / "Warnung").
+\newcommand{\ZSFtoneQuietBackChapter}{\BoxPlainBackColor}
+\newcommand{\ZSFtoneQuietBackNeutral}{StaticSubBoxBack}
+\newcommand{\ZSFtoneQuietBackWarn}{\WarnboxBackColor}
+
+% Rahmenfarbe in zwei Stärken — der Regler `frame` wählt zwischen ihnen.
+% `soft` begrenzt die Box nur, `strong` grenzt sie gegen die Umgebung ab
+% (Zielketten). Beide sind Landepunkte desselben Tons, damit auch eine
+% getönte Box in beiden Stärken stimmig bleibt.
+\newcommand{\ZSFtoneFrameSoftChapter}{\BoxFrameColor}
+\newcommand{\ZSFtoneFrameSoftNeutral}{StaticSubBoxBorder}
+\newcommand{\ZSFtoneFrameSoftWarn}{\BoxFrameColor}
+\newcommand{\ZSFtoneFrameStrongChapter}{\BoxTitleColor}
+\newcommand{\ZSFtoneFrameStrongNeutral}{StaticBoxTitleText}
+\newcommand{\ZSFtoneFrameStrongWarn}{ETHRot}
+
+% Für goalbox (semantische Ziel-Box)
 \newcommand{\GoalConditionBackColor}{white}
 \newcommand{\GoalConditionFrameColor}{\chaptercolorlight!22}
 \newcommand{\GoalTargetBackColor}{\chaptercolorlight!22}

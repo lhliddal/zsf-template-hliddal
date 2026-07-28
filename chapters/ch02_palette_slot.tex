@@ -3,26 +3,26 @@
 
 \SubsectionBar[sec:procedure]{Nummerierte Schrittfolge}
 
-\begin{procedure}[Schritte mit Marke und Text\ZSFTitleTag{procedure}]
-  \ProcStep{Automatisch gezählt}{Die Nummerierung kommt aus der Umgebung.}
-  \ProcStep{Zweiteiliger Schritt}{Fette Marke oben, Erklärung darunter.}
-  \ProcStep{Nur bei stabiler Folge}{Sonst ist eine Liste die bessere Wahl.}
-\end{procedure}
+\begin{ZSFlist}[Schritte mit Marke und Text\ZSFTitleTag{ordered}][ordered]
+  \ZSFItem{Automatisch gezählt}{Die Nummerierung kommt aus der Umgebung.}
+  \ZSFItem{Zweiteiliger Schritt}{Fette Marke oben, Erklärung darunter.}
+  \ZSFItem{Nur bei stabiler Folge}{Sonst ist eine Liste die bessere Wahl.}
+\end{ZSFlist}
 
 \SubsectionBar[sec:lists]{Faktenliste ohne und mit Rahmen}
 
-\begin{factlist}
-  \ZSFFact{factlist}{Ohne Titelargument rahmenlos und ohne Kopfzeile.}
-  \ZSFFact{ZSFFact}{Jeder Eintrag ist ein Paar aus Marke und Erklärung.}
-  \ZSFFact{Farbiger Punkt}{Das Aufzählungszeichen trägt die Kapitelfarbe.}
-\end{factlist}
+\begin{ZSFlist}
+  \ZSFItem{ZSFlist}{Ohne Titelargument rahmenlos und ohne Kopfzeile.}
+  \ZSFItem{ZSFItem}{Jeder Eintrag ist ein Paar aus Marke und Erklärung.}
+  \ZSFItem{Farbiger Punkt}{Das Aufzählungszeichen trägt die Kapitelfarbe.}
+\end{ZSFlist}
 
-\begin{factlist}[Dieselbe Liste mit Titel\ZSFTitleTag{factlist mit Titel}]
-  \ZSFFact{Ein Argument}{Der Titel bindet die Liste in eine Statement-Box.}
-  \ZSFFact{Gleiche Einträge}{Marke und Aufzählungszeichen bleiben identisch.}
-\end{factlist}
+\begin{ZSFlist}[Dieselbe Liste mit Titel\ZSFTitleTag{mit Titel}]
+  \ZSFItem{Ein Argument}{Der Titel bindet die Liste in eine leise Box.}
+  \ZSFItem{Gleiche Einträge}{Marke und Aufzählungszeichen bleiben identisch.}
+\end{ZSFlist}
 
 \begin{runintext}
-  Eine Liste, zwei Erscheinungsformen: \ZSFkeyword{factlist} entscheidet
-  über den Titel, nicht über den Namen der Umgebung.
+  Eine Umgebung, vier Erscheinungsformen: \ZSFkeyword{ZSFlist} entscheidet
+  über Titel und \ZSFkeyword*{ordered}, nicht über den Namen.
 \end{runintext}

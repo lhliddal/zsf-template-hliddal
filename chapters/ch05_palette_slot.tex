@@ -5,10 +5,10 @@
 \ZSFindex{ZSFfig}
 \ZSFindex{ZSFfigside}
 
-\ZSFfig[0.34]{example-image-a}{Ein Bild, optional skaliert\ZSFTitleTag{ZSFfig}}%
-  {Der Breitenanteil ist optional; ohne ihn greift die zentrale Höhenbegrenzung.}
+\ZSFfig[width=0.34]{example-image-a}{Ein Bild, optional skaliert\ZSFTitleTag{ZSFfig}}%
+  {width und height sind Schlüssel wie überall; ohne sie greifen die zentralen Vorbelegungen.}
 
-\ZSFfigside[0.27]{example-image-a}{Bild links, Text rechts\ZSFTitleTag{ZSFfigside}}{%
+\ZSFfigside[width=0.27]{example-image-a}{Bild links, Text rechts\ZSFTitleTag{ZSFfigside}}{%
   Der erste Wert bestimmt den Bildanteil, der Rest gehört dem Text.}
 
 \ZSFfig{example-image-a,example-image-b,example-image-c}%
@@ -42,9 +42,16 @@
     \textbackslash tiny; pgfplots kommt aus dem Opt-in-Modul 12\_plots.}
 \end{figbox}
 
-\begin{splitbox}[split ratio=0.34, sidebyside align=center]
+\begin{defbox}[Derselbe Regler, mit Kopfzeile\ZSFTitleTag{split}][split=0.34]
+  \centering Formel
+  \tcblower
+  \ZSFkeyword*{split} ist ein Regler wie jeder andere und gilt deshalb auch
+  auf einer Box mit Titel — vorher brauchte es dafür eine Verschachtelung.
+\end{defbox}
+
+\begin{splitbox}[split=0.34, sidebyside align=center]
   \centering linker Block
   \tcblower
   \ZSFkeyword{splitbox} ordnet zwei beliebige Inhaltsblöcke ohne sichtbaren
-  Rahmen nebeneinander an; \ZSFkeyword*{split ratio} legt den linken Anteil fest.
+  Rahmen nebeneinander an; \ZSFkeyword*{split} legt den linken Anteil fest.
 \end{splitbox}

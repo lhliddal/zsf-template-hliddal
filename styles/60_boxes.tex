@@ -245,7 +245,7 @@
 % Box — die einzelnen Stile setzen nur noch ihre Unterschiede. Besonders das
 % before-Hook ist Pflicht (Begruendung im Kommentar oben) und darf deshalb
 % nicht pro Box wiederholt werden, wo man es vergessen kann.
-% Schicht 1 — Fluss. Auch rahmenlose Boxen (statementbox, splitbox) laufen
+% Schicht 1 — Fluss. Auch rahmenlose Boxen (weight=quiet, splitbox) laufen
 % hierüber, damit Abstände und Balken-Bindung überall identisch greifen.
 \tcbset{zsfbox/.style={
   enhanced jigsaw,
@@ -254,10 +254,98 @@
   before={\par\ZSFConsumeAfterSubsectionBar\ZSFTitleBarLockOff},
 }}
 
+% ------------------------------------------------------------
+% Instanz-Regler — Ebene 3 der Pyramide
+% ------------------------------------------------------------
+% Was hier steht, war früher pro Box im Stil fest verdrahtet. Genau das war der
+% Grund für die Anzahl Boxen: Jede Kombination aus Polsterung, Umbruchverhalten
+% und Ausrichtung brauchte einen eigenen Namen. Als benannte Regler sind es
+% Eigenschaften einer Box, keine verschiedenen Boxen.
+%
+% Ein Preset ist ab hier eine LISTE AUS DIESEN REGLERN, nie ein eigener Stil
+% (rules/10_architecture → Gestaltung an genau einem Ort). Nur so trifft eine
+% Geometrieänderung garantiert jede Box; zwei unabhängige Stildefinitionen
+% driften auseinander, ohne dass eine davon für sich falsch aussieht.
+
+% Polsterung ist zweidimensional: waagrecht entscheidet über Kante und
+% Balkenfreiraum, senkrecht über die Höhe. Getrennt, weil die Fälle sich
+% tatsächlich kreuzen (Wertegitter: waagrecht bündig, senkrecht knapp).
+\tcbset{
+  padx/.is choice,
+  padx/normal/.style={left=\ZSFboxPadX,    right=\ZSFboxPadX},
+  padx/bar/.style   ={left=\ZSFboxPadXBar, right=\ZSFboxPadX},
+  padx/none/.style  ={left=0pt,            right=0pt},
+  pady/.is choice,
+  pady/normal/.style={top=\ZSFboxPadY,      bottom=\ZSFboxPadY},
+  pady/tight/.style ={top=\ZSFtextMinPad,   bottom=\ZSFtextMinPad},
+  pady/quiet/.style ={top=\ZSFboxPadYTight, bottom=\ZSFboxPadYTight},
+  pady/none/.style  ={top=0pt,              bottom=0pt},
+}
+
+% Ausrichtung des Boxinhalts. Als Hook statt als direktem 'before upper',
+% damit die Eintritts-Sequenz einer Box an EINER Stelle steht und die
+% Ausrichtung sie nicht ersetzen muss.
+\newcommand{\ZSFBoxAlign}{}
+% Kontext-Flag der Box (heute nur die formulabox). Ebenfalls Teil derselben
+% Sequenz — sonst bräuchte jede Box mit Kontext ein eigenes 'before upper'.
+\newcommand{\ZSFBoxContext}{}
+% Absatzabstand im Boxinhalt. Textboxen setzen ihn eigenständig (\ZSFspaceS),
+% Container um Tabellen und Listen erben den Dokumentwert — dort gibt es keine
+% Absätze, und ein eigener Wert würde nur die Liste verschieben.
+% Als Regler statt als Auslassung: Vorher fehlte die Zeile in tablebox und
+% leisen Box einfach, was von einem Versehen nicht zu unterscheiden war.
+\newcommand{\ZSFBoxParskip}{}
+% Die Ausrichtung ERSETZT die Justierung, sie ergänzt sie nicht: `align=left`
+% ist der Flattersatz für schmale Spalten (55_readability), `align=center` ist
+% zentrierter Satz. Beides zusammen wäre kein zentrierter Flattersatz, sondern
+% zentrierter Satz mit den Umbruch-Penalties des Flattersatzes — sichtbar an
+% anders gebrochenen Formelzeilen.
+\tcbset{
+  align/.is choice,
+  align/left/.style  ={/utils/exec={\renewcommand{\ZSFBoxAlign}{\ZSFReadableAuto}}},
+  align/center/.style={/utils/exec={\renewcommand{\ZSFBoxAlign}{\centering}}},
+  bodyparskip/.is choice,
+  bodyparskip/box/.style={
+    /utils/exec={\renewcommand{\ZSFBoxParskip}{\setlength{\parskip}{\ZSFspaceS}}}},
+  bodyparskip/inherit/.style={
+    /utils/exec={\renewcommand{\ZSFBoxParskip}{}}},
+}
+% Die Eintritts-Sequenz jeder Box — an genau einer Stelle, aus benannten
+% Teilen: Absatzabstand, Justierung, Kontext-Flag, Titelzeile der leisen
+% Fassung (leer, solange die Box eine echte Kopfzeile trägt).
+\newcommand{\ZSFBoxEnter}{\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext\ZSFBoxQuietTitle}
+
+% Rahmen. Der Regler wählt die STÄRKE, die Farbe dazu kommt aus dem Ton —
+% deshalb greift er auf dessen Landepunkte zu statt auf feste Farben. Ein
+% `frame=soft` überschriebe sonst die Rahmenfarbe eines gewählten Tons.
+%
+% Ohne Angabe gilt die weiche Rahmenfarbe des Tons — `frame` ist der Regler
+% für die Abweichung davon, nicht die Quelle des Defaults (Begründung oben
+% bei den Ton-Tokens).
+%
+% Keiner der drei Werte setzt `boxrule`, ausser wo der Rahmen ganz entfällt.
+% Grund: In tcolorbox ist `boxrule` eine Sammeloption und setzt `titlerule`
+% mit. Ein erneutes `boxrule=` NACH dem Basisstil holt damit die Linie unter
+% dem Titelbalken zurück, die zsfboxshape gerade auf 0pt gesetzt hat — die Box
+% wird um die Linienstärke höher, ohne dass am Rahmen etwas sichtbar wäre.
+% Die Rahmenstärke selbst gehört zur Form und steht in zsfboxshape.
+\tcbset{
+  frame/.is choice,
+  frame/soft/.style  ={colframe=\ZSFtoneFrameSoft},
+  frame/strong/.style={colframe=\ZSFtoneFrameStrong},
+  frame/none/.style  ={frame hidden, boxrule=0pt, arc=0pt, outer arc=0pt},
+}
+
+% Atomar: bricht nie über eine Spaltengrenze, auch nicht im Pack-Modus.
+% Muss in der Optionsliste NACH dem Basisstil stehen — dorthin hängt
+% \ZSFBoxesBreakableOn sein 'breakable'. Als benannter Regler ist diese
+% Reihenfolge in den Presets festgeschrieben statt in einem Kommentar.
+\tcbset{atomic/.style={unbreakable}}
+
 % Schicht 2 — Form. Alles, was die Geometrie JEDER Inhaltsbox bestimmt.
 % Wer Rahmenstärke, Ecken oder Innenabstand des Systems ändern will, ändert
-% hier — und nur hier. left/right/top/bottom gehören dazu, damit \linewidth
-% in jeder Box identisch ist (sonst variierende Tabellen-Breiten je Box-Typ).
+% hier — und nur hier. padx/pady gehören dazu, damit \linewidth in jeder Box
+% identisch ist (sonst variierende Tabellen-Breiten je Box-Typ).
 \tcbset{zsfboxshape/.style={
   zsfbox,
   breakable=false,
@@ -266,40 +354,91 @@
   titlerule=0pt,
   arc=\ZSFboxArc,
   outer arc=\ZSFboxArc,
-  left=\ZSFboxPadX,
-  right=\ZSFboxPadX,
-  top=\ZSFboxPadY,
-  bottom=\ZSFboxPadY,
+  padx=normal,
+  pady=normal,
 }}
 
-% Farbton einer Titelbox — der Regler, der neue Box-Varianten überflüssig
-% macht (rules/02_ai_mandate → Katalog-Ökonomie). Jede Titelbox nimmt ihn
-% als Option entgegen: \begin{defbox}[Titel][tone=neutral].
+% Farbton einer Box — der Regler, der neue Box-Varianten überflüssig macht
+% (rules/02_ai_mandate → Katalog-Ökonomie). Jede Box nimmt ihn als Option
+% entgegen: \begin{defbox}[Titel][tone=neutral].
 %   chapter  folgt der Kapitelfarbe (Default)
 %   neutral  kapitelunabhängig grau — für Boxen, die bewusst NICHT zum
 %            Kapitel gehören (Meta-Hinweise, Konventionen, Legenden)
 %   warn     rote Kopfzeile (die warnbox verwendet genau diesen Ton)
+%
+% Der Ton hat vier Wirkungen, nicht drei: Fläche, Rahmen, Kopfzeile — und den
+% Akzent. Den Akzent trägt eine rahmenlose Box anstelle der Kopfzeile (linker
+% Balken und Titelzeile der leisen Box, Aufzählungszeichen der ZSFlist).
+% Er gehört in dieselbe Auswahl, sonst bedeutet derselbe Regler auf zwei Boxen
+% zweierlei: `tone=neutral` färbte die Fläche grau, liess den Balken aber
+% kapitelfarben — halb umgesetzt, ohne dass etwas meldet.
+%
+% Die beiden Box-Familien nehmen den Ton an verschiedenen Stellen entgegen:
+% eine Titelbox über Fläche und Kopfzeile, eine rahmenlose über Akzent und
+% ruhige Fläche. Deshalb setzt jeder Ton BEIDE Landepunkte; welchen eine Box
+% liest, entscheidet ihr Stil. Das ist der Grund, warum ein einziger Regler
+% genügt und die leise Box trotzdem im Kapitelton ungetönt bleibt.
+%
+% \ZSFtoneAccent / \ZSFtoneQuietBack werden per /utils/exec gesetzt und sind
+% damit auf die Optionen-Gruppe der Box beschränkt; die Farbtokens selbst
+% stehen in 40_colors_structure (rules/10_architecture → keine Farbtints hier).
+% Die Rahmenfarbe setzt der Ton direkt UND stellt sie als Makro bereit.
+% Das ist keine Doppelung, sondern Folge der tcolorbox-Mechanik: `colframe`
+% wird beim Setzen der Option sofort aufgelöst (\colorlet), nicht erst beim
+% Zeichnen. Ein `colframe=\Makro` nimmt deshalb den Wert an, den das Makro an
+% DIESER Stelle der Optionsliste hat — eine spätere Tonwahl erreicht es nicht
+% mehr. Also: der Ton setzt die weiche Farbe als Default (wirkt auch, wenn er
+% zuletzt kommt), und `frame=strong` greift für die Presets auf das Makro zu.
+% Gegenprobe zum Akzent: \ZSFtoneAccent funktioniert als reines Makro, weil
+% `borderline` seine Farbe erst beim Zeichnen ausliest.
+\newcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}
+\newcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}
+\newcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}
+\newcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}
 \tcbset{
   tone/.is choice,
   tone/chapter/.style={
     colback=\BoxBackColor, colbacktitle=\BoxTitleColor,
-    colframe=\BoxFrameColor, coltitle=\BoxTitleTextColor},
+    colframe=\ZSFtoneFrameSoftChapter, coltitle=\BoxTitleTextColor,
+    /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}%
+                 \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}%
+                 \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}%
+                 \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}}},
   tone/neutral/.style={
     colback=StaticSubBoxBack, colbacktitle=StaticBoxTitleBack,
-    colframe=StaticSubBoxBorder, coltitle=StaticBoxTitleText},
+    colframe=\ZSFtoneFrameSoftNeutral, coltitle=StaticBoxTitleText,
+    /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentNeutral}%
+                 \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackNeutral}%
+                 \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftNeutral}%
+                 \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongNeutral}}},
   tone/warn/.style={
     colback=\WarnboxBackColor, colbacktitle=\WarnboxTitleColor,
-    colframe=\BoxFrameColor, coltitle=\WarnboxTitleTextColor},
+    colframe=\ZSFtoneFrameSoftWarn, coltitle=\WarnboxTitleTextColor,
+    /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentWarn}%
+                 \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackWarn}%
+                 \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftWarn}%
+                 \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongWarn}}},
 }
 
-% Schicht 3 — Titelbox. Der EINZIGE Vertrag für Boxen mit Titelbalken;
-% defbox, tablebox, figbox, warnbox, formulabox, goalbox, valuegrid und
-% codebox stehen alle darauf.
+% Schicht 3 — Titelbox. Der EINZIGE Vertrag für Boxen mit Titelbalken; alle
+% Presets unten stehen darauf.
+%
+% Die Eintritts-Sequenz des Boxinhalts steht hier EINMAL und setzt sich aus
+% benannten Teilen zusammen: Absatzabstand, Lesbarkeit, Ausrichtung (Regler
+% `align`), Kontext-Flag. Vorher hatte fast jede Box ihr eigenes
+% 'before upper' und liess dabei je einen Teil weg — die formulabox etwa den
+% Flattersatz, die tablebox den Absatzabstand. Solche Auslassungen sind nicht
+% erkennbar, weil jede Box für sich plausibel aussieht.
 \tcbset{zsftitlebox/.style={
   zsfboxshape,
   tone=chapter,
+  align=left,
+  bodyparskip=box,
   zsftitlebar,
-  before upper={\parskip=\ZSFspaceS\relax\ZSFReadableAuto},
+  % Hooks zurücksetzen, damit eine verschachtelte Box die Einstellungen der
+  % äusseren nicht erbt — sie sind gruppenlokal, aber nicht selbstlöschend.
+  /utils/exec={\renewcommand{\ZSFBoxContext}{}\renewcommand{\ZSFBoxQuietTitle}{}},
+  before upper={\ZSFBoxEnter},
 }}
 
 % ------------------------------------------------------------
@@ -325,29 +464,87 @@
 \makeatother
 
 % ------------------------------------------------------------
-% Titelboxen — jede setzt nur ihren Unterschied zu zsftitlebox
+% Presets — jede Box ist eine Liste aus den Reglern oben
 % ------------------------------------------------------------
-% tablebox: Rahmen und Ecken der Titelbox, aber kein Innen-Padding — der
-% Zebra-Hintergrund soll bis an die Boxkante laufen.
-\tcbset{zsftableboxstyle/.style={
+% Prüffrage an jedes Preset: Steht hier ein Schlüssel, für den es einen Regler
+% gäbe? Dann gehört der Regler hin. Rohe Schlüssel bleiben nur, wo die
+% Eigenschaft wirklich einmalig ist (der Zebra-Beschnitt der Tabelle, die harte
+% Kontur der Formelbox) — und dann mit Begründung.
+
+% Tabelle: Hintergrund bis an die Kante, damit das Zebra nicht kurz vor dem
+% Rahmen endet. 'clip upper' schneidet die Streifen an der Rundung ab.
+\tcbset{preset/table/.style={
   zsftitlebox,
   colback=\BoxPlainBackColor,
-  left=0pt, right=0pt, top=0pt, bottom=0pt,
+  padx=none, pady=none,
+  bodyparskip=inherit,
   clip upper,
-  before upper={\ZSFReadableAuto},
 }}
-% figbox bleibt auch im Pack-Modus atomar (rules/30_spacing → Anhang):
-% ein Umbruch mitten im Bild ergibt keinen Sinn. Deshalb 'unbreakable'
-% NACH zsftitlebox — dorthin hängt \ZSFBoxesBreakableOn sein 'breakable'.
-\tcbset{zsffigboxstyle/.style={zsftitlebox, unbreakable}}
+% Abbildung: bleibt auch im Pack-Modus atomar (rules/30_spacing → Anhang) —
+% ein Umbruch mitten im Bild ergibt keinen Sinn.
+\tcbset{preset/fig/.style={zsftitlebox, atomic}}
 
+% ------------------------------------------------------------
+% Gewicht — laut oder leise, dieselbe Box
+% ------------------------------------------------------------
+% `weight` war früher der Unterschied zwischen zwei Umgebungen: defbox trug
+% einen Titelbalken, statementbox einen linken Akzentbalken. Die Auswahlregel
+% dazu lautete „nach Inhalt wählen" und brauchte einen Absatz Erklärung — ein
+% sicheres Zeichen, dass es keine Auswahl war, sondern eine Eigenschaft.
+%
+%   weight=loud   Titelbalken, Rahmen, getönte Fläche  (Default)
+%   weight=quiet  linker Akzentbalken, rahmenlos, ruhige Fläche
+%
+% Der Titel wandert dabei aus der Kopfzeile in die erste Inhaltszeile. Damit
+% das OHNE eine zweite Umgebung geht, merkt sich die Box ihren Titel in einem
+% Makro und die leise Fassung setzt ihn selbst — es bleibt bei genau einem
+% \begin{tcolorbox} und einem \end.
+\makeatletter
+\newcommand{\ZSF@boxTitleText}{}
+\newif\ifZSF@boxHasTitle
+\newcommand{\ZSFBoxQuietTitle}{}
+\newcommand{\ZSF@emitQuietTitle}{%
+  \ifZSF@boxHasTitle
+    {\bfseries\color{\ZSFtoneAccent}\ZSF@boxTitleText}\par\vspace{\ZSFspaceXS}%
+  \fi
+}
+% Das `colback` der leisen Fassung steht am Ende ihrer Optionsliste, damit es
+% die Titelbox-Fläche eines gewählten Tons ersetzt statt von ihr überschrieben
+% zu werden (siehe Kommentar bei den Ton-Landepunkten).
+\tcbset{
+  weight/.is choice,
+  weight/loud/.style ={
+    /utils/exec={\renewcommand{\ZSFBoxQuietTitle}{}}},
+  weight/quiet/.style={
+    preset/quiet, notitle,
+    /utils/exec={\renewcommand{\ZSFBoxQuietTitle}{\ZSF@emitQuietTitle}},
+    colback=\ZSFtoneQuietBack},
+}
 \NewDocumentEnvironment{defbox}{O{} O{}}
-  {\begin{ZSF@box}{zsftitlebox}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+  {\renewcommand{\ZSF@boxTitleText}{#1}%
+   \IfBlankTF{#1}{\ZSF@boxHasTitlefalse}{\ZSF@boxHasTitletrue}%
+   \begin{ZSF@box}{zsftitlebox}{#1}{#2}}
+  {\end{ZSF@box}} % chktex 9
+\makeatother
+
 \NewDocumentEnvironment{tablebox}{O{} O{}}
-  {\begin{ZSF@box}{zsftableboxstyle}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+  {\begin{ZSF@box}{preset/table}{#1}{#2}}{\end{ZSF@box}} % chktex 9
 \NewDocumentEnvironment{figbox}{O{} O{}}
-  {\begin{ZSF@box}{zsffigboxstyle}{#1}{#2}}{\end{ZSF@box}} % chktex 9
-% Warn-Box — dieselbe Titelbox im Warn-Ton, mit vorbelegtem Titel.
+  {\begin{ZSF@box}{preset/fig}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+% Warn-Box — dieselbe Titelbox im Warn-Ton, mit vorbelegtem Titel »Achtung«.
+%
+% BEWUSSTE AUSNAHME zur Katalog-Ökonomie und die einzige im Katalog: Nach
+% rules/02_ai_mandate schlägt ein Regler einen neuen Baustein, und technisch
+% IST diese Box nichts als \begin{defbox}[…][tone=warn]. Sie behält trotzdem
+% einen eigenen Namen, aus zwei Gründen:
+%   1. Der Name trägt die Semantik. »Stolperfalle« ist die meistgesuchte
+%      Kategorie einer Prüfungs-ZSF; sie über eine Farboption auszudrücken,
+%      verlagert Bedeutung in einen Gestaltungsschalter.
+%   2. Der vorbelegte Titel ist die eigentliche Leistung — die Box ist ohne
+%      jedes Argument vollständig und damit die einzige, die man nicht
+%      falsch benennen kann.
+% Kein Präzedenzfall: Ein weiterer Ton bekommt KEINE eigene Umgebung, solange
+% er nicht beides mitbringt (eigene Semantik UND eine sinnvolle Vorbelegung).
 \NewDocumentEnvironment{warnbox}{O{Achtung} O{}}
   {\begin{ZSF@box}{zsftitlebox, tone=warn}{#1}{#2}}{\end{ZSF@box}} % chktex 9
 
@@ -364,20 +561,21 @@
 % 'before upper' gesetzt und ist damit auf die Boxgruppe beschränkt — es
 % braucht kein Zurücksetzen.
 \makeatletter
-\tcbset{zsfformulastyle/.style={
+\tcbset{preset/formula/.style={
   zsftitlebox,
+  align=center,
   colback=\FormulaboxBackColor,
   colbacktitle=\FormulaboxBackColor,
   colframe=\FormulaboxFrameColor,
   lefttitle=\ZSFboxPadX,
   righttitle=\ZSFboxPadX,
   bottomtitle=0pt,
-  before upper={\parskip=\ZSFspaceS\centering\ZSF@inFormulaBoxtrue},
+  /utils/exec={\renewcommand{\ZSFBoxContext}{\ZSF@inFormulaBoxtrue}},
   after upper={\par},
   middle=\ZSFspaceSep,
 }}
 \NewDocumentEnvironment{formulabox}{O{} O{}}
-  {\begin{ZSF@box}{zsfformulastyle}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+  {\begin{ZSF@box}{preset/formula}{#1}{#2}}{\end{ZSF@box}} % chktex 9
 \makeatother
 
 % Formel-Note (klein, kursiv, dezent) — unter oder über Formeln
@@ -426,31 +624,57 @@
   \fi
 }
 
-% \ZSFfig[breite]{pfad|pfad1,pfad2,…}{Titel}{Caption}
+% ------------------------------------------------------------
+% Bild-Optionen — dieselbe Schlüsselform wie überall sonst
+% ------------------------------------------------------------
+% Das optionale Argument der Bild-Makros war der einzige nackte Wert im
+% System: `\ZSFfig[0.7]` gegen `\ZSFtable[header=false]` und
+% `\defbox[…][tone=neutral]`. Ein Argument, dessen Bedeutung man nur aus der
+% Doku kennt, ist eine Fehlerquelle bei jeder Verwendung
+% (rules/02_ai_mandate → gleiche Sache, gleiche Bedienung).
+%
+%   width   Anteil der Zeilenbreite. Bei \ZSFfig die Breite des Bildes bzw.
+%           der ganzen Reihe, bei \ZSFfigside der Anteil des Bildes.
+%   height  Höhenbegrenzung dieser einen Abbildung.
+%
+% Die Höhe war vorher NUR global (\ZSFfigMaxHeight) — und fiel still weg,
+% sobald man eine Breite angab: der Zweig mit expliziter Breite setzte gar
+% kein `height`. Ein hohes Bild sprengte damit genau dann die Spalte, wenn
+% man am Layout gedreht hatte. Jetzt begrenzen beide Zweige, und der globale
+% Wert ist nur noch die Vorbelegung.
+\makeatletter
+\newcommand{\ZSF@figWidthFrac}{}
+\newlength{\ZSF@figHeightLimit}
+\pgfkeys{
+  /zsf/fig/.is family, /zsf/fig,
+  width/.store in=\ZSF@figWidthFrac,
+  height/.code={\setlength{\ZSF@figHeightLimit}{#1}},
+  ZSF@figDefaults/.style={width=, height=\ZSFfigMaxHeight},
+}
+
+% \ZSFfig[<Optionen>]{pfad|pfad1,pfad2,…}{Titel}{Caption}
 %   EIN Makro für ein Bild und für eine Bildreihe (rules/02_ai_mandate →
 %   Katalog-Ökonomie). Eine Pfadliste der Länge 1 IST das Einzelbild —
 %   dafür brauchte es früher ein zweites Makro (\ZSFfigrow).
-%   Ein Pfad:      ohne [breite] greift die zentrale Höhenbegrenzung,
-%                  mit einem Anteil wie [0.7] die exakte lokale Breite.
-%   Mehrere Pfade: gleiche Breite nebeneinander; sie ergibt sich aus der
-%                  Anzahl Pfade. [breite] begrenzt die Reihe insgesamt.
-\makeatletter
+%   Mehrere Pfade: gleiche Breite nebeneinander, abgeleitet aus der Anzahl;
+%   `width` begrenzt dann die Reihe insgesamt.
 \newcounter{ZSF@figNum}
 \newlength{\ZSF@figWidth}
-\newcommand{\ZSF@figRowFraction}{0.97}
 \newcommand{\ZSFfig}[4][]{%
+  \begingroup
+  \pgfkeys{/zsf/fig, ZSF@figDefaults, #1}%
   \begin{figbox}[{#3}]%
     \setcounter{ZSF@figNum}{0}%
     \@for\ZSF@figItem:=#2\do{\stepcounter{ZSF@figNum}}%
     \ifnum\value{ZSF@figNum}>1\relax
       \setlength{\ZSF@figWidth}{\dimexpr
-        \if\relax\detokenize{#1}\relax\ZSF@figRowFraction\else#1\fi
+        \ifx\ZSF@figWidthFrac\@empty\ZSFfigUsableFraction\else\ZSF@figWidthFrac\fi
         \linewidth/\value{ZSF@figNum}\relax}%
       \noindent
       \@for\ZSF@figItem:=#2\do{%
         \begin{minipage}[c]{\ZSF@figWidth}%
           \centering
-          \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,%
+          \includegraphics[width=\linewidth,height=\ZSF@figHeightLimit,%
             keepaspectratio]{\ZSF@figItem}%
         \end{minipage}%
         \hfill
@@ -459,55 +683,72 @@
       \par
     \else
       \centering
-      \if\relax\detokenize{#1}\relax
-        \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,keepaspectratio]{#2}%
-      \else
-        \includegraphics[width=\dimexpr#1\linewidth\relax,keepaspectratio]{#2}%
-      \fi
+      \setlength{\ZSF@figWidth}{\dimexpr
+        \ifx\ZSF@figWidthFrac\@empty 1\else\ZSF@figWidthFrac\fi\linewidth\relax}%
+      \includegraphics[width=\ZSF@figWidth,height=\ZSF@figHeightLimit,%
+        keepaspectratio]{#2}%
     \fi
     \ZSFfigcaption{#4}%
   \end{figbox}%
+  \endgroup
 }
-\makeatother
 
-% \ZSFfigside[Bildanteil]{pfad}{Titel}{Inhalt rechts} — Bild links,
-% Inhalt rechts. Der Anteil wird erst am Einsatzort gegen die dortige
-% \linewidth ausgewertet; Standard sind 30%.
-\newcommand{\ZSFfigside}[4][0.30]{%
+% \ZSFfigside[<Optionen>]{pfad}{Titel}{Inhalt rechts} — Bild links, Inhalt
+% rechts. `width` ist hier der Anteil des BILDES (Vorbelegung 0.30); er wird
+% erst am Einsatzort gegen die dortige \linewidth ausgewertet.
+\newcommand{\ZSFfigside}[4][]{%
+  \begingroup
+  \pgfkeys{/zsf/fig, ZSF@figDefaults, width=0.30, #1}%
   \begin{figbox}[{#3}]%
     \noindent
-    \begin{minipage}[c]{#1\linewidth}%
+    \begin{minipage}[c]{\ZSF@figWidthFrac\linewidth}%
       \centering
-      \includegraphics[width=\linewidth,height=\ZSFfigMaxHeight,keepaspectratio]{#2}%
+      \includegraphics[width=\linewidth,height=\ZSF@figHeightLimit,%
+        keepaspectratio]{#2}%
     \end{minipage}%
     \hfill
-    \begin{minipage}[c]{\dimexpr0.96\linewidth-#1\linewidth\relax}%
+    \begin{minipage}[c]{\dimexpr\ZSFfigUsableFraction\linewidth
+                              -\ZSF@figWidthFrac\linewidth\relax}%
       \raggedright
       #4%
     \end{minipage}%
     \par
   \end{figbox}%
+  \endgroup
 }
+\makeatother
 
 % Zwei beliebige Blöcke nebeneinander, rahmenlos. Ohne Titel, deshalb hat
 % splitbox nur das Optionen-Argument — die Aufteilung ist ein Schlüssel
 % darin und damit benannt statt eine nackte Zahl an erster Stelle:
-%   \begin{splitbox}[split ratio=0.34, sidebyside align=center]
+%   \begin{splitbox}[split=0.34, sidebyside align=center]
 % Reihenfolge ist hier bedeutsam: zsfbox bringt Skips und Eintritts-Hook,
 % blankest setzt danach den leeren Skin und nullt Rahmen und Innenabstände.
 % Umgekehrt würde das 'enhanced jigsaw' aus zsfbox den Rahmen zurückholen.
-\tcbset{split ratio/.style={lefthand width=#1\linewidth}}
+% `split` ist ein Regler wie jeder andere und deshalb auf JEDER Box gültig:
+% \begin{defbox}[Titel][split=0.34] ergibt einen zweispaltigen Block MIT
+% Kopfzeile — vorher ging das nur, indem man eine splitbox in eine defbox
+% verschachtelte. Der Wert ist der Anteil der linken Hälfte.
+\tcbset{split/.style={
+  sidebyside,
+  sidebyside align=top,
+  sidebyside gap=\ZSFspaceM,
+  lower separated=false,
+  lefthand width=#1\linewidth,
+}}
+% splitbox ist das rahmenlose, titellose Preset dieses Reglers — der mit
+% Abstand häufigste Fall, deshalb ein eigener Name statt vier Optionen.
+% 'blankest' muss NACH zsfbox stehen: dessen 'enhanced jigsaw' holte sonst
+% den Rahmen zurück.
 \NewDocumentEnvironment{splitbox}{O{}}{%
   \begin{tcolorbox}[
     zsfbox,
     blankest,
-    sidebyside,
-    sidebyside align=top,
-    sidebyside gap=\ZSFspaceM,
-    split ratio=0.3,
-    lower separated=false,
-    before upper={\ZSFReadableAuto},
-    before lower={\ZSFReadableAuto},
+    align=left,
+    bodyparskip=inherit,
+    split=0.3,
+    before upper={\ZSFBoxEnter},
+    before lower={\ZSFBoxEnter},
     #1
   ]%
 }{%
@@ -517,63 +758,82 @@
 % ------------------------------------------------------------
 % Aussagen / Verfahren / Listen
 % ------------------------------------------------------------
-% statementbox: dezent, linker Farbbalken in Kapitelfarbe. Steht auf
-% derselben Form wie die Titelboxen und nimmt genau das zurück, was sie
-% rahmenlos macht — Rahmen, Ecken und die obere/untere Polsterung.
-\tcbset{zsfstatementstyle/.style={
+% Die leise Fassung: dezent, linker Balken im Akzent des Tons. Steht auf derselben
+% Form wie die Titelboxen und nimmt genau das zurück, was sie rahmenlos macht
+% — Rahmen, Ecken und die obere/untere Polsterung.
+%
+% `tone=chapter` steht hier, damit der Default gesetzt ist; eine vom Aufrufer
+% übergebene Tonwahl kommt danach und gewinnt. Die Fläche setzt bewusst NICHT
+% dieser Stil, sondern die Umgebung nach den Aufrufer-Optionen — Begründung
+% dort.
+\tcbset{preset/quiet/.style={
   zsfboxshape,
-  colback=\BoxPlainBackColor,
-  colframe=\BoxPlainBackColor,
-  frame hidden,
-  borderline west={\ZSFstatementBarWidth}{0pt}{\StatementBarColor},
-  boxrule=0pt,
-  arc=0pt, outer arc=0pt,
-  left=\ZSFboxPadXBar,
-  top=\ZSFboxPadYTight,
-  bottom=\ZSFboxPadYTight,
-  before upper={\ZSFReadableAuto},
+  tone=chapter,
+  align=left,
+  bodyparskip=inherit,
+  frame=none,
+  borderline west={\ZSFstatementBarWidth}{0pt}{\ZSFtoneAccent},
+  padx=bar, pady=quiet,
+  /utils/exec={\renewcommand{\ZSFBoxContext}{}},
+  before upper={\ZSFBoxEnter},
 }}
 
-% Gleiches Aufrufmuster wie die Titelboxen: [<Titel>][<Optionen>]. Der Titel
-% ist hier kein tcolorbox-Titelbalken, sondern eine fette Zeile — sichtbar
-% anders, aber gleich zu bedienen (rules/02_ai_mandate → gleiche Bedienung).
-\NewDocumentEnvironment{statementbox}{O{} O{}}
-  {\begin{tcolorbox}[zsfstatementstyle, #2]%
-   \IfBlankTF{#1}{}%
-     {{\bfseries\color{\StatementTitleColor}#1}\par\vspace{\ZSFspaceXS}}%
-   \ignorespaces}
-  {\end{tcolorbox}}
-
-% procedure: nummerierte Schritt-Liste in einer statementbox.
-\NewDocumentEnvironment{procedure}{O{} O{}}
-  {\begin{statementbox}[#1][#2]%
-   \begin{enumerate}[leftmargin=\ZSFprocLeftMargin,labelsep=\ZSFlistLabelSep,itemsep=\ZSFprocItemSep,topsep=0pt,parsep=0pt,partopsep=0pt]}
-  {\end{enumerate}\end{statementbox}}
-\newcommand{\ProcStep}[2]{\item {\bfseries #1}\\[\ZSFprocStepGap]#2}
-
-% factlist: Liste von Definitions-/Eigenschaftsfakten, Einträge via \ZSFFact.
-% Ohne Titel rahmenlos, mit Titel in einer statementbox — dieselbe Liste,
-% eine Option statt zweier Environments. Das Aufzählungszeichen bleibt in
-% beiden Fällen identisch; früher unterschieden sie sich hier grundlos.
+% ------------------------------------------------------------
+% ZSFlist — eine Liste, zwei Nummerierungen
+% ------------------------------------------------------------
+% Früher zwei Umgebungen mit zwei Item-Makros: `procedure`+\ProcStep für
+% nummerierte Schritte, `factlist`+\ZSFFact für Fakten. Beide waren „eine
+% Liste in einer optionalen leisen Box"; sie unterschieden sich in der
+% Nummerierung und im Item-Layout — beides Eigenschaften einer Liste, keine
+% verschiedenen Absichten. Der Vereinigungstest schlug hart an: Jeder Fix an
+% der einen musste an der anderen nachgezogen werden.
+%
+%   \begin{ZSFlist}[Titel]            Aufzählung, Marke inline
+%   \begin{ZSFlist}[Titel][ordered]   Nummerierung, Marke über dem Text
+%   \begin{ZSFlist}                   ohne Titel: ganz ohne Box
+%
+% Das Item-Layout folgt der Listenart, weil es daran hängt: Ein nummerierter
+% Schritt trägt Fliesstext und braucht die Marke als eigene Zeile, ein Fakt
+% ist ein Einzeiler. Wer beides entkoppeln muss, bekommt einen Regler — aber
+% erst, wenn der Fall wirklich auftritt.
 \makeatletter
-\newif\ifZSF@factlistBoxed
-\newcommand{\ZSF@factlistOpen}[1]{%
-  \begin{itemize}[
-    leftmargin=\ZSFlistLeftMargin,
-    labelsep=\ZSFlistLabelSep,
-    label={\textcolor{\StatementBarColor}{\textbullet}},
-    itemsep=\ZSFprocItemSep,
-    topsep=#1,
-    parsep=0pt,
-    partopsep=0pt
-  ]}
-\NewDocumentEnvironment{factlist}{O{} O{}}
-  {\IfBlankTF{#1}%
-     {\ZSF@factlistBoxedfalse\ZSF@factlistOpen{\ZSFspaceXS}}%
-     {\ZSF@factlistBoxedtrue\begin{statementbox}[#1][#2]\ZSF@factlistOpen{0pt}}}
-  {\end{itemize}\ifZSF@factlistBoxed\end{statementbox}\fi} % chktex 9
+\newif\ifZSF@listOrdered
+\newif\ifZSF@listBoxed
+\tcbset{ordered/.is if=ZSF@listOrdered, ordered/.default=true}
+\newcommand{\ZSF@listOpen}[1]{%
+  \ifZSF@listOrdered
+    \begin{enumerate}[
+      leftmargin=\ZSFlistLeftMarginOrdered, labelsep=\ZSFlistLabelSep,
+      itemsep=\ZSFlistItemSep, topsep=#1, parsep=0pt, partopsep=0pt]%
+  \else
+    \begin{itemize}[
+      leftmargin=\ZSFlistLeftMargin, labelsep=\ZSFlistLabelSep,
+      label={\textcolor{\ZSFtoneAccent}{\textbullet}},
+      itemsep=\ZSFlistItemSep, topsep=#1, parsep=0pt, partopsep=0pt]%
+  \fi
+}
+\newcommand{\ZSF@listClose}{%
+  \ifZSF@listOrdered\end{enumerate}\else\end{itemize}\fi % chktex 9
+}
+% Die rahmenlose Fassung hat keine Box, die die Optionen entgegennähme — ohne
+% das \tcbset fiele `ordered` oder eine Tonwahl dort stillschweigend unter den
+% Tisch. Eine Option, die je nach Titelargument wirkt oder nicht, ist eine
+% Falle; die Umgebung ist ohnehin eine Gruppe, das \tcbset endet also mit ihr.
+\NewDocumentEnvironment{ZSFlist}{O{} O{}}
+  {\ZSF@listOrderedfalse
+   \IfBlankTF{#1}%
+     {\ZSF@listBoxedfalse\tcbset{#2}\ZSF@listOpen{\ZSFspaceXS}}%
+     {\ZSF@listBoxedtrue\begin{defbox}[#1][weight=quiet, #2]\ZSF@listOpen{0pt}}}
+  {\ZSF@listClose\ifZSF@listBoxed\end{defbox}\fi} % chktex 9
 \makeatother
-\newcommand{\ZSFFact}[2]{\item \textbf{#1}\,---\,#2}
+% Ein Item-Makro statt zweier. Marke und Text sind in beiden Listenarten
+% dieselben zwei Rollen; nur ihre Anordnung folgt der Nummerierung.
+\makeatletter
+\newcommand{\ZSFItem}[2]{%
+  \item
+  \ifZSF@listOrdered{\bfseries #1}\\[\ZSFlistMarkGap]#2\else\textbf{#1}\,---\,#2\fi
+}
+\makeatother
 
 % ------------------------------------------------------------
 % Goal-System: Bedingung -> Umformung -> Ziel (Inline + Card)
@@ -581,18 +841,17 @@
 % Wie die Titelbox, aber ungetönt, mit kräftigerem Rahmen und knapper
 % Polsterung. 'unbreakable' bewusst nach zsftitlebox: eine Zielkette bleibt
 % auch im Pack-Modus atomar (rules/30_spacing → Anhang).
-\tcbset{zsfgoalboxstyle/.style={
+\tcbset{preset/goal/.style={
   zsftitlebox,
-  unbreakable,
+  align=center,
+  pady=tight,
+  frame=strong,
   colback=\BoxPlainBackColor,
-  colframe=\BoxTitleColor,
-  top=\ZSFtextMinPad,
-  bottom=\ZSFtextMinPad,
-  before upper={\parskip=\ZSFspaceS\centering},
   after upper={\par},
+  atomic,
 }}
 \NewDocumentEnvironment{goalbox}{O{} O{}}
-  {\begin{ZSF@box}{zsfgoalboxstyle}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+  {\begin{ZSF@box}{preset/goal}{#1}{#2}}{\end{ZSF@box}} % chktex 9
 
 \newtcbox{\GoalConditionBox}{%
   on line, enhanced,
@@ -643,12 +902,12 @@
 % ------------------------------------------------------------
 % Interner Panel-Rahmen des Valuegrids — kein öffentlicher Baustein.
 % Kapitel greifen ausschliesslich über \begin{valuegrid}{n}[Titel] zu.
-\tcbset{zsfvaluegridshell/.style={
+\tcbset{preset/valuegrid/.style={
   zsftitlebox,
-  unbreakable,
+  padx=none, pady=tight,
   colback=\BoxPlainBackColor,
   colframe=NeutralBoxFrameColor,
-  left=0pt, right=0pt, top=\ZSFtextMinPad, bottom=\ZSFtextMinPad,
+  atomic,
 }}
 \newcommand{\ZSFvaluegridCommon}{
   colsep=\ZSFtableEdgePad,
@@ -661,7 +920,7 @@
 % generiert. Titel steht wie bei jeder Box an erster Stelle; das Pflichtargument
 % folgt danach (rules/20_boxes → Aufruf-Konvention).
 \NewDocumentEnvironment{valuegrid}{O{} O{} m}
-  {\begin{ZSF@box}{zsfvaluegridshell}{#1}{#2}%
+  {\begin{ZSF@box}{preset/valuegrid}{#1}{#2}%
    \begin{tblr}{colspec={l *{#3}{c}},\ZSFvaluegridCommon}}
   {\end{tblr}\end{ZSF@box}} % chktex 9
 
@@ -683,11 +942,11 @@
 % Schalter anhängen, steht in der Optionsliste davor und verliert dagegen.
 \newcommand{\ZSFBoxesBreakableOn}{%
   \tcbset{zsftitlebox/.append style={breakable},
-          zsfstatementstyle/.append style={breakable}}%
+          preset/quiet/.append style={breakable}}%
 }
 \newcommand{\ZSFBoxesBreakableOff}{%
   \tcbset{zsftitlebox/.append style={breakable=false},
-          zsfstatementstyle/.append style={breakable=false}}%
+          preset/quiet/.append style={breakable=false}}%
 }
 % Hebt die Platzreserven vor Boxen und Überschriften auf, damit ein
 % Anhang dicht packt statt früh umzubrechen.
