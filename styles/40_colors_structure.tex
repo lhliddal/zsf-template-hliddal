@@ -86,6 +86,10 @@
 % ------------------------------------------------------------
 \definecolor{ETHRot}{HTML}{CC0000}
 \colorlet{WarnboxBack}{ETHRot!15}
+% Weicher Rahmen des Warn-Tons. Eigener Wert statt des Kapitelrahmens: sonst
+% ist der Warn-Ton der einzige, dessen Rahmen der Kapitelfarbe folgt — eine
+% Warnbox sähe damit in jedem Kapitel anders umrandet aus.
+\colorlet{WarnboxFrame}{ETHRot!25}
 
 % Semantisches Formel-Highlighting (kapitelunabhängig, siehe \ZSFmhlA/B/C/D).
 % Dedizierte Farben -- bewusst NICHT aus der Kapitelrotation (ChapterColorN), sonst
@@ -104,7 +108,6 @@
 \definecolor{StaticBoxTitleText}{HTML}{0F172A}
 \definecolor{StaticSubBoxBack}{HTML}{F8FAFC}
 \definecolor{StaticSubBoxBorder}{HTML}{CBD5E1}
-\colorlet{NeutralBoxFrameColor}{black!20}
 \colorlet{FormulaSeparatorColor}{black!30}
 \colorlet{MutedTextColor}{black!60}
 \colorlet{IdentityMarkerColor}{black!10}
@@ -151,10 +154,9 @@
 \newcommand{\WarnboxTitleColor}{ETHRot}
 \newcommand{\WarnboxTitleTextColor}{white}
 
-% Formelbox und Zielketten-Bedingung tragen bewusst eine harte Kontur statt
-% des dezenten Kapitelrahmens; auch das ist eine Gestaltungsentscheidung und
-% gehört deshalb hierher, nicht in styles/60_boxes.tex.
-\newcommand{\FormulaboxFrameColor}{black}
+% Zielketten-Bedingung trägt bewusst eine harte Kontur statt des dezenten
+% Kapitelrahmens; auch das ist eine Gestaltungsentscheidung und gehört
+% deshalb hierher, nicht in styles/60_boxes.tex.
 \newcommand{\GoalConditionBorderColor}{black}
 
 % ── Ton-Tokens: wie der `tone`-Regler in den zwei Box-Familien landet ──
@@ -178,16 +180,21 @@
 \newcommand{\ZSFtoneQuietBackNeutral}{StaticSubBoxBack}
 \newcommand{\ZSFtoneQuietBackWarn}{\WarnboxBackColor}
 
-% Rahmenfarbe in zwei Stärken — der Regler `frame` wählt zwischen ihnen.
+% Rahmenfarbe in drei Stärken — der Regler `frame` wählt zwischen ihnen.
 % `soft` begrenzt die Box nur, `strong` grenzt sie gegen die Umgebung ab
-% (Zielketten). Beide sind Landepunkte desselben Tons, damit auch eine
-% getönte Box in beiden Stärken stimmig bleibt.
+% (Zielketten), `hard` setzt die kräftige Kontur (Formelbox). Alle drei sind
+% Landepunkte desselben Tons, damit eine getönte Box in jeder Stärke stimmig
+% bleibt: Jede Stärke muss in jedem Ton definiert sein, sonst fällt eine
+% Kombination auf die Farbe eines fremden Tons zurück.
 \newcommand{\ZSFtoneFrameSoftChapter}{\BoxFrameColor}
 \newcommand{\ZSFtoneFrameSoftNeutral}{StaticSubBoxBorder}
-\newcommand{\ZSFtoneFrameSoftWarn}{\BoxFrameColor}
+\newcommand{\ZSFtoneFrameSoftWarn}{WarnboxFrame}
 \newcommand{\ZSFtoneFrameStrongChapter}{\BoxTitleColor}
 \newcommand{\ZSFtoneFrameStrongNeutral}{StaticBoxTitleText}
 \newcommand{\ZSFtoneFrameStrongWarn}{ETHRot}
+\newcommand{\ZSFtoneFrameHardChapter}{black}
+\newcommand{\ZSFtoneFrameHardNeutral}{StaticBoxTitleText}
+\newcommand{\ZSFtoneFrameHardWarn}{ETHRot}
 
 % Für goalbox (semantische Ziel-Box)
 \newcommand{\GoalConditionBackColor}{white}

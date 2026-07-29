@@ -22,11 +22,9 @@
 % styles/40_colors_structure.tex. Schadlos wenn das Modul deaktiviert ist.
 \newcommand{\ZSFfontCodeComment}{\ttfamily\color{ce_green}}
 
-% Semantische Tabellen-Fontgrössen
-% (werden als optionales Argument an ZSFtable/ZSFtableFlat/ZSFtablePlain
-%  übergeben — siehe styles/20_tables.tex).
-% Default = \ZSFfontTable. Für lange, dichte Tabellen (viele Zeilen,
-% knapper Inhalt) \ZSFfontTableDense verwenden.
+% Semantische Tabellen-Fontgrössen. Kapitel wählen sie nicht direkt, sondern
+% über den Regler `font` der ZSFtable (`normal` | `dense`, styles/20_tables.tex).
+% `dense` ist für lange Tabellen mit vielen Zeilen und knappem Zellinhalt.
 \newcommand{\ZSFfontTable}{\normalsize}
 \newcommand{\ZSFfontTableDense}{\footnotesize}
 

@@ -6,20 +6,17 @@
 % listings samt tcolorbox-Listings-Library selbst.
 % Farben (ce_*, code_*) aus 40_colors_structure.tex,
 % Längen (\ZSFcode*) aus 30_layout_spacing.tex,
-% Box-Stile (zsftitlebox, \BoxFrameColor) aus 60_boxes.tex.
+% Box-Grundvertrag (zsftitlebox) und Regler aus 60_boxes.tex.
 %
 % Stellt bereit:
 %   - lstlisting-Style "CodeExpert" (dunkler Code-Block)
-%   - codebox[Titel]            — Container für Code-Snippets
-%                                 (zero top/bottom padding, lstlisting
-%                                 bringt eigene Skips mit)
-%   - codeboxfirst/mid/last     — mehrteilige Code-Gruppen mit
-%                                 möglichem Spaltenumbruch zwischen
-%                                 den Teilen (offene Kanten, visuell
-%                                 zusammenhängend)
-%
-% Herkunft: konsolidiert aus zsf-informatik2-fs2026
-% (styles/65_code_style.tex + Code-Container aus styles/60_boxes.tex).
+%   - codebox[Titel][Optionen]  — Container für Code-Snippets; ohne
+%                                 vertikale Polsterung, weil lstlisting
+%                                 eigene Skips mitbringt
+%   - Regler `part`             — whole (Default) | first | mid | last:
+%                                 mehrteilige Code-Gruppen mit offenen
+%                                 Kanten, zwischen denen die Spalte
+%                                 umbrechen darf
 % ============================================================
 
 \RequirePackage{listings}
@@ -75,15 +72,14 @@
 \tcbset{preset/code/.style={
   zsftitlebox,
   colback=\BoxPlainBackColor,
-  top=0pt, bottom=0pt,
+  pady=none,
 }}
 
 % ------------------------------------------------------------
 % Mehrteilige Code-Gruppen — eine Umgebung mit Regler
 % ------------------------------------------------------------
-% Früher vier Namen (codebox / codeboxfirst / codeboxmid / codeboxlast) für
-% eine Box mit vier Kantenformen. Jetzt ein Regler (rules/02_ai_mandate →
-% Katalog-Ökonomie):
+% Eine Box mit vier Kantenformen — also ein Regler, nicht vier Namen
+% (rules/02_ai_mandate → Katalog-Ökonomie):
 %
 %   \begin{codebox}[Titel]                 geschlossene Box (Default)
 %   \begin{codebox}[Titel][part=first]     Rahmen oben + Seiten, unten offen
@@ -96,17 +92,20 @@
 % Offene Kanten statt geschlossener Box: eine eigene Form, aber derselbe
 % Fluss-Vertrag wie jede andere Box (zsfbox). Die Skips sind der bewusste
 % Unterschied — die Teile müssen aneinanderstossen.
+% `frame=soft` ist hier Pflicht und nicht Kosmetik: Dieser Stil erbt von
+% `zsfbox` (Fluss) statt von `zsfboxshape` (Form) und bekommt die Rahmenwahl
+% deshalb nicht mit. Ohne die Zeile trüge ein Codebox-Teil die Wahl der
+% vorhergehenden Box weiter.
 \tcbset{zsf@codebox@split@base/.style={
   zsfbox,
   unbreakable,
   colback=\BoxPlainBackColor,
-  colframe=\BoxFrameColor,
+  frame=soft,
   leftrule=\ZSFboxRuleWidth, rightrule=\ZSFboxRuleWidth,
   toprule=0pt, bottomrule=0pt,
   arc=0pt, outer arc=0pt,
   boxsep=0pt,
-  left=\ZSFboxPadX, right=\ZSFboxPadX,
-  top=0pt, bottom=0pt,
+  padx=normal, pady=none,
   before skip=0pt,
   after skip=\ZSFspaceXS,
 }}

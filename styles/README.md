@@ -13,7 +13,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
-| `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\formulasep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
+| `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\ZSFsep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
 | `65_code_style.tex` | **OPT-IN** (Informatik): lädt `listings` samt tcolorbox-Library; Style `CodeExpert`, `codebox[Titel][part=…]` (whole/first/mid/last) |
 | `66_index.tex` | **OPT-IN**: lädt `makeidx`; Stichwortverzeichnis mit `\ZSFkeyword`-Auto-Indexierung, `\ZSFindex`/`\ZSFindexsee`, `x.x`-/`x.x.x`-Locator und `zsfindex.ist` |
 | `67_code_comments.tex` | **OPT-IN** (Informatik, nach 65): Smart Code-Kommentare `\CodeLine{code}[comment]`, `\InlineComment`/`\OverlineComment` |
@@ -35,8 +35,9 @@ weiterhin mit allen optionalen Modulen deaktiviert; dort werden sie ausschliessl
 
 Diese Liste ist die Quelle für den **Lebenszyklusstatus** der exportierten
 Kapitelbefehle. Die fachliche Verwendung und Auswahl beschreiben die Regeln in
-`rules/20_boxes.md`, `rules/25_structure_markers.md`, `rules/40_tables.md`,
-`rules/50_math.md` und `rules/55_index.md`.
+`rules/20_boxes.md` (Katalog), `rules/21_box_options.md` (Regler),
+`rules/25_structure_markers.md`, `rules/40_tables.md`, `rules/50_math.md`
+und `rules/55_index.md`.
 
 ### Stabil — für neue Kapitel vorgesehen
 
@@ -49,7 +50,7 @@ Kapitelbefehle. Die fachliche Verwendung und Auswahl beschreiben die Regeln in
 - Bilder: `\ZSFfig`, `\ZSFfigside`, `\ZSFfigcaption`.
 - Semantik und Navigation: `\ZSFkeyword`, `\ZSFlabel`, `\ZSFdanger`,
   `\ZSFconclusion`, `\ZSFhl`, `\ZSFref`, `\ZSFsectionref`, `\ZSFTitleTag`,
-  `\ZSFItemHeading`, `\ZSFItem`, `\ZSFfontDiagramLabel`.
+  `\ZSFsep`, `\ZSFItem`, `\ZSFfontDiagramLabel`.
 - Abstände in Kapiteln: `\ZSFgap`, `\ZSFSectionGap`.
 - Punktuelle Umbruchsteuerung in Kapiteln: `\ZSFbreak`, `\ZSFnobreak`,
   `\ZSFallowbreak`.
@@ -67,7 +68,7 @@ Kapitelbefehle. Die fachliche Verwendung und Auswahl beschreiben die Regeln in
 - Formel-API: `\R`, `\C`, `\N`, `\Z`, `\Q`, `\dd`, `\vect`, `\abs`,
   `\norm`, `\ZSFsumAuto`, `\ZSFlimAuto`, `\ZSFbraceunder`,
   `\ZSFbraceover`, `\ZSFmhlA`, `\ZSFmhlB`, `\ZSFmhlC`, `\ZSFmhlD`,
-  `\formulasep`, `\formulanote`,
+  `\formulanote`,
   `\ZSFformulaline`,
   `\textVorBox`, `\textNachBox`.
 - Goal-System: `\GoalCondition`, `\GoalStep`, `\GoalTarget`,
@@ -89,7 +90,7 @@ weiter unten **länger**. Zwei Sätze, die unabhängig voneinander gelten:
    zu einem benannten Regler — auch ohne anstehende Zusammenlegung.
 
 Wer hier etwas einträgt, prüft zuerst, ob ein Regler an einem vorhandenen
-Baustein denselben Fall trägt (`rules/20_boxes.md` → Richtung).
+Baustein denselben Fall trägt (`rules/21_box_options.md`).
 
 ### Kompatibilität — bereinigt
 
@@ -119,6 +120,7 @@ Funktion bleibt über einen stabilen Baustein erreichbar:
 | `factlist` + `\ZSFFact` | `ZSFlist[Titel]` + `\ZSFItem` |
 | `split ratio=…` | `split=…` (gilt jetzt auf jeder Box, nicht nur `splitbox`) |
 | `\ZSFfig[<Anteil>]`, `\ZSFfigside[<Anteil>]` | `\ZSFfig[width=…, height=…]`, `\ZSFfigside[width=…]` |
+| `\formulasep`, `\ZSFItemHeading` | `\ZSFsep` bzw. `\ZSFsep[Beschriftung]` |
 
 Fach-Forks mit eigenen Style-Kopien sind davon nicht betroffen; sie behalten,
 was sie mitgebracht haben (siehe `rules/00_meta.md` → Verhältnis zu Forks).
@@ -195,7 +197,7 @@ deshalb nicht in der Token-Liste oben:
 | `padx` | alle Boxen | `normal`, `bar`, `none` |
 | `pady` | alle Boxen | `normal`, `tight`, `quiet`, `none` |
 | `align` | alle Boxen | `left`, `center` |
-| `frame` | alle Boxen | Ton-Default, `soft`, `strong`, `none` |
+| `frame` | alle Boxen | `soft`, `strong`, `hard`, `none` |
 | `atomic` | alle Boxen | Flag |
 | `split` | alle Boxen | Anteil der linken Hälfte |
 | `ordered` | `ZSFlist` | Flag |
@@ -204,6 +206,11 @@ deshalb nicht in der Token-Liste oben:
 | `header` | `ZSFtable` | `true`, `false` |
 | `zebra` | `ZSFtable` | `true`, `false` |
 | `font` | `ZSFtable` | `normal`, `dense` |
+
+Diese Tabelle ist die Quelle für Durchgang 3 von `check_showcase_coverage.sh`:
+Jeder Schlüssel muss in einer `rules/*.md` beschrieben sein. Ein Regler, den
+nur diese Datei kennt, existiert für eine KI nicht — und die Regler sind die
+Liste, die laut Entwicklungsrichtung **wachsen** soll.
 
 Darüber hinaus ist jeder tcolorbox-Schlüssel erlaubt (`breakable`,
 `sidebyside align=center`, …) — das zweite optionale Argument wird

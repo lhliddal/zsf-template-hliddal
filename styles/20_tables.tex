@@ -76,9 +76,9 @@
 % ------------------------------------------------------------
 % Semantische Tabellen-Umgebung (Single Point of Truth)
 % ------------------------------------------------------------
-% EINE Umgebung mit Reglern statt dreier fast gleicher Varianten
-% (rules/02_ai_mandate → Katalog-Ökonomie). Früher: ZSFtable /
-% ZSFtableFlat / ZSFtablePlain — drei Namen für zwei Ja/Nein-Fragen.
+% EINE Umgebung mit Reglern statt mehrerer fast gleicher Varianten
+% (rules/02_ai_mandate → Katalog-Ökonomie): Kopfzeile und Zebra sind zwei
+% Ja/Nein-Fragen, keine drei Umgebungsnamen.
 %
 %   \begin{ZSFtable}[<Optionen>]{<colspec>}
 %
@@ -89,8 +89,7 @@
 %               Zellinhalt. Default 'font=normal'.
 %
 % Die Zebra-Startzeile folgt automatisch der Kopfzeile: mit Header ab
-% Zeile 2, ohne ab Zeile 1. Genau das war der einzige echte Unterschied
-% zwischen ZSFtable und ZSFtableFlat.
+% Zeile 2, ohne ab Zeile 1.
 %
 % colspec nutzt L/C/R (gleichverteilt, jeweils Faktor 1) oder
 % Y{.}/Z{.}/Q{.}/F{.} (proportional). Summe der Faktoren muss gleich

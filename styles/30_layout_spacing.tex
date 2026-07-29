@@ -109,9 +109,9 @@
 % Deshalb staffeln sich die Werte nach der Grösse der eröffneten Einheit:
 % Kapitel > Abschnitt > Unterabschnitt.
 % Die drei Werte sind EINE Staffelung, kein Trio unabhängiger Zahlen. Wer die
-% ZSF früher oder später umbrechen lassen will, dreht deshalb den Faktor —
-% vorher musste man drei Register einzeln anfassen und dabei ihr Verhältnis
-% von Hand wahren. Grösser = die Spalte bricht eher vorzeitig um und lässt
+% ZSF früher oder später umbrechen lassen will, dreht deshalb den Faktor und
+% nicht die drei Register einzeln — nur so bleibt ihr Verhältnis gewahrt.
+% Grösser = die Spalte bricht eher vorzeitig um und lässt
 % Balken seltener knapp am Fuss stehen; kleiner = dichter gefüllte Spalten.
 \providecommand{\ZSFBreakReserveFactor}{1}
 \newlength{\ZSFbreakThresholdChapter}
@@ -146,9 +146,8 @@
 
 % Nutzbarer Anteil der Zeilenbreite in mehrteiligen Bild-Layouts; der Rest ist
 % der \hfill-Steg zwischen den Elementen (Bildreihe in \ZSFfig, Bild-neben-Text
-% in \ZSFfigside). Stand vorher als nackte 0.97 bzw. 0.96 in styles/60_boxes —
-% zwei Werte für dieselbe Absicht, um einen Punkt verschieden, ohne dass ein
-% Grund dokumentiert war. Als Makro statt \newlength: es ist ein Faktor, kein
+% in \ZSFfigside) — EIN Wert, damit die beiden Layouts nicht um einen Punkt
+% auseinanderdriften. Als Makro statt \newlength: es ist ein Faktor, kein
 % Mass, und wird erst an der Verwendungsstelle gegen die dortige \linewidth
 % ausgewertet.
 \newcommand{\ZSFfigUsableFraction}{0.97}
@@ -161,8 +160,8 @@
 % Tokens für die ruhige Box-Familie und ZSFlist.
 % Der Einzug ist der einzige Wert, der sich zwischen nummerierter und
 % unnummerierter Liste unterscheidet — eine Zahl mit Punkt braucht mehr Platz
-% als ein Aufzählungszeichen. Deshalb zwei Werte unter EINEM Namen, statt
-% zweier Registersätze mit verschiedenen Präfixen wie früher (proc/list).
+% als ein Aufzählungszeichen. Deshalb zwei Werte unter EINEM Namen statt
+% zweier Registersätze mit verschiedenen Präfixen.
 \newlength{\ZSFstatementBarWidth}\setlength{\ZSFstatementBarWidth}{2pt}
 \newlength{\ZSFlistMarkGap}         \setlength{\ZSFlistMarkGap}{\ZSFspaceXS}
 \newlength{\ZSFlistItemSep}         \setlength{\ZSFlistItemSep}{\ZSFspaceXS}
@@ -176,9 +175,8 @@
 \newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFDensityBoxes\ZSFspaceXS}
 
 % ── Horizontaler Innenabstand: eine Stellschraube für alle Inhaltsboxen ──
-% Vorher stand an jeder Box ein eigener Wert (0pt/XS/S/M). Wer die Ränder
-% ändern wollte, musste jede Box einzeln anfassen — genau der Fall, in dem
-% eine KI repariert statt anzupassen.
+% Ein eigener Wert pro Box zwänge dazu, für eine Randkorrektur jede Box
+% einzeln anzufassen — genau der Fall, in dem eine KI repariert statt anzupassen.
 %
 % \ZSFboxPadX        — Standard-Rand zwischen Boxkante und Inhalt.
 % \ZSFboxPadXBar     — für Boxen mit linkem Farbbalken: der Inhalt muss den
@@ -191,8 +189,8 @@
 \newlength{\ZSFtableEdgePad} \setlength{\ZSFtableEdgePad}{\ZSFDensityTables\ZSFspaceM}
 
 % Vertikal dasselbe: Innenabstand oben/unten und der Abstand NACH einer Box.
-% \ZSFBoxBeforeSkip gab es schon, das Gegenstück fehlte — deshalb stand
-% "after skip=\ZSFspaceS" fünfmal einzeln im Code.
+% Beide als Register, damit der Abstand nach einer Box nicht pro Box-Stil
+% erneut ausgeschrieben wird.
 \newlength{\ZSFboxPadY}      \setlength{\ZSFboxPadY}{\ZSFDensityBoxes\ZSFspaceS}
 \newlength{\ZSFboxPadYTight} \setlength{\ZSFboxPadYTight}{\ZSFDensityBoxes\ZSFspaceXS}
 \newlength{\ZSFBoxAfterSkip} \setlength{\ZSFBoxAfterSkip}{\ZSFDensityBoxes\ZSFspaceS}
@@ -339,9 +337,8 @@
 % ------------------------------------------------------------
 % Formelnote, Trennlinie, Item-Heading und Folgerung setzen alle denselben
 % Einschub: laufenden \parskip zurücknehmen, definierten Abstand setzen.
-% Das Muster stand neunmal von Hand im Code — und jede Kopie hatte \parskip
-% fest verdrahtet, wodurch der Absatzabstand nicht an der Dichte-Stellschraube
-% hängen konnte. Eine Stelle statt neun; wer den Rhythmus ändert, ändert hier.
+% Als Makro statt von Hand, damit der Abstand an der Dichte-Stellschraube hängt
+% und der Rhythmus an einer Stelle änderbar bleibt.
 \newcommand{\ZSFInterlude}[1]{\par\vspace{-\parskip}\vspace{#1}}
 % Trenner-Abstand um den Mittelpunkt im Index-Locator "6.2 · (S. 4)" (66_index).
 % Bewusst als Makro statt \newlength: das em soll an der Verwendungsstelle in der
