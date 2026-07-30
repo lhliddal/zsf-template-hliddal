@@ -92,6 +92,36 @@ weiter unten **länger**. Zwei Sätze, die unabhängig voneinander gelten:
 Wer hier etwas einträgt, prüft zuerst, ob ein Regler an einem vorhandenen
 Baustein denselben Fall trägt (`rules/21_box_options.md`).
 
+Zwei Testfragen entscheiden den Einzelfall:
+
+- **Vereinigungstest:** Müsste eine Verbesserung an Baustein A anschliessend an
+  Baustein B nachgezogen werden? Dann sind A und B ein Baustein mit einem Regler.
+- **Reglertest:** Drückt der Regler eine Entscheidung aus, die der Autor pro
+  Stelle tatsächlich trifft? Oder folgt sie zwingend aus der Inhaltsart? Nur im
+  ersten Fall ist es ein Regler; im zweiten gehört sie in eine Vorbelegung.
+
+### Bewusst getrennt gehaltene Bausteine
+
+Diese vier haben die Prüfung bestanden und bleiben **absichtlich** eigene Namen.
+Wer sie zusammenlegen will, argumentiert gegen die hier genannte Absicht — nicht
+gegen ein Versehen.
+
+| Baustein | eigene Absicht | technisch wäre es |
+| --- | --- | --- |
+| `warnbox` | »Stolperfalle« ist die meistgesuchte Kategorie einer Prüfungs-ZSF; der vorbelegte Titel macht die Box ohne jedes Argument vollständig | `defbox[…][tone=warn]` |
+| `figbox` | „hier steht eine Abbildung" — der Container für selbstgezeichnete Diagramme | `defbox[…][atomic]` |
+| `goalbox` | „hier wird hergeleitet" — die Kombination aus vier Reglern ist nicht ableitbar, und Komponieren ist genau das Entwerfen, das die KI nicht tun soll | `defbox[…][align=center, pady=tight, frame=strong, atomic]` |
+| `splitbox` | der rahmenlose Zweispalter ist der häufigste Split-Fall und wäre sonst vier Optionen lang | `defbox[][split=…, frame=none, padx=none, pady=none]` |
+
+Gemeinsames Muster: Jeder ist ein **Ein-Zeilen-Preset** über demselben
+Reglersatz — ein Name, der nur eine Vorbelegung benennt, kostet fast nichts und
+erspart der KI das Komponieren.
+
+`warnbox` ist dabei die einzige Box, die einen **Ton** als eigenen Namen führt.
+Das ist eine benannte Ausnahme, kein Muster: Ein weiterer Ton bekommt keine
+eigene Umgebung, solange er nicht beides mitbringt — eigene Semantik **und**
+eine sinnvolle Vorbelegung.
+
 ### Kompatibilität — bereinigt
 
 Die früher hier geführten Namen sind **entfernt**. Die Nutzungsanalyse über
@@ -157,18 +187,34 @@ nur noch, worin sie sich wirklich unterscheidet:
 und `codebox` sind Ableitungen von `zsftitlebox`; `preset/quiet` (via
 `weight=quiet`) leitet von `zsfboxshape` ab und nimmt Rahmen und Ecken zurück.
 
-**Der `tone`-Regler hat zwei Landepunkte, nicht einen.** Ein Ton setzt je vier
-Schlüssel für die Titelbox-Familie (`colback`, `colbacktitle`, `colframe`,
-`coltitle`) und zusätzlich zwei Makros für die rahmenlose Familie:
-`\ZSFtoneAccent` (Balken, Titelzeile, Aufzählungszeichen) und
-`\ZSFtoneQuietBack` (Fläche). Welchen Landepunkt eine Box liest, entscheidet
-ihr Stil — dadurch genügt **ein** Regler, und die leise Box bleibt im
-Kapitelton trotzdem ungetönt. Die Farbtokens dazu stehen in
-`40_colors_structure` (`\ZSFtoneAccent*`, `\ZSFtoneQuietBack*`).
+**Der `tone`-Regler hat zwei Landepunkte, nicht einen.** Ein Ton setzt die
+Schlüssel der Titelbox-Familie (`colbacktitle`, `colframe`, `coltitle`) und
+zusätzlich zwei Makros für die rahmenlose Familie: `\ZSFtoneAccent` (Balken,
+Titelzeile, Aufzählungszeichen) und `\ZSFtoneQuietBack` (Fläche). Welchen
+Landepunkt eine Box liest, entscheidet ihr Stil — dadurch genügt **ein**
+Regler, und die leise Box bleibt im Kapitelton trotzdem ungetönt. Die
+Farbtokens dazu stehen in `40_colors_structure` (`\ZSFtoneAccent*`,
+`\ZSFtoneLoudBack*`, `\ZSFtoneQuietBack*`).
 
-`weight=quiet` setzt sein `colback` bewusst **am Ende** seiner Optionsliste.
-Stünde es davor, würde ein ausgeschriebenes `tone=chapter` die Box tönen, ein
-weggelassenes nicht — derselbe Aufruf mit und ohne Default sähe verschieden aus.
+**Die Fläche setzt der Ton nicht als einen Wert, sondern als beide** — laut und
+ruhig, über den Schlüssel `ZSF@toneSurface`. Welche davon gilt, entscheidet die
+Gewicht-Wahl, die zu diesem Zeitpunkt bereits feststeht. Grund ist dieselbe
+tcolorbox-Mechanik wie beim Rahmen: `colback` wird sofort per `\colorlet`
+aufgelöst und gehört damit dem letzten Schreiber. Setzten Ton und Gewicht es
+beide, entschiede die Reihenfolge im Aufruf — und ein ausgeschriebenes
+`tone=chapter` tönte eine leise Box, ein weggelassenes nicht.
+
+**`weight` wird von der Fabrik vorab gelesen, nicht in der Optionsliste
+ausgewertet.** Es ist der einzige Regler, der keinen Wert wählt, sondern den
+**Basisstil** — und ein Basisstil bringt Vorbelegungen mit (`padx=bar`,
+`frame=none`, `align=left`, …). Stünde er wie die übrigen Regler in der
+Aufrufer-Liste, liefen diese Vorbelegungen nach den Wahlen des Aufrufers und
+überschrieben sie: `[tone=warn, weight=quiet]` verlor den Ton,
+`[frame=strong, weight=quiet]` den Rahmen — beides stumm, weil jeder Wert für
+sich gültig ist. `ZSF@box` liest die Wahl deshalb per `pgfkeys`-Vorlauf aus dem
+Aufruf und setzt die fertige Basis (`ZSF@weightBase`) **vor** die
+Aufrufer-Optionen. Wer einen weiteren Regler dieser Art anlegt, macht es
+genauso. Geprüft wird das von `tests/check_box_options.sh`.
 
 **Die Rahmenfarbe setzt der Ton direkt, obwohl es dafür auch Makros gibt.**
 Das ist keine Doppelung, sondern Folge der tcolorbox-Mechanik: `colframe` wird
@@ -207,10 +253,19 @@ deshalb nicht in der Token-Liste oben:
 | `zebra` | `ZSFtable` | `true`, `false` |
 | `font` | `ZSFtable` | `normal`, `dense` |
 
-Diese Tabelle ist die Quelle für Durchgang 3 von `check_showcase_coverage.sh`:
-Jeder Schlüssel muss in einer `rules/*.md` beschrieben sein. Ein Regler, den
-nur diese Datei kennt, existiert für eine KI nicht — und die Regler sind die
-Liste, die laut Entwicklungsrichtung **wachsen** soll.
+Diese Tabelle ist die Quelle für zwei Durchgänge von
+`check_showcase_coverage.sh`. **Durchgang 3:** Jeder Schlüssel muss in einer
+`rules/*.md` beschrieben sein — ein Regler, den nur diese Datei kennt,
+existiert für eine KI nicht. **Durchgang 4:** Jeder Wert ausser der
+Vorbelegung muss in `chapters/` an einer Box gesetzt sein; eine blosse
+Erwähnung im Titel-Tag oder im Fliesstext zählt nicht. Für Bausteine gilt seit
+Durchgang 1, dass Behaupten nicht genügt — für die Liste, die laut
+Entwicklungsrichtung **wachsen** soll, gilt es damit auch.
+
+Die Spaltenreihenfolge ist deshalb bindend: Spalte 1 der Schlüssel, Spalte 3
+die Werte mit der **Vorbelegung zuerst**. Ein neuer Regler wird hier
+eingetragen, in einer `rules/*.md` beschrieben und in `chapters/` vorgeführt —
+sonst bricht `make check`.
 
 Darüber hinaus ist jeder tcolorbox-Schlüssel erlaubt (`breakable`,
 `sidebyside align=center`, …) — das zweite optionale Argument wird

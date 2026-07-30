@@ -47,6 +47,51 @@
   — beide zusammen, in beliebiger Reihenfolge. Keine Wahl verwirft die andere.
 \end{defbox}
 
+\SubsectionBar[sec:box-knobs]{Polsterung, Rahmen, Umbruch}
+
+\begin{runintext}
+  Die übrigen Regler gelten wortgleich auf jeder Box, und ihre Reihenfolge in
+  der Optionsliste ist bedeutungslos. Das ist keine Absichtserklärung: Jeder
+  Lauf von \ZSFlabel{make check} setzt jedes Reglerpaar in beiden Reihenfolgen
+  und vergleicht das Ergebnis.
+\end{runintext}
+
+\begin{defbox}[Inhalt bis an die Kante\ZSFTitleTag{padx=none, pady=none}][padx=none, pady=none]
+  Ohne Innenabstand — so sitzt eine Tabelle bündig im Rahmen und das Zebra
+  endet nicht kurz davor.
+\end{defbox}
+
+\begin{defbox}[Platz für den Balken\ZSFTitleTag{padx=bar}][padx=bar]
+  Links mehr Rand: Der Inhalt hält den Akzentbalken der leisen Fassung frei.
+\end{defbox}
+
+\begin{defbox}[Knappste Höhe\ZSFTitleTag{pady=tight}][pady=tight]
+  \ZSFkeyword*{pady} regelt die Polsterung oben und unten.
+\end{defbox}
+
+\begin{defbox}[Eine Stufe darüber\ZSFTitleTag{pady=quiet}][pady=quiet]
+  Dieselbe Box, nur senkrecht anders gepolstert.
+\end{defbox}
+
+\begin{defbox}[Kräftige Kontur\ZSFTitleTag{frame=hard}][frame=hard]
+  \ZSFkeyword*{frame} wählt nur die Stärke — die Farbe kommt aus dem Ton.
+\end{defbox}
+
+\begin{defbox}[Rahmenlos mit Kopfzeile\ZSFTitleTag{frame=none}][frame=none]
+  Rahmen und Gewicht sind zwei getrennte Fragen.
+\end{defbox}
+
+\begin{defbox}[Bleibt zusammen\ZSFTitleTag{atomic}][atomic]
+  \ZSFkeyword*{atomic} hält die Box auch im Pack-Modus über der Spaltengrenze
+  zusammen.
+\end{defbox}
+
+\begin{defbox}[Absatzabstand vom Dokument\ZSFTitleTag{bodyparskip=inherit}][bodyparskip=inherit]
+  Statt des eigenen Box-Werts gilt der Dokumentwert.
+
+  Sichtbar wird das erst am zweiten Absatz.
+\end{defbox}
+
 \SubsubsectionBar[sec:box-hierarchy]{Dritte Lookup-Ebene}
 
 \begin{defbox}[][weight=quiet]

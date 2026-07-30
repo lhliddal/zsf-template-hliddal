@@ -36,7 +36,7 @@ IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTI
 
 .PHONY: build rebuild check clean all \
         check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules check-init-project \
-        check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
+        check-root-clean check-pdf-identity check-guardrails check-showcase-coverage check-box-options lint \
         sync-rules check-rules check-rule-authorship \
         release-proof print-pdf-basename print-release-id
 
@@ -63,8 +63,8 @@ rebuild: build
 # Läuft NICHT in CI: tests/ tools/ rules/ sind git-excluded und fehlen im Clone.
 # 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
 check: build check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
-       check-init-project check-root-clean check-pdf-identity check-guardrails check-showcase-coverage lint \
-       check-rule-authorship check-rules
+       check-init-project check-root-clean check-pdf-identity check-guardrails check-showcase-coverage \
+       check-box-options lint check-rule-authorship check-rules
 	@echo "make check: alle Prüfungen bestanden."
 
 check-main-full:
@@ -107,6 +107,12 @@ check-guardrails:
 
 check-showcase-coverage:
 	@bash tests/check_showcase_coverage.sh
+
+# Prüft die Regler-Zusage aus rules/21_box_options.md am laufenden Satz:
+# jedes Reglerpaar in beiden Reihenfolgen, und jeder Reglerwert gegen die
+# Vorbelegung. Beide Fehlerarten sind stumm und deshalb nur so zu finden.
+check-box-options:
+	@bash tests/check_box_options.sh
 
 # chktex ist stilistischer Lint (advisory): meldet, bricht den Build aber nicht.
 # Der harte Lint-Gate auf geänderten Dateien läuft über pre-commit.

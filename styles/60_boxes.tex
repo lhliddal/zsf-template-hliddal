@@ -307,9 +307,14 @@
 % Titel-Merker der leisen Fassung. Gefüllt wird er von der Fabrik, gesetzt vom
 % Gewicht-Regler weiter unten; hier stehen nur die Deklarationen, damit sie vor
 % beidem existieren.
+%
+% \ifZSF@boxQuiet trägt die Gewicht-Wahl. Sie steht schon fest, BEVOR die
+% Optionsliste läuft — die Fabrik liest sie in einem Vor-Lauf aus dem Aufruf
+% (siehe dort). Deshalb darf der Ton weiter unten sie bereits abfragen.
 \makeatletter
 \newcommand{\ZSF@boxTitleText}{}
 \newif\ifZSF@boxHasTitle
+\newif\ifZSF@boxQuiet
 \makeatother
 \newcommand{\ZSFBoxQuietTitle}{}
 % Die Eintritts-Sequenz jeder Box — an genau einer Stelle, aus benannten
@@ -415,15 +420,33 @@
 % Auch die Rahmenfarben sind reine Makros: Der Ton legt sie ab, aufgelöst
 % werden sie erst vom Rahmen-Resolver am Ende der Optionsliste. Dadurch ist es
 % gleichgültig, ob der Ton vor oder nach der Rahmenwahl steht.
+%
+% Die FLÄCHE nimmt der Ton nicht als einen Wert entgegen, sondern als beide:
+% die laute und die ruhige. Welche davon gesetzt wird, entscheidet die
+% Gewicht-Wahl, die zu diesem Zeitpunkt bereits feststeht.
+%
+% Warum nicht einfach `colback` und die leise Box überschreibt es? Weil
+% `colback` sofort per \colorlet aufgelöst wird und damit dem letzten
+% Schreiber gehört. Setzte der Ton die laute Fläche und das Gewicht danach
+% die ruhige, entschiede die Reihenfolge im Aufruf — und ein ausgeschriebenes
+% `tone=chapter` tönte eine leise Box, ein weggelassenes nicht. Derselbe
+% Aufruf mit und ohne Default sähe verschieden aus, ohne dass etwas meldet.
+% Hier trifft stattdessen jeder Ton beide Fälle und wählt selbst.
 \newcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}
 \newcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}
 \newcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}
 \newcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}
 \newcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardChapter}
+\makeatletter
+\tcbset{ZSF@toneSurface/.code 2 args={%
+  \ifZSF@boxQuiet\tcbset{colback=#2}\else\tcbset{colback=#1}\fi
+}}
+\makeatother
 \tcbset{
   tone/.is choice,
   tone/chapter/.style={
-    colback=\BoxBackColor, colbacktitle=\BoxTitleColor,
+    ZSF@toneSurface={\ZSFtoneLoudBackChapter}{\ZSFtoneQuietBackChapter},
+    colbacktitle=\BoxTitleColor,
     coltitle=\BoxTitleTextColor,
     /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}%
                  \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}%
@@ -431,7 +454,8 @@
                  \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}%
                  \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardChapter}}},
   tone/neutral/.style={
-    colback=StaticSubBoxBack, colbacktitle=StaticBoxTitleBack,
+    ZSF@toneSurface={\ZSFtoneLoudBackNeutral}{\ZSFtoneQuietBackNeutral},
+    colbacktitle=StaticBoxTitleBack,
     coltitle=StaticBoxTitleText,
     /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentNeutral}%
                  \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackNeutral}%
@@ -439,7 +463,8 @@
                  \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongNeutral}%
                  \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardNeutral}}},
   tone/warn/.style={
-    colback=\WarnboxBackColor, colbacktitle=\WarnboxTitleColor,
+    ZSF@toneSurface={\ZSFtoneLoudBackWarn}{\ZSFtoneQuietBackWarn},
+    colbacktitle=\WarnboxTitleColor,
     coltitle=\WarnboxTitleTextColor,
     /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentWarn}%
                  \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackWarn}%
@@ -494,10 +519,39 @@
 % ZSF@resolveframe steht bewusst als LETZTE Option: erst danach ist der Rahmen
 % aus Stärke und Ton zusammengesetzt, unabhängig davon, in welcher Reihenfolge
 % Preset und Aufrufer sie gewählt haben.
+%
+% Vor-Lauf für das Gewicht. `weight` ist der einzige Regler, der keinen WERT
+% wählt, sondern den BASISSTIL — und ein Basisstil bringt Vorbelegungen mit.
+% Stünde er wie die übrigen Regler in der Aufrufer-Liste, liefen seine
+% Vorbelegungen nach den Wahlen des Aufrufers und überschrieben sie. Genau das
+% war der Fall: `[tone=warn, weight=quiet]` verlor den Ton, `[frame=strong,
+% weight=quiet]` den Rahmen — stumm, weil beide Werte für sich gültig sind.
+%
+% Deshalb wird die Wahl hier vorab aus der Liste gelesen und die fertige Basis
+% VOR die Aufrufer-Optionen gesetzt. Danach gilt für jeden Regler dieselbe
+% Reihenfolge: Vorbelegung, dann Aufrufer. Dasselbe Muster liest \ZSFfig schon
+% für `width`/`height` aus seiner Optionsliste.
+%
+% .unknown verwirft hier alles andere — es wird gleich darauf in der echten
+% Optionsliste ausgewertet. Absolute Schlüsselpfade (/utils/exec) umgehen die
+% Familie und laufen im Vor-Lauf mit; in Kapiteln kommen sie nicht vor, und der
+% Linter meldet rohe tcolorbox-Eingriffe ohnehin.
+\pgfkeys{
+  /zsf/boxweight/.is family, /zsf/boxweight,
+  weight/.is choice,
+  weight/loud/.code ={\ZSF@boxQuietfalse},
+  weight/quiet/.code={\ZSF@boxQuiettrue},
+  .unknown/.code={},% chktex 26
+}
 \NewDocumentEnvironment{ZSF@box}{m m m}{%
   \renewcommand{\ZSF@boxTitleText}{#2}%
   \IfBlankTF{#2}{\ZSF@boxHasTitlefalse}{\ZSF@boxHasTitletrue}%
-  \begin{tcolorbox}[#1, zsftitle={#2}, #3, ZSF@resolveframe]%
+  % Zentraler Reset statt einer Zeile pro Basisstil: Sonst erbt eine Box, deren
+  % Stil den Merker nicht zurücksetzt, die Titelzeile der Box, in der sie steht.
+  \renewcommand{\ZSFBoxQuietTitle}{}%
+  \ZSF@boxQuietfalse
+  \pgfkeys{/zsf/boxweight, #3}%
+  \begin{tcolorbox}[#1, zsftitle={#2}, ZSF@weightBase, #3, ZSF@resolveframe]%
 }{%
   \end{tcolorbox}%
 }
@@ -541,19 +595,28 @@
     {\bfseries\color{\ZSFtoneAccent}\ZSF@boxTitleText}\par\vspace{\ZSFspaceXS}%
   \fi
 }
-% Das `colback` der leisen Fassung steht am Ende ihrer Optionsliste, damit es
-% die Titelbox-Fläche eines gewählten Tons ersetzt statt von ihr überschrieben
-% zu werden. Anders als beim Rahmen ist das hier richtig: Die ruhige Fläche IST
-% die Aussage von `weight=quiet` und soll den Flächenwert des Tons verdrängen,
-% während der Rahmen umgekehrt beides zusammenführen muss.
+% Die Basis der leisen Fassung. Sie wird von der Fabrik VOR den
+% Aufrufer-Optionen eingesetzt (Begründung dort), nicht mittendrin — deshalb
+% darf sie Vorbelegungen wie `frame=none` oder `padx=bar` mitbringen, ohne
+% eine Wahl des Aufrufers zu verwerfen.
+%
+% Die Fläche setzt sie bewusst NICHT selbst: Sie kommt vom Ton, der beide
+% Fassungen kennt und anhand des Gewichts wählt (siehe `ZSF@toneSurface`).
+% Täte sie es hier, wäre sie wieder ein Schreiber auf `colback` neben dem Ton
+% — und welcher gewinnt, hinge erneut an der Reihenfolge.
+\tcbset{ZSF@weightBase/.code={%
+  \ifZSF@boxQuiet
+    \tcbset{preset/quiet, notitle,
+            /utils/exec={\renewcommand{\ZSFBoxQuietTitle}{\ZSF@emitQuietTitle}}}%
+  \fi
+}}
+% Der Schlüssel selbst bleibt als No-op bestehen: Er steht weiterhin in der
+% Aufrufer-Liste, wo tcolorbox ihn sonst als unbekannt meldete. Gelesen wurde
+% er zu diesem Zeitpunkt längst — im Vor-Lauf der Fabrik.
 \tcbset{
   weight/.is choice,
-  weight/loud/.style ={
-    /utils/exec={\renewcommand{\ZSFBoxQuietTitle}{}}},
-  weight/quiet/.style={
-    preset/quiet, notitle,
-    /utils/exec={\renewcommand{\ZSFBoxQuietTitle}{\ZSF@emitQuietTitle}},
-    colback=\ZSFtoneQuietBack},
+  weight/loud/.code ={},
+  weight/quiet/.code={},
 }
 \makeatother
 
@@ -878,14 +941,35 @@
 \newcommand{\ZSF@listClose}{%
   \ifZSF@listOrdered\end{enumerate}\else\end{itemize}\fi % chktex 9
 }
-% Die rahmenlose Fassung hat keine Box, die die Optionen entgegennähme — ohne
-% das \tcbset fiele `ordered` oder eine Tonwahl dort stillschweigend unter den
-% Tisch. Eine Option, die je nach Titelargument wirkt oder nicht, ist eine
-% Falle; die Umgebung ist ohnehin eine Gruppe, das \tcbset endet also mit ihr.
+% Ohne Titel entsteht keine Box — und damit kein Träger für die Box-Regler.
+% `ordered` und `tone` wirken trotzdem, weil die Liste beide selbst liest
+% (Nummerierung; Farbe des Aufzählungszeichens). Jeder andere Regler hat hier
+% nichts, worauf er wirken könnte, und verschwand bisher stumm: `\tcbset`
+% nahm ihn entgegen, und niemand las ihn je wieder.
+%
+% Er wird deshalb gemeldet statt geschluckt. Ein Regler, der auf einer Box
+% wirkungslos ist, ohne dass etwas sagt, ist die teuerste Fehlerart des
+% Systems — teurer als ein fehlendes Feature, weil er die Vorhersagbarkeit
+% aller übrigen Regler mit entwertet (rules/02_ai_mandate → Randverhalten I).
+\pgfkeys{
+  /zsf/listplain/.is family, /zsf/listplain,
+  ordered/.code={\tcbset{ordered=#1}},
+  ordered/.default=true,
+  tone/.code={\tcbset{tone=#1}},
+  .unknown/.code={% chktex 26
+    \PackageError{ZSF}{%
+      Regler '\pgfkeyscurrentname' ist auf einer ZSFlist ohne Titel wirkungslos%
+    }{%
+      Ohne Titel hat die Liste keine Box, auf die ein Box-Regler wirken kann.
+      Entweder einen Titel setzen (dann gelten alle Box-Regler) oder die
+      Option weglassen. In dieser Form gelten nur: ordered, tone.%
+    }%
+  },
+}
 \NewDocumentEnvironment{ZSFlist}{O{} O{}}
   {\ZSF@listOrderedfalse
    \IfBlankTF{#1}%
-     {\ZSF@listBoxedfalse\tcbset{#2}\ZSF@listOpen{\ZSFspaceXS}}%
+     {\ZSF@listBoxedfalse\pgfkeys{/zsf/listplain, #2}\ZSF@listOpen{\ZSFspaceXS}}%
      {\ZSF@listBoxedtrue\begin{defbox}[#1][weight=quiet, #2]\ZSF@listOpen{0pt}}}
   {\ZSF@listClose\ifZSF@listBoxed\end{defbox}\fi} % chktex 9
 \makeatother
