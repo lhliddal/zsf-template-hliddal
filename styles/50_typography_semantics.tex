@@ -28,6 +28,31 @@
 \newcommand{\ZSFfontTable}{\normalsize}
 \newcommand{\ZSFfontTableDense}{\footnotesize}
 
+% ── Auszeichnungen INNERHALB der Bausteine ──
+% Vier Rollen, die vorher als rohes \bfseries bzw. \small in den Bausteinen
+% selbst standen. Als benannte Makros, weil sonst dieselbe Entscheidung an
+% mehreren Stellen liegt: Wer die Tabellenköpfe entfetten will, müsste sonst
+% 20_tables anfassen, wer die Listenmarken entfettet 60_boxes — und wer beides
+% konsistent halten will, müsste es wissen (rules/10_architecture → Gestaltung
+% an genau einem Ort).
+%
+% Kopfzelle einer ZSFtable (\ZSFhead).
+\newcommand{\ZSFfontTableHead}{\bfseries}
+% Marke einer ZSFlist und Beschriftung eines \ZSFsep-Blockwechsels — beide
+% sind dieselbe Rolle: eine kurze fette Beschriftung innerhalb eines Bausteins.
+\newcommand{\ZSFfontBlockLabel}{\bfseries}
+% Text, der per \textVorBox/\textNachBox an eine Box gebunden wird.
+\newcommand{\ZSFfontBoxBinding}{\small}
+% Inline-Pille für Stolperfallen (\ZSFdanger).
+\newcommand{\ZSFfontDangerTag}{\sffamily\bfseries}
+
+% Dezente Anmerkung — die EINE Quelle für Schrift und Farbe aller Anmerkungen
+% in und an einer Box: \formulanote, \ZSFformulaline, \ZSFfigcaption und die
+% Formelform von \textVorBox/\textNachBox. rules/20_boxes sagt zu, dass die
+% Anmerkungs-Makros sich in der Platzierung unterscheiden und nicht im Stil;
+% diese Zeile ist der Ort, an dem die Zusage eingelöst wird.
+\newcommand{\ZSFBoxNote}[1]{{\ZSFfontNote\color{MutedTextColor}#1}}
+
 % Beschriftung IN Diagrammen: TikZ-Knoten, Achsen-/Kurvenlabels und
 % Annotationen an Formelteilen. Ersetzt lokales \tiny/\scriptsize an
 % genau diesen Stellen — Diagramm-Inhalt ist Inhalt, seine Schriftgrösse

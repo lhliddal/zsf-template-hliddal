@@ -171,7 +171,7 @@
 
 % Kleinstes vertikales Innenmass für Text an einer Kante: Zeilenluft in
 % Tabellen (\extrarowheight in 70_document_settings) und die knappe Polsterung
-% von goalbox/valuegrid.
+% jeder Box mit `pady=tight` (leise Box, goalbox, valuegrid).
 \newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFDensityBoxes\ZSFspaceXS}
 
 % ── Horizontaler Innenabstand: eine Stellschraube für alle Inhaltsboxen ──
@@ -192,7 +192,6 @@
 % Beide als Register, damit der Abstand nach einer Box nicht pro Box-Stil
 % erneut ausgeschrieben wird.
 \newlength{\ZSFboxPadY}      \setlength{\ZSFboxPadY}{\ZSFDensityBoxes\ZSFspaceS}
-\newlength{\ZSFboxPadYTight} \setlength{\ZSFboxPadYTight}{\ZSFDensityBoxes\ZSFspaceXS}
 \newlength{\ZSFBoxAfterSkip} \setlength{\ZSFBoxAfterSkip}{\ZSFDensityBoxes\ZSFspaceS}
 
 % Balken haben ihren eigenen vertikalen Rhythmus — bewusst getrennt vom
@@ -273,12 +272,17 @@
 % wachsen. Gesetzt wird es von der formulabox.
 \newif\ifZSF@inFormulaBox
 % Text der zur Box DARUNTER gehört (Einleitung)
+%
+% Die Formelform geht über \ZSFBoxNote (50_typography_semantics) statt über
+% eigene Schrift und Farbe. rules/20_boxes sagt zu, dass sich \formulanote,
+% \ZSFformulaline und \textNachBox in der Platzierung unterscheiden und nicht
+% im Stil — mit einer zweiten Quelle war das nicht wahr, sondern nur beinahe.
 \newcommand{\textVorBox}[1]{%
   \ifZSF@inFormulaBox
     \par
     \begingroup
     \setlength{\parskip}{0pt}%
-    \noindent\raggedright\textcolor{MutedTextColor}{\textbf{#1}}\par
+    \noindent\raggedright\ZSFBoxNote{#1}\par
     \endgroup
     \vspace{\ZSFspaceXS}%
     \centering
@@ -287,7 +291,7 @@
     \addvspace{\ZSFspaceOuter}%
     \begingroup
     \setlength{\parskip}{0pt}%
-    {\small\color{TextVorBoxColor} \noindent #1\par}%
+    {\ZSFfontBoxBinding\color{TextVorBoxColor} \noindent #1\par}%
     \endgroup
     \nopagebreak
     \vspace{\ZSFspaceXS}%
@@ -303,7 +307,7 @@
     \vspace{\ZSFspaceXS}%
     \begingroup
     \setlength{\parskip}{0pt}%
-    \noindent\raggedright\textcolor{MutedTextColor}{\small #1}\par
+    \noindent\raggedright\ZSFBoxNote{#1}\par
     \endgroup
     \centering
   \else
@@ -313,7 +317,7 @@
     \begingroup
     \setlength{\parskip}{0pt}%
     \nopagebreak
-    {\small\color{TextNachBoxColor} \noindent #1\par}%
+    {\ZSFfontBoxBinding\color{TextNachBoxColor} \noindent #1\par}%
     \endgroup
     \addvspace{\ZSFspaceOuter}%
   \fi

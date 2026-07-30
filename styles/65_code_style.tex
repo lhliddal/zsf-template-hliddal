@@ -71,7 +71,7 @@
 % ------------------------------------------------------------
 \tcbset{preset/code/.style={
   zsftitlebox,
-  colback=\BoxPlainBackColor,
+  ZSF@surface=plain,
   pady=none,
 }}
 
@@ -92,14 +92,14 @@
 % Offene Kanten statt geschlossener Box: eine eigene Form, aber derselbe
 % Fluss-Vertrag wie jede andere Box (zsfbox). Die Skips sind der bewusste
 % Unterschied — die Teile müssen aneinanderstossen.
-% `frame=soft` ist hier Pflicht und nicht Kosmetik: Dieser Stil erbt von
-% `zsfbox` (Fluss) statt von `zsfboxshape` (Form) und bekommt die Rahmenwahl
-% deshalb nicht mit. Ohne die Zeile trüge ein Codebox-Teil die Wahl der
-% vorhergehenden Box weiter.
+% `frame=soft` und `ZSF@surface=plain` sind hier Pflicht und nicht Kosmetik:
+% Dieser Stil erbt von `zsfbox` (Fluss) statt von `zsfboxshape` (Form) und
+% bekommt die verzögert aufgelösten Wahlen deshalb nicht mit. Ohne die beiden
+% Zeilen trüge ein Codebox-Teil Rahmen und Fläche der vorhergehenden Box weiter.
 \tcbset{zsf@codebox@split@base/.style={
   zsfbox,
   unbreakable,
-  colback=\BoxPlainBackColor,
+  ZSF@surface=plain,
   frame=soft,
   leftrule=\ZSFboxRuleWidth, rightrule=\ZSFboxRuleWidth,
   toprule=0pt, bottomrule=0pt,
@@ -111,10 +111,19 @@
 }}
 % Die vier Kantenformen als Auswahl-Schlüssel. 'whole' ist der Default und
 % liefert die geschlossene Box; die drei anderen öffnen je eine Kante.
+%
+% `part` wählt wie `weight` keinen WERT, sondern einen BASISSTIL — und ein
+% Basisstil bringt Vorbelegungen mit (`padx=normal`, `pady=none`, Skips).
+% Stünde er wie die übrigen Regler in der Aufrufer-Liste, liefen diese
+% Vorbelegungen nach den Wahlen des Aufrufers und überschrieben sie:
+% `[padx=bar, part=first]` verlor den Innenabstand, `[part=first, padx=bar]`
+% behielt ihn — stumm, weil beide Werte für sich gültig sind. Deshalb liest
+% die Umgebung die Wahl unten im Vor-Lauf und setzt die fertige Basis VOR die
+% Aufrufer-Optionen, genau wie `ZSF@weightBase` in styles/60_boxes.tex.
 \tcbset{
-  part/.is choice,
-  part/whole/.style={preset/code},
-  part/first/.style={
+  ZSF@partBase/.is choice,
+  ZSF@partBase/whole/.style={preset/code},
+  ZSF@partBase/first/.style={
     zsf@codebox@split@base,
     toprule=\ZSFboxRuleWidth,
     arc=\ZSFboxArc, outer arc=\ZSFboxArc,
@@ -122,14 +131,36 @@
     before skip=\ZSFBoxBeforeSkip,
     zsftitlebar,
   },
-  part/mid/.style={zsf@codebox@split@base},
-  part/last/.style={
+  ZSF@partBase/mid/.style={zsf@codebox@split@base},
+  ZSF@partBase/last/.style={
     zsf@codebox@split@base,
     bottomrule=\ZSFboxRuleWidth,
     arc=\ZSFboxArc, outer arc=\ZSFboxArc,
     sharp corners=north,
     after skip=\ZSFspaceS,
   },
+  % Der öffentliche Schlüssel bleibt als No-op bestehen: Er steht weiterhin in
+  % der Aufrufer-Liste, wo tcolorbox ihn sonst als unbekannt meldete. Gelesen
+  % wurde er zu diesem Zeitpunkt längst.
+  part/.is choice,
+  part/whole/.code={},
+  part/first/.code={},
+  part/mid/.code={},
+  part/last/.code={},
 }
+\makeatletter
+\newcommand{\ZSF@codeBase}{ZSF@partBase=whole}
+\pgfkeys{
+  /zsf/codepart/.is family, /zsf/codepart,
+  part/.code={\renewcommand{\ZSF@codeBase}{ZSF@partBase=#1}},
+  .unknown/.code={},% chktex 26
+}
+% Öffnet die Box mit EXPANDIERTER Basis — ohne den Umweg landete der Makroname
+% selbst in der Optionsliste (dasselbe Muster wie \ZSF@figOpen in 60_boxes).
+\newcommand{\ZSF@codeOpen}[3]{\begin{ZSF@box}{#1}{#2}{#3}} % chktex 9
 \NewDocumentEnvironment{codebox}{O{} O{}}
-  {\begin{ZSF@box}{part=whole}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+  {\renewcommand{\ZSF@codeBase}{ZSF@partBase=whole}%
+   \pgfkeys{/zsf/codepart, #2}%
+   \expandafter\ZSF@codeOpen\expandafter{\ZSF@codeBase}{#1}{#2}}
+  {\end{ZSF@box}} % chktex 9
+\makeatother

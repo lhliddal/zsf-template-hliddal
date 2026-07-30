@@ -11,7 +11,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`, `\ZSFheaderRow`, `\ZSFhead` |
 | `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter` |
-| `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
+| `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
 | `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\ZSFsep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
 | `65_code_style.tex` | **OPT-IN** (Informatik): lädt `listings` samt tcolorbox-Library; Style `CodeExpert`, `codebox[Titel][part=…]` (whole/first/mid/last) |
@@ -151,6 +151,7 @@ Funktion bleibt über einen stabilen Baustein erreichbar:
 | `split ratio=…` | `split=…` (gilt jetzt auf jeder Box, nicht nur `splitbox`) |
 | `\ZSFfig[<Anteil>]`, `\ZSFfigside[<Anteil>]` | `\ZSFfig[width=…, height=…]`, `\ZSFfigside[width=…]` |
 | `\formulasep`, `\ZSFItemHeading` | `\ZSFsep` bzw. `\ZSFsep[Beschriftung]` |
+| `pady=quiet` | `pady=tight` — beide Werte ergaben dasselbe Mass; die Skala hat drei unterscheidbare Stufen, also drei Namen. `quiet` war zudem ein Gewichtswort neben `weight=quiet` mit anderer Bedeutung |
 
 Fach-Forks mit eigenen Style-Kopien sind davon nicht betroffen; sie behalten,
 was sie mitgebracht haben (siehe `rules/00_meta.md` → Verhältnis zu Forks).
@@ -159,12 +160,20 @@ was sie mitgebracht haben (siehe `rules/00_meta.md` → Verhältnis zu Forks).
 
 **Die Stabil-Liste oben ist abschliessend: Was dort nicht steht, ist intern** —
 unabhängig vom Namen. Das `ZSF@`-Präfix markiert nur einen Teil der Internas;
-viele heissen aus historischen Gründen schlicht `ZSF…` und sehen dadurch
-öffentlich aus. Beispiele für Internas ohne Präfix: die Farb-Tokens
-(`\BoxTitleColor`, `\SubsectionBarColor`, …), die Balken-Hooks
+viele heissen schlicht `ZSF…` und sehen dadurch öffentlich aus. Beispiele für
+Internas ohne Präfix: die Farb-Tokens (`\BoxTitleColor`, `\SubsectionBarColor`,
+`\ZSFtoneEmphasisBack*`, …), die Balken-Hooks
 (`\ZSFConsumeAfterSubsectionBar`, `\ZSFMarkAfterSubsectionBar`), die
-Spacing-Register (`\ZSFboxPadX`, `\ZSFbarPadY`, …) und die Schriftmakros
-(`\ZSFfontBoxTitle`, …).
+Spacing-Register (`\ZSFboxPadX`, `\ZSFbarPadY`, …), die Schrift- und
+Auszeichnungs-Hooks (`\ZSFfontBoxTitle`, `\ZSFfontTableHead`,
+`\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`,
+`\ZSFBoxNote`) und die Eintritts-Sequenzen (`\ZSFBoxSetup`, `\ZSFBoxEnter`).
+
+Die Auszeichnungs-Hooks sind die Antwort auf eine Prüffrage, die vorher mit
+Nein zu beantworten war: *Box-Titel, Tabellenkopf und Listenmarke gemeinsam
+entfetten — reicht eine Zeile je Rolle?* Vorher stand an jeder dieser Stellen
+ein rohes `\bfseries` im jeweiligen Baustein, und wer eine Rolle umstellte,
+erwischte die anderen nicht.
 
 Ebenfalls intern: die tcolorbox-Basisstile (`zsfbox`, `zsfboxshape`,
 `zsftitlebox`, `zsfbar`, `zsfvaluegridshell`, …) und die Environments
@@ -187,41 +196,72 @@ nur noch, worin sie sich wirklich unterscheidet:
 und `codebox` sind Ableitungen von `zsftitlebox`; `preset/quiet` (via
 `weight=quiet`) leitet von `zsfboxshape` ab und nimmt Rahmen und Ecken zurück.
 
-**Der `tone`-Regler hat zwei Landepunkte, nicht einen.** Ein Ton setzt die
-Schlüssel der Titelbox-Familie (`colbacktitle`, `colframe`, `coltitle`) und
-zusätzlich zwei Makros für die rahmenlose Familie: `\ZSFtoneAccent` (Balken,
-Titelzeile, Aufzählungszeichen) und `\ZSFtoneQuietBack` (Fläche). Welchen
-Landepunkt eine Box liest, entscheidet ihr Stil — dadurch genügt **ein**
-Regler, und die leise Box bleibt im Kapitelton trotzdem ungetönt. Die
-Farbtokens dazu stehen in `40_colors_structure` (`\ZSFtoneAccent*`,
-`\ZSFtoneLoudBack*`, `\ZSFtoneQuietBack*`).
+#### Die zwei Mechaniken, die die Reihenfolge-Zusage tragen
 
-**Die Fläche setzt der Ton nicht als einen Wert, sondern als beide** — laut und
-ruhig, über den Schlüssel `ZSF@toneSurface`. Welche davon gilt, entscheidet die
-Gewicht-Wahl, die zu diesem Zeitpunkt bereits feststeht. Grund ist dieselbe
-tcolorbox-Mechanik wie beim Rahmen: `colback` wird sofort per `\colorlet`
-aufgelöst und gehört damit dem letzten Schreiber. Setzten Ton und Gewicht es
-beide, entschiede die Reihenfolge im Aufruf — und ein ausgeschriebenes
-`tone=chapter` tönte eine leise Box, ein weggelassenes nicht.
+`rules/21_box_options.md` sagt zu, dass die Reihenfolge in der Optionsliste
+bedeutungslos ist. Diese Zusage hält nicht von selbst — sie steht auf zwei
+Mechaniken, die beide aus **einer** tcolorbox-Eigenschaft folgen: `colback`,
+`colbacktitle` und `colframe` werden beim Setzen der Option **sofort** per
+`\colorlet` aufgelöst und gehören damit dem letzten Schreiber. Wer eine dieser
+Farben früh in der Liste festlegt, verliert sie an jede spätere Option, die
+dieselbe Farbe schreibt.
 
-**`weight` wird von der Fabrik vorab gelesen, nicht in der Optionsliste
-ausgewertet.** Es ist der einzige Regler, der keinen Wert wählt, sondern den
-**Basisstil** — und ein Basisstil bringt Vorbelegungen mit (`padx=bar`,
-`frame=none`, `align=left`, …). Stünde er wie die übrigen Regler in der
-Aufrufer-Liste, liefen diese Vorbelegungen nach den Wahlen des Aufrufers und
-überschrieben sie: `[tone=warn, weight=quiet]` verlor den Ton,
-`[frame=strong, weight=quiet]` den Rahmen — beides stumm, weil jeder Wert für
-sich gültig ist. `ZSF@box` liest die Wahl deshalb per `pgfkeys`-Vorlauf aus dem
-Aufruf und setzt die fertige Basis (`ZSF@weightBase`) **vor** die
-Aufrufer-Optionen. Wer einen weiteren Regler dieser Art anlegt, macht es
-genauso. Geprüft wird das von `tests/check_box_options.sh`.
+**1 — Verzögerte Auflösung.** Ton, Rahmenstärke und Flächen-Rolle legen nur
+Makros ab; gesetzt werden die Farben von zwei Resolvern als **letzte** Optionen
+jeder Box (`ZSF@resolveframe`, `ZSF@resolvesurface`). Zu dem Zeitpunkt stehen
+alle Wahlen fest, gleichgültig wer sie getroffen hat.
 
-**Die Rahmenfarbe setzt der Ton direkt, obwohl es dafür auch Makros gibt.**
-Das ist keine Doppelung, sondern Folge der tcolorbox-Mechanik: `colframe` wird
-beim Setzen der Option sofort per `\colorlet` aufgelöst, nicht erst beim
-Zeichnen. Ein `colframe=\Makro` friert deshalb den Wert ein, den das Makro an
-dieser Stelle der Optionsliste hat. `\ZSFtoneAccent` funktioniert dagegen als
-reines Makro, weil `borderline` seine Farbe erst beim Zeichnen ausliest.
+- **Rahmen:** der Regler wählt die *Stärke*, der Ton die *Farbe*
+  (`\ZSFtoneFrameSoft/Strong/Hard`).
+- **Fläche:** der Baustein wählt die *Rolle*, der Ton die *Farbe*. Vier Rollen
+  über den internen Schlüssel `ZSF@surface`: `auto` (laut oder ruhig — das
+  Gewicht entscheidet), `plain` (ungetönt; Basis für Zebra, Gitterlinien,
+  Syntaxfarben), `quiet` (immer die ruhige Fläche) und `emphasis` (betont,
+  Formelbox). `ZSF@titlefill` beantwortet dieselbe Frage für die Kopfzeile:
+  `tone` gibt ihr den Titelbalken, `surface` setzt sie auf die Fläche der Box.
+- Die Farbtokens dazu stehen in `40_colors_structure`
+  (`\ZSFtoneAccent*`, `\ZSFtoneLoudBack*`, `\ZSFtoneQuietBack*`,
+  `\ZSFtoneEmphasisBack*`). **Jede Rolle muss in jedem Ton definiert sein**,
+  sonst fällt eine Kombination auf die Farbe eines fremden Tons zurück.
+- Ein Preset setzt `colback` deshalb **nie** direkt. Täte es das, verlöre es
+  die Fläche an jede spätere Tonwahl des Aufrufers — und ein ausgeschriebenes
+  `tone=chapter` sähe anders aus als ein weggelassenes, obwohl es dieselbe
+  Wahl ist. Genau das war auf `tablebox`, `goalbox`, `valuegrid`, `splitbox`
+  und `formulabox` der Fall.
+
+`\ZSFtoneAccent` braucht diese Behandlung **nicht**: `borderline` liest seine
+Farbe erst beim Zeichnen aus und funktioniert deshalb als reines Makro.
+
+**2 — Vor-Lauf für Regler, die einen Basisstil wählen.** `weight` und `part`
+wählen keinen *Wert*, sondern eine *Basis* — und eine Basis bringt
+Vorbelegungen mit (`padx=bar`, `frame=none`, Skips). Stünden sie wie die
+übrigen Regler in der Aufrufer-Liste, liefen ihre Vorbelegungen **nach** den
+Wahlen des Aufrufers und überschrieben sie: `[tone=warn, weight=quiet]` verlor
+den Ton, `[padx=bar, part=first]` den Innenabstand — stumm, weil jeder Wert
+für sich gültig ist. Beide werden deshalb per `pgfkeys`-Vorlauf aus dem Aufruf
+gelesen, und die fertige Basis (`ZSF@weightBase` in `60_boxes`,
+`ZSF@partBase` in `65_code_style`) steht **vor** den Aufrufer-Optionen. Der
+öffentliche Schlüssel bleibt daneben als No-op bestehen, damit tcolorbox ihn
+nicht als unbekannt meldet.
+
+**Wer einen weiteren Regler dieser Art anlegt, macht es genauso.** Ob er es
+getan hat, sagt `tests/check_box_options.sh` — der Test setzt jedes Reglerpaar
+auf jeder Box in beiden Reihenfolgen.
+
+#### Zwei Sequenzen beim Eintritt in eine Box
+
+`\ZSFBoxSetup` und `\ZSFBoxEnter` sehen aus wie eine Verdopplung, sind aber
+zwei verschiedene Häufigkeiten:
+
+| Makro | läuft | Inhalt |
+| --- | --- | --- |
+| `\ZSFBoxSetup` | in **jedem** Textblock der Box — auch in der unteren Hälfte des `split`-Reglers | Absatzabstand, Justierung, Kontext-Flag |
+| `\ZSFBoxEnter` | **einmal** beim Eintritt in die Box | `\ZSFBoxSetup` + Titelzeile der leisen Fassung |
+
+Ohne die Trennung setzte `[weight=quiet, split=…]` den Titel zweimal, einmal
+über jeder Hälfte. Das ist teurer als ein verworfener Regler: Es entsteht
+Inhalt, statt dass welcher verschwindet, und beide Hälften sehen für sich
+plausibel aus. `check_box_options.sh` prüft es deshalb im PDF-Text.
 
 Wer eine neue Box anlegt, erweitert eine dieser Schichten und zählt ihre
 Schlüssel **nicht** erneut auf (Begründung: `rules/10_architecture.md` → „Beim
@@ -241,7 +281,7 @@ deshalb nicht in der Token-Liste oben:
 | `tone` | alle Boxen | `chapter`, `neutral`, `warn` |
 | `weight` | alle Boxen mit Titel | `loud`, `quiet` |
 | `padx` | alle Boxen | `normal`, `bar`, `none` |
-| `pady` | alle Boxen | `normal`, `tight`, `quiet`, `none` |
+| `pady` | alle Boxen | `normal`, `tight`, `none` |
 | `align` | alle Boxen | `left`, `center` |
 | `frame` | alle Boxen | `soft`, `strong`, `hard`, `none` |
 | `atomic` | alle Boxen | Flag |
@@ -253,14 +293,21 @@ deshalb nicht in der Token-Liste oben:
 | `zebra` | `ZSFtable` | `true`, `false` |
 | `font` | `ZSFtable` | `normal`, `dense` |
 
-Diese Tabelle ist die Quelle für zwei Durchgänge von
-`check_showcase_coverage.sh`. **Durchgang 3:** Jeder Schlüssel muss in einer
-`rules/*.md` beschrieben sein — ein Regler, den nur diese Datei kennt,
-existiert für eine KI nicht. **Durchgang 4:** Jeder Wert ausser der
-Vorbelegung muss in `chapters/` an einer Box gesetzt sein; eine blosse
-Erwähnung im Titel-Tag oder im Fliesstext zählt nicht. Für Bausteine gilt seit
-Durchgang 1, dass Behaupten nicht genügt — für die Liste, die laut
-Entwicklungsrichtung **wachsen** soll, gilt es damit auch.
+Diese Tabelle ist die Quelle für **drei** Verifier-Durchgänge, je einer pro
+Zusage, die ein Eintrag hier abgibt:
+
+- **beschrieben** — `check_showcase_coverage.sh`, Durchgang 3: Jeder Schlüssel
+  muss in einer `rules/*.md` stehen. Ein Regler, den nur diese Datei kennt,
+  existiert für eine KI nicht.
+- **vorgeführt** — `check_showcase_coverage.sh`, Durchgang 4: Jeder Wert ausser
+  der Vorbelegung muss in `chapters/` an einer Box gesetzt sein; eine blosse
+  Erwähnung im Titel-Tag oder im Fliesstext zählt nicht.
+- **geprüft** — `check_box_options.sh`, Durchgang 4: Jeder Schlüssel muss dort
+  auch tatsächlich gesetzt und auf Reihenfolgefreiheit geprüft werden. Ohne
+  diesen Durchgang konnte ein Regler eingetragen, beschrieben und vorgeführt
+  werden, ohne je geprüft zu werden — zwei belegte Defekte kamen durch genau
+  diese Lücke. Der Durchgang läuft in beide Richtungen: Was geprüft wird und
+  hier fehlt, meldet er ebenfalls.
 
 Die Spaltenreihenfolge ist deshalb bindend: Spalte 1 der Schlüssel, Spalte 3
 die Werte mit der **Vorbelegung zuerst**. Ein neuer Regler wird hier

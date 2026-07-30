@@ -123,7 +123,6 @@
 \newcommand{\ZSFTitleHeader}[2]{%
   \ZSFBarPenalty{-500}%
   \begin{zsftitleheader}
-    \sffamily
     {\color{ZSFDocumentTitleTextColor}\ZSFfontTitleHeader #1\par}%
     \vspace{\ZSFspaceXS}%
     {\color{ZSFDocumentTitleBylineColor}\ZSFfontNote von~#2\par}%
@@ -271,10 +270,9 @@
   padx/bar/.style   ={left=\ZSFboxPadXBar, right=\ZSFboxPadX},
   padx/none/.style  ={left=0pt,            right=0pt},
   pady/.is choice,
-  pady/normal/.style={top=\ZSFboxPadY,      bottom=\ZSFboxPadY},
-  pady/tight/.style ={top=\ZSFtextMinPad,   bottom=\ZSFtextMinPad},
-  pady/quiet/.style ={top=\ZSFboxPadYTight, bottom=\ZSFboxPadYTight},
-  pady/none/.style  ={top=0pt,              bottom=0pt},
+  pady/normal/.style={top=\ZSFboxPadY,    bottom=\ZSFboxPadY},
+  pady/tight/.style ={top=\ZSFtextMinPad, bottom=\ZSFtextMinPad},
+  pady/none/.style  ={top=0pt,            bottom=0pt},
 }
 
 % Ausrichtung des Boxinhalts. Als Hook statt als direktem 'before upper',
@@ -318,9 +316,20 @@
 \makeatother
 \newcommand{\ZSFBoxQuietTitle}{}
 % Die Eintritts-Sequenz jeder Box — an genau einer Stelle, aus benannten
-% Teilen: Absatzabstand, Justierung, Kontext-Flag, Titelzeile der leisen
-% Fassung (leer, solange die Box eine echte Kopfzeile trägt).
-\newcommand{\ZSFBoxEnter}{\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext\ZSFBoxQuietTitle}
+% Teilen. Sie zerfällt in zwei Hälften, weil die Teile verschieden oft laufen:
+%
+%   \ZSFBoxSetup  Satzeinstellungen — gelten in JEDEM Textblock der Box und
+%                 laufen deshalb auch in der unteren Hälfte des split-Reglers.
+%   \ZSFBoxEnter  der Eintritt der Box als GANZES: Setup plus die Titelzeile
+%                 der leisen Fassung.
+%
+% Die Trennung ist kein Stil, sondern Inhaltsschutz: Liefe die Titelzeile in
+% derselben Sequenz wie die Satzeinstellungen, setzte `weight=quiet` zusammen
+% mit `split` den Titel zweimal — einmal über jeder Hälfte. Das ist schlimmer
+% als ein verworfener Regler, weil Inhalt entsteht statt zu verschwinden, und
+% es meldet sich nicht (rules/02_ai_mandate → Randverhalten I).
+\newcommand{\ZSFBoxSetup}{\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext}
+\newcommand{\ZSFBoxEnter}{\ZSFBoxSetup\ZSFBoxQuietTitle}
 
 % Rahmen — der Regler wählt die STÄRKE, die Farbe dazu kommt aus dem Ton.
 %
@@ -366,6 +375,58 @@
 }}
 \makeatother
 
+% Fläche — der Baustein wählt die ROLLE, die Farbe dazu kommt aus dem Ton.
+%
+% Wortgleich zum Rahmen darüber und aus demselben Grund: tcolorbox löst
+% `colback` und `colbacktitle` beim Setzen der Option sofort per \colorlet auf.
+% Beide gehören damit dem letzten Schreiber. Ein Preset, das seine Fläche
+% direkt setzt, verliert sie deshalb an jede spätere Tonwahl des Aufrufers —
+% und ein ausgeschriebenes `tone=chapter` sähe anders aus als ein
+% weggelassenes, obwohl es dieselbe Wahl ist. Verzögert aufgelöst stehen
+% Rolle und Ton beide fest, wenn der Resolver läuft; die Reihenfolge im
+% Aufruf ist dann bedeutungslos.
+%
+%   auto      laut oder ruhig — entscheidet das Gewicht (Default)
+%   plain     ungetönt; Basis für Zebra, Gitterlinien, Syntaxfarben
+%   quiet     immer die ruhige Fläche, unabhängig vom Gewicht
+%   emphasis  betont; für Boxen, deren Inhalt selbst die Aussage ist
+%
+% `ZSF@titlefill` beantwortet dieselbe Frage für die Kopfzeile: `tone` gibt
+% ihr den Titelbalken des Tons, `surface` setzt sie auf die Fläche der Box
+% (Formelbox — dort ist der Titel eine Zeile, kein Balken).
+\makeatletter
+\newcommand{\ZSF@surfaceRole}{auto}
+\newcommand{\ZSF@titleFillRole}{tone}
+\tcbset{
+  ZSF@surface/.is choice,
+  ZSF@surface/auto/.code    ={\renewcommand{\ZSF@surfaceRole}{auto}},
+  ZSF@surface/plain/.code   ={\renewcommand{\ZSF@surfaceRole}{plain}},
+  ZSF@surface/quiet/.code   ={\renewcommand{\ZSF@surfaceRole}{quiet}},
+  ZSF@surface/emphasis/.code={\renewcommand{\ZSF@surfaceRole}{emphasis}},
+  ZSF@titlefill/.is choice,
+  ZSF@titlefill/tone/.code   ={\renewcommand{\ZSF@titleFillRole}{tone}},
+  ZSF@titlefill/surface/.code={\renewcommand{\ZSF@titleFillRole}{surface}},
+}
+% Läuft als letzte Option jeder Box, direkt neben dem Rahmen-Resolver.
+% Erst die Rolle in eine Farbe übersetzen, dann setzen — so kann die Kopfzeile
+% dieselbe Farbe bekommen, ohne die Fallunterscheidung zu wiederholen.
+\newcommand{\ZSF@resolvedBack}{\ZSFtoneLoudBack}
+\tcbset{ZSF@resolvesurface/.code={%
+  \IfStrEqCase{\ZSF@surfaceRole}{%
+    {auto}    {\ifZSF@boxQuiet\renewcommand{\ZSF@resolvedBack}{\ZSFtoneQuietBack}%
+               \else\renewcommand{\ZSF@resolvedBack}{\ZSFtoneLoudBack}\fi}%
+    {plain}   {\renewcommand{\ZSF@resolvedBack}{\BoxPlainBackColor}}%
+    {quiet}   {\renewcommand{\ZSF@resolvedBack}{\ZSFtoneQuietBack}}%
+    {emphasis}{\renewcommand{\ZSF@resolvedBack}{\ZSFtoneEmphasisBack}}%
+  }%
+  \tcbset{colback=\ZSF@resolvedBack}%
+  \IfStrEqCase{\ZSF@titleFillRole}{%
+    {tone}   {}%
+    {surface}{\tcbset{colbacktitle=\ZSF@resolvedBack}}%
+  }%
+}}
+\makeatother
+
 % Atomar: bricht nie über eine Spaltengrenze, auch nicht im Pack-Modus.
 % Muss in der Optionsliste NACH dem Basisstil stehen — dorthin hängt
 % \ZSFBoxesBreakableOn sein 'breakable'. Als benannter Regler ist diese
@@ -376,9 +437,10 @@
 % Wer Rahmenstärke, Ecken oder Innenabstand des Systems ändern will, ändert
 % hier — und nur hier. padx/pady gehören dazu, damit \linewidth in jeder Box
 % identisch ist (sonst variierende Tabellen-Breiten je Box-Typ).
-% `frame=soft` steht hier, damit jede Box die Rahmenwahl zurücksetzt. Ohne
-% diese Zeile trüge eine Box die Wahl der vorhergehenden weiter, sobald sie
-% selbst keine trifft — der Regler merkt sich die Absicht ja in einem Makro.
+% `frame=soft`, `ZSF@surface=auto` und `ZSF@titlefill=tone` stehen hier, damit
+% jede Box die verzögert aufgelösten Wahlen zurücksetzt. Ohne diese Zeilen
+% trüge eine Box die Wahl der vorhergehenden weiter, sobald sie selbst keine
+% trifft — die Regler merken sich die Absicht ja in Makros.
 \tcbset{zsfboxshape/.style={
   zsfbox,
   breakable=false,
@@ -390,6 +452,8 @@
   padx=normal,
   pady=normal,
   frame=soft,
+  ZSF@surface=auto,
+  ZSF@titlefill=tone,
 }}
 
 % Farbton einer Box — der Regler, der neue Box-Varianten überflüssig macht
@@ -421,53 +485,50 @@
 % werden sie erst vom Rahmen-Resolver am Ende der Optionsliste. Dadurch ist es
 % gleichgültig, ob der Ton vor oder nach der Rahmenwahl steht.
 %
-% Die FLÄCHE nimmt der Ton nicht als einen Wert entgegen, sondern als beide:
-% die laute und die ruhige. Welche davon gesetzt wird, entscheidet die
-% Gewicht-Wahl, die zu diesem Zeitpunkt bereits feststeht.
+% Auch die FLÄCHEN legt der Ton nur als Makros ab — alle drei Rollen, laut,
+% ruhig und betont. Welche davon gilt, entscheidet der Flächen-Resolver oben
+% aus der Rolle des Bausteins und dem Gewicht. Der Ton schreibt `colback`
+% deshalb nie selbst; täte er es, gehörte die Fläche wieder dem letzten
+% Schreiber und ein Preset könnte sie nicht mehr vorbelegen.
 %
-% Warum nicht einfach `colback` und die leise Box überschreibt es? Weil
-% `colback` sofort per \colorlet aufgelöst wird und damit dem letzten
-% Schreiber gehört. Setzte der Ton die laute Fläche und das Gewicht danach
-% die ruhige, entschiede die Reihenfolge im Aufruf — und ein ausgeschriebenes
-% `tone=chapter` tönte eine leise Box, ein weggelassenes nicht. Derselbe
-% Aufruf mit und ohne Default sähe verschieden aus, ohne dass etwas meldet.
-% Hier trifft stattdessen jeder Ton beide Fälle und wählt selbst.
+% Der Titelbalken ist die einzige Farbe, die der Ton direkt setzt: Er hat
+% keine Rollen, sondern gehört immer dem Ton.
 \newcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}
+\newcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackChapter}
 \newcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}
+\newcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackChapter}
 \newcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}
 \newcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}
 \newcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardChapter}
-\makeatletter
-\tcbset{ZSF@toneSurface/.code 2 args={%
-  \ifZSF@boxQuiet\tcbset{colback=#2}\else\tcbset{colback=#1}\fi
-}}
-\makeatother
 \tcbset{
   tone/.is choice,
   tone/chapter/.style={
-    ZSF@toneSurface={\ZSFtoneLoudBackChapter}{\ZSFtoneQuietBackChapter},
     colbacktitle=\BoxTitleColor,
     coltitle=\BoxTitleTextColor,
     /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}%
+                 \renewcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackChapter}%
                  \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}%
+                 \renewcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackChapter}%
                  \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}%
                  \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}%
                  \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardChapter}}},
   tone/neutral/.style={
-    ZSF@toneSurface={\ZSFtoneLoudBackNeutral}{\ZSFtoneQuietBackNeutral},
     colbacktitle=StaticBoxTitleBack,
     coltitle=StaticBoxTitleText,
     /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentNeutral}%
+                 \renewcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackNeutral}%
                  \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackNeutral}%
+                 \renewcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackNeutral}%
                  \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftNeutral}%
                  \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongNeutral}%
                  \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardNeutral}}},
   tone/warn/.style={
-    ZSF@toneSurface={\ZSFtoneLoudBackWarn}{\ZSFtoneQuietBackWarn},
     colbacktitle=\WarnboxTitleColor,
     coltitle=\WarnboxTitleTextColor,
     /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentWarn}%
+                 \renewcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackWarn}%
                  \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackWarn}%
+                 \renewcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackWarn}%
                  \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftWarn}%
                  \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongWarn}%
                  \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardWarn}}},
@@ -516,9 +577,10 @@
 % Ein Regler, der auf einer Box Inhalt verliert, ist schlimmer als einer, der
 % dort gar nicht gilt (rules/02_ai_mandate → gleiche Sache, gleiche Bedienung).
 %
-% ZSF@resolveframe steht bewusst als LETZTE Option: erst danach ist der Rahmen
-% aus Stärke und Ton zusammengesetzt, unabhängig davon, in welcher Reihenfolge
-% Preset und Aufrufer sie gewählt haben.
+% ZSF@resolveframe und ZSF@resolvesurface stehen bewusst als LETZTE Optionen:
+% erst danach sind Rahmen und Fläche aus Rolle bzw. Stärke und Ton
+% zusammengesetzt, unabhängig davon, in welcher Reihenfolge Preset und
+% Aufrufer sie gewählt haben.
 %
 % Vor-Lauf für das Gewicht. `weight` ist der einzige Regler, der keinen WERT
 % wählt, sondern den BASISSTIL — und ein Basisstil bringt Vorbelegungen mit.
@@ -551,7 +613,8 @@
   \renewcommand{\ZSFBoxQuietTitle}{}%
   \ZSF@boxQuietfalse
   \pgfkeys{/zsf/boxweight, #3}%
-  \begin{tcolorbox}[#1, zsftitle={#2}, ZSF@weightBase, #3, ZSF@resolveframe]%
+  \begin{tcolorbox}[#1, zsftitle={#2}, ZSF@weightBase, #3,
+                    ZSF@resolveframe, ZSF@resolvesurface]%
 }{%
   \end{tcolorbox}%
 }
@@ -567,9 +630,10 @@
 
 % Tabelle: Hintergrund bis an die Kante, damit das Zebra nicht kurz vor dem
 % Rahmen endet. 'clip upper' schneidet die Streifen an der Rundung ab.
+% Die Fläche bleibt ungetönt, weil das Zebra sie als Basis braucht.
 \tcbset{preset/table/.style={
   zsftitlebox,
-  colback=\BoxPlainBackColor,
+  ZSF@surface=plain,
   padx=none, pady=none,
   bodyparskip=inherit,
   clip upper,
@@ -590,9 +654,13 @@
 % Titeltext liefert die Fabrik (siehe dort), deshalb gilt der Regler auf JEDER
 % Box und nicht nur auf der defbox.
 \makeatletter
+% Die Titelschrift kommt aus demselben Makro wie die der Kopfzeile
+% (\ZSFfontBoxTitle in zsftitlebar). Ein eigenes \bfseries hier hiesse: wer
+% die Box-Titel umstellt, erwischt die leise Fassung nicht — und sieht es
+% nicht, weil beide für sich plausibel aussehen.
 \newcommand{\ZSF@emitQuietTitle}{%
   \ifZSF@boxHasTitle
-    {\bfseries\color{\ZSFtoneAccent}\ZSF@boxTitleText}\par\vspace{\ZSFspaceXS}%
+    {\ZSFfontBoxTitle\color{\ZSFtoneAccent}\ZSF@boxTitleText}\par\vspace{\ZSFspaceXS}%
   \fi
 }
 % Die Basis der leisen Fassung. Sie wird von der Fabrik VOR den
@@ -660,8 +728,8 @@
 \tcbset{preset/formula/.style={
   zsftitlebox,
   align=center,
-  colback=\FormulaboxBackColor,
-  colbacktitle=\FormulaboxBackColor,
+  ZSF@surface=emphasis,
+  ZSF@titlefill=surface,
   frame=hard,
   lefttitle=\ZSFboxPadX,
   righttitle=\ZSFboxPadX,
@@ -679,7 +747,8 @@
 % ------------------------------------------------------------
 % Alles, was zwischen den Inhalt einer Box geschoben wird, besteht aus höchstens
 % drei Gesten: ein Einschub (\ZSFInterlude, 30_layout_spacing), eine Trennlinie
-% und eine dezente Anmerkung. Die beiden letzten stehen hier je EINMAL.
+% und eine dezente Anmerkung (\ZSFBoxNote, 50_typography_semantics — sie ist
+% eine Schriftrolle und steht deshalb bei den übrigen). Hier steht die Linie.
 %
 % Der Grund ist nicht Kürze, sondern Drift: Zieht jedes Element seine eigene
 % Linie und setzt seine eigene Notenschrift, genügt ein vergessener Farbtoken,
@@ -688,7 +757,6 @@
 \newcommand{\ZSFBoxRule}{%
   \noindent\textcolor{FormulaSeparatorColor}{\rule{\linewidth}{\ZSFboxRuleWidth}}%
 }
-\newcommand{\ZSFBoxNote}[1]{{\ZSFfontNote\color{MutedTextColor}#1}}
 
 % \ZSFsep[<Beschriftung>] — Blockwechsel innerhalb einer Box.
 %
@@ -699,7 +767,7 @@
 % die es Optionen gibt (rules/02_ai_mandate → Reglertest).
 \NewDocumentCommand{\ZSFsep}{o}{%
   \ZSFInterlude{\ZSFspaceSep}%
-  \IfValueT{#1}{{\centering\textbf{#1}\par}\ZSFInterlude{\ZSFspaceS}}%
+  \IfValueT{#1}{{\centering\ZSFfontBlockLabel #1\par}\ZSFInterlude{\ZSFspaceS}}%
   \ZSFBoxRule
   \ZSFInterlude{\ZSFspaceSep}%
   \penalty-50%
@@ -849,18 +917,22 @@
 % auf JEDER Box gültig: \begin{defbox}[Titel][split=0.34] ergibt einen
 % zweispaltigen Block MIT Kopfzeile. Der Wert ist der Anteil der linken Hälfte.
 %
-% Der Regler bringt die Eintritts-Sequenz der UNTEREN Hälfte selbst mit, weil
+% Der Regler bringt die Satzeinstellungen der UNTEREN Hälfte selbst mit, weil
 % erst er sie entstehen lässt. Stünde sie stattdessen bei den Boxen, müsste
 % jede einzelne daran denken — und wer es vergisst, bekommt eine rechte Hälfte
 % ohne Flattersatz und ohne Absatzabstand, während die linke beides hat. Das
 % sieht man an einem kurzen Text nicht (rules/02_ai_mandate → Randverhalten I).
+%
+% \ZSFBoxSetup und nicht \ZSFBoxEnter: Die untere Hälfte braucht die
+% Satzeinstellungen, aber nicht die Titelzeile — die gehört der Box, nicht
+% ihren Hälften (Begründung bei den beiden Makros).
 \tcbset{split/.style={
   sidebyside,
   sidebyside align=top,
   sidebyside gap=\ZSFspaceM,
   lower separated=false,
   lefthand width=#1\linewidth,
-  before lower={\ZSFBoxEnter},
+  before lower={\ZSFBoxSetup},
 }}
 % splitbox ist das rahmenlose, titellose Preset dieses Reglers — der mit
 % Abstand häufigste Fall, deshalb ein eigener Name statt vier Optionen.
@@ -877,7 +949,7 @@
   bodyparskip=inherit,
   frame=none,
   padx=none, pady=none,
-  colback=\ZSFtoneQuietBack,
+  ZSF@surface=quiet,
   split=0.3,
   before upper={\ZSFBoxEnter},
 }}
@@ -902,7 +974,7 @@
   bodyparskip=inherit,
   frame=none,
   borderline west={\ZSFstatementBarWidth}{0pt}{\ZSFtoneAccent},
-  padx=bar, pady=quiet,
+  padx=bar, pady=tight,
   /utils/exec={\renewcommand{\ZSFBoxContext}{}},
   before upper={\ZSFBoxEnter},
 }}
@@ -978,7 +1050,11 @@
 \makeatletter
 \newcommand{\ZSFItem}[2]{%
   \item
-  \ifZSF@listOrdered{\bfseries #1}\\[\ZSFlistMarkGap]#2\else\textbf{#1}\,---\,#2\fi
+  \ifZSF@listOrdered
+    {\ZSFfontBlockLabel #1}\\[\ZSFlistMarkGap]#2%
+  \else
+    {\ZSFfontBlockLabel #1}\,---\,#2%
+  \fi
 }
 \makeatother
 
@@ -993,7 +1069,7 @@
   align=center,
   pady=tight,
   frame=strong,
-  colback=\BoxPlainBackColor,
+  ZSF@surface=plain,
   after upper={\par},
   atomic,
 }}
@@ -1041,7 +1117,7 @@
   on line, boxsep=\ZSFspaceXS,
   left=\ZSFspaceS, right=\ZSFspaceS, top=\ZSFspaceXS, bottom=\ZSFspaceXS,
   boxrule=0pt, arc=\ZSFboxArc,
-  fontupper=\sffamily\bfseries
+  fontupper=\ZSFfontDangerTag
 }
 
 % ------------------------------------------------------------
@@ -1052,7 +1128,7 @@
 \tcbset{preset/valuegrid/.style={
   zsftitlebox,
   padx=none, pady=tight,
-  colback=\BoxPlainBackColor,
+  ZSF@surface=plain,
   frame=strong,
   atomic,
 }}

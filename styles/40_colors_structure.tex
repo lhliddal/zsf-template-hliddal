@@ -108,6 +108,12 @@
 \definecolor{StaticBoxTitleText}{HTML}{0F172A}
 \definecolor{StaticSubBoxBack}{HTML}{F8FAFC}
 \definecolor{StaticSubBoxBorder}{HTML}{CBD5E1}
+% Betonte Fläche des neutralen und des Warn-Tons — die Gegenstücke zu
+% \FormulaboxBackColor im Kapitelton. Jede Flächen-Rolle muss in jedem Ton
+% definiert sein, sonst faellt eine Kombination auf die Farbe eines fremden
+% Tons zurueck (dieselbe Begruendung wie bei den drei Rahmenstaerken unten).
+\colorlet{StaticEmphasisBack}{StaticBoxTitleBack!40}
+\colorlet{WarnboxEmphasisBack}{ETHRot!22}
 \colorlet{FormulaSeparatorColor}{black!30}
 \colorlet{MutedTextColor}{black!60}
 \colorlet{IdentityMarkerColor}{black!10}
@@ -172,12 +178,13 @@
 \newcommand{\ZSFtoneAccentNeutral}{StaticBoxTitleText}
 \newcommand{\ZSFtoneAccentWarn}{ETHRot}
 
-% Laute Fläche: die Füllung einer Box mit Kopfzeile. Gegenstück zur ruhigen
-% Fläche unten, und aus demselben Grund ein benannter Token: Der Ton muss
-% BEIDE Flächen anbieten, damit `weight` zwischen ihnen wählen kann, ohne
-% dass eine der beiden Fassungen einen eigenen Farbgriff mitbringt. Stünde
-% nur die laute hier, müsste die leise ihre Fläche selbst setzen — und täte
-% das zwangsläufig an einer anderen Stelle der Optionsliste als der Ton.
+% ── Die drei Flächen-Rollen eines Tons ──
+% Eine Box waehlt die ROLLE ihrer Flaeche, der Ton liefert die FARBE dazu —
+% genau wie bei den drei Rahmenstaerken darunter. Deshalb muss jede Rolle in
+% jedem Ton definiert sein: Eine fehlende Kombination faellt sonst auf die
+% Farbe eines fremden Tons zurueck.
+%
+% Laute Fläche: die Füllung einer Box mit Kopfzeile.
 \newcommand{\ZSFtoneLoudBackChapter}{\BoxBackColor}
 \newcommand{\ZSFtoneLoudBackNeutral}{StaticSubBoxBack}
 \newcommand{\ZSFtoneLoudBackWarn}{\WarnboxBackColor}
@@ -189,6 +196,18 @@
 \newcommand{\ZSFtoneQuietBackChapter}{\BoxPlainBackColor}
 \newcommand{\ZSFtoneQuietBackNeutral}{StaticSubBoxBack}
 \newcommand{\ZSFtoneQuietBackWarn}{\WarnboxBackColor}
+
+% Betonte Fläche: kräftiger als die laute, für Boxen, deren Inhalt selbst die
+% Aussage ist (Formelbox). In jedem Ton eine Stufe über der lauten Fläche.
+\newcommand{\ZSFtoneEmphasisBackChapter}{\FormulaboxBackColor}
+\newcommand{\ZSFtoneEmphasisBackNeutral}{StaticEmphasisBack}
+\newcommand{\ZSFtoneEmphasisBackWarn}{WarnboxEmphasisBack}
+
+% Ungetönte Fläche (Rolle `plain`): bewusst OHNE Ton-Varianten. Sie ist die
+% Abwesenheit einer Tönung und trägt in jedem Ton dieselbe Farbe — eine
+% getönte Plain-Fläche wäre ein Widerspruch. Tabelle, Wertegitter, Zielkette
+% und Codebox brauchen sie als neutrale Basis, auf der Zebra, Gitterlinien
+% und Syntaxfarben lesbar bleiben. Der Token dafür ist \BoxPlainBackColor.
 
 % Rahmenfarbe in drei Stärken — der Regler `frame` wählt zwischen ihnen.
 % `soft` begrenzt die Box nur, `strong` grenzt sie gegen die Umgebung ab
