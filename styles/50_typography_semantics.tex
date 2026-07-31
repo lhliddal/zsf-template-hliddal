@@ -96,17 +96,26 @@
 % der zwei Dinge heisst, verliert seine Aussage (rules/25_structure_markers).
 \newcommand{\ZSFlabel}[1]{\ZSFlabelStyle{#1}}
 
-% Die beiden Darstellungs-Hooks der Marker. Sie sind absichtlich getrennt und
-% absichtlich gleich vorbelegt:
-%   getrennt, weil \ZSFkeyword und \ZSFlabel verschiedene Dinge bedeuten und
-%     eine ZSF den Unterschied sichtbar machen können soll, ohne ein einziges
-%     Kapitel anzufassen;
-%   gleich vorbelegt, weil die Template-Referenz keine Gestaltungsentscheidung
-%     vorwegnimmt, die niemand getroffen hat.
-% Wer den Scan-Anker abheben will (er ist laut rules/25_structure_markers der PRIMÄRE
-% Anker, sieht aber heute aus wie jede andere Fettung), ändert genau diese
-% eine Zeile — pro ZSF in preamble.tex per \renewcommand, nie im Kapitel.
-\newcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
+% Die beiden Darstellungs-Hooks der Marker — getrennt, weil \ZSFkeyword und
+% \ZSFlabel verschiedene Dinge bedeuten und eine ZSF den Unterschied ändern
+% können soll, ohne ein einziges Kapitel anzufassen.
+%
+% VERSCHIEDEN vorbelegt, und das ist der Punkt: \ZSFkeyword ist laut
+% rules/25_structure_markers der PRIMÄRE Scan-Anker, \ZSFlabel ausdrücklich
+% keiner. Rendern beide fett, ist der wichtigste Anker der ZSF von jeder
+% beliebigen Beschriftung nicht zu unterscheiden — und Auffindbarkeit unter
+% Zeitdruck ist das oberste Ziel (rules/00_meta).
+%
+% Warum ausgerechnet die Kapitelfarbe: Die anderen billigen Signale sind
+% vergeben — fett+unterstrichen ist \ZSFhl, die rote Pille \ZSFdanger, der
+% Pfeil \ZSFconclusion. Die Farbe ist frei und trägt im System bereits die
+% Bedeutung »dieses Kapitel« (Balken, Akzente, Verweis-Locator); der Anker
+% fügt damit keine neue Farbdimension hinzu, sondern nutzt die vorhandene.
+%
+% \chaptercolor statt eines eigenen Tokens, damit der Anker der Kapitelrotation
+% folgt wie jedes andere farbtragende Element. Umstellen pro ZSF in
+% preamble.tex per \renewcommand, nie im Kapitel.
+\newcommand{\ZSFkeywordStyle}[1]{\textbf{\textcolor{\chaptercolor}{#1}}}
 \newcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
 \newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\ZSFfontBoxBinding (S.#1)}}

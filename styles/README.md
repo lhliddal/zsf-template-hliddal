@@ -13,7 +13,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
-| `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\ZSFsep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
+| `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxcontract` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`/`splitalign`/`grid`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\ZSFsep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
 | `65_code_style.tex` | **OPT-IN** (Informatik): lädt `listings` samt tcolorbox-Library; Style `CodeExpert`, `codebox[Titel][part=…]` (whole/first/mid/last) |
 | `66_index.tex` | **OPT-IN**: lädt `makeidx`; Stichwortverzeichnis mit `\ZSFkeyword`-Auto-Indexierung, `\ZSFindex`/`\ZSFindexsee`, `x.x`-/`x.x.x`-Locator und `zsfindex.ist` |
 | `67_code_comments.tex` | **OPT-IN** (Informatik, nach 65): Smart Code-Kommentare `\CodeLine{code}[comment]`, `\InlineComment`/`\OverlineComment` |
@@ -183,18 +183,31 @@ Kapitel dürfen sich auf nichts davon stützen. Style-Module dürfen und sollen 
 
 ### Der Box-Grundvertrag (für Style-Autoren)
 
-Jede Inhaltsbox steht auf **drei** Schichten in `60_boxes.tex` und setzt danach
+Jede Inhaltsbox steht auf **vier** Schichten in `60_boxes.tex` und setzt danach
 nur noch, worin sie sich wirklich unterscheidet:
 
 | Schicht | Verantwortung |
 | --- | --- |
 | `zsfbox` | Fluss — Skips (`\ZSFBoxBeforeSkip`/`\ZSFBoxAfterSkip`) und Eintritts-Hook (Balken-Bindung). Auch rahmenlose Boxen laufen hierüber. |
-| `zsfboxshape` | Form — Rahmenstärke, Ecken, `boxsep`, Innenabstand, `breakable`. **Die eine Stelle für die Geometrie aller Boxen.** |
-| `zsftitlebox` | Titelbox — Farbtokens, Titelbalken (`zsftitlebar`), Lesbarkeit. |
+| `zsfboxcontract` | Vertrag — Ton, Justierung, Absatzabstand, Eintritts-Sequenz, Hook-Reset und das Zurücksetzen der verzögert aufgelösten Wahlen (`frame`, `ZSF@surface`, `ZSF@titlefill`, `splitalign`). Gilt auch für Boxen mit eigener Form. |
+| `zsfboxshape` | Form — Rahmenstärke, Ecken, `boxsep`, Innenabstand, `breakable`. **Die eine Stelle für die Geometrie geschlossener Boxen.** |
+| `zsftitlebox` | Titelbox — Form plus Titelbalken (`zsftitlebar`). Zwei Zeilen, mehr ist sie nicht. |
 
 `defbox`, `tablebox`, `figbox`, `warnbox`, `formulabox`, `goalbox`, `valuegrid`
 und `codebox` sind Ableitungen von `zsftitlebox`; `preset/quiet` (via
-`weight=quiet`) leitet von `zsfboxshape` ab und nimmt Rahmen und Ecken zurück.
+`weight=quiet`) und `preset/split` leiten von `zsfboxshape` ab und nehmen Rahmen
+und Ecken zurück.
+
+**Warum der Vertrag eine eigene Schicht ist.** Drei Stile bestimmen ihre Form
+selbst und können deshalb nicht von `zsfboxshape` erben: `preset/quiet`,
+`preset/split` und die offenen Kanten der `codebox`
+(`zsf@codebox@split@base` in `65_code_style`). Sie zählten den halben Vertrag
+jeweils erneut auf — und jede dieser Zeilen war irgendwann in einem der drei
+vergessen worden, jedes Mal stumm (grauer Titelbalken statt Kapitelfarbe;
+`align` und `bodyparskip` gemerkt, aber nie ausgeführt). Die Prüffrage
+*„Titelbalken aller Boxen entfetten — reicht eine Zeile?"* war hier als
+einziger Stelle im System mit Nein zu beantworten. Wer eine Box mit eigener
+Form anlegt, erweitert deshalb `zsfboxcontract` und schreibt ihn nicht ab.
 
 #### Die zwei Mechaniken, die die Reihenfolge-Zusage tragen
 
@@ -286,7 +299,9 @@ deshalb nicht in der Token-Liste oben:
 | `frame` | alle Boxen | `soft`, `strong`, `hard`, `none` |
 | `atomic` | alle Boxen | Flag |
 | `split` | alle Boxen | Anteil der linken Hälfte |
+| `splitalign` | alle Boxen | `top`, `center`, `bottom` |
 | `ordered` | `ZSFlist` | Flag |
+| `grid` | `valuegrid` | `both`, `horizontal`, `none` |
 | `bodyparskip` | alle Boxen | `box` (eigener Absatzabstand), `inherit` (Dokumentwert) |
 | `part` | `codebox` | `whole`, `first`, `mid`, `last` |
 | `header` | `ZSFtable` | `true`, `false` |
@@ -314,9 +329,26 @@ die Werte mit der **Vorbelegung zuerst**. Ein neuer Regler wird hier
 eingetragen, in einer `rules/*.md` beschrieben und in `chapters/` vorgeführt —
 sonst bricht `make check`.
 
-Darüber hinaus ist jeder tcolorbox-Schlüssel erlaubt (`breakable`,
-`sidebyside align=center`, …) — das zweite optionale Argument wird
-unverändert an tcolorbox durchgereicht.
+Darüber hinaus sind tcolorbox' eigene Schlüssel erlaubt (`breakable`, …) — das
+zweite optionale Argument geht an tcolorbox weiter.
+
+**Box-spezifische Regler gelten nur auf ihrer Box.** `ordered` (`ZSFlist`),
+`grid` (`valuegrid`) und `part` (`codebox`) wurden auf jeder anderen Box
+klaglos entgegengenommen und nie wieder gelesen. Welche Box welchen Regler
+besitzt, sagt sie der Fabrik über `\ZSF@boxOwnKnobs`, bevor sie sie ruft; der
+Vor-Lauf weist alles andere mit einer Meldung ab. Zurückgesetzt wird der Besitz
+direkt nach dem Vor-Lauf, damit eine verschachtelte Box ihn nicht erbt.
+Geprüft in `check_box_options.sh`, Durchgang 9.
+
+**Vier Farbschlüssel sind ausgenommen und werden abgewiesen:** `colback`,
+`colframe`, `colbacktitle`, `coltitle`. Die beiden Resolver am Listenende
+setzen sie ohnehin neu, ein Wert aus dem Aufruf ginge also verloren — bis
+hierher stillschweigend, und `colbacktitle` je nach Box mal so und mal nicht
+(`defbox`: wirkte, `formulabox`: verworfen). Abgefangen werden sie im Vor-Lauf
+der Fabrik (`/zsf/boxpre`), weil das die einzige Stelle ist, an der die
+Aufrufer-Liste als Ganzes sichtbar ist — ein `colback/.code` im globalen
+`\tcbset` träfe die Resolver selbst. Die Meldung nennt den zuständigen Regler.
+Geprüft in `check_box_options.sh`, Durchgang 7.
 
 Drei Boxen erzwingen ihr Umbruchverhalten mit dem Regler `atomic` **nach**
 `zsftitlebox` (`figbox`, `goalbox`, `valuegrid`), damit der Pack-Modus

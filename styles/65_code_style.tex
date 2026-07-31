@@ -89,27 +89,25 @@
 % Die Teile sind visuell zusammenhängend, physisch getrennt — dazwischen darf
 % die Spalte umbrechen. Titel trägt nur der erste Teil.
 % ------------------------------------------------------------
-% Offene Kanten statt geschlossener Box: eine eigene Form, aber derselbe
-% Fluss-Vertrag wie jede andere Box (zsfbox). Die Skips sind der bewusste
-% Unterschied — die Teile müssen aneinanderstossen.
-% `frame=soft` und `ZSF@surface=plain` sind hier Pflicht und nicht Kosmetik:
-% Dieser Stil erbt von `zsfbox` (Fluss) statt von `zsfboxshape` (Form) und
-% bekommt die verzögert aufgelösten Wahlen deshalb nicht mit. Ohne die beiden
-% Zeilen trüge ein Codebox-Teil Rahmen und Fläche der vorhergehenden Box weiter.
-% Weil dieser Stil von `zsfbox` (Fluss) statt von `zsftitlebox` erbt, bringt er
-% keinen der dortigen Vertragsteile mit. Die vier folgenden Zeilen holen sie
-% nach; ohne sie bleibt der Titelbalken im tcolorbox-Grau statt in der
-% Kapitelfarbe, und `align` wie `bodyparskip` merken sich zwar ihre Wahl,
-% werden aber nie ausgeführt — beides stumm.
+% Offene Kanten statt geschlossener Box: eine eigene FORM, aber derselbe
+% Vertrag wie jede andere Box. Die Skips sind der bewusste Unterschied — die
+% Teile müssen aneinanderstossen.
+%
+% Genau deshalb `zsfboxcontract` und nicht `zsfboxshape`: Der Vertrag (Ton,
+% Justierung, Absatzabstand, Eintritts-Sequenz, Reset der verzögert
+% aufgelösten Wahlen) gilt auch für eine Box, die ihre Kanten selbst zeichnet —
+% die Form gilt nicht. Wer ihn hier stattdessen abschreibt, lässt früher oder
+% später eine Zeile aus, und die Auslassung meldet sich nicht: ein grauer
+% Titelbalken statt der Kapitelfarbe sieht für sich plausibel aus.
+%
+% `ZSF@surface=plain` und `bodyparskip=inherit` sind keine nachgeholten
+% Vertragsteile, sondern echte Abweichungen: Code braucht die ungetönte Fläche,
+% auf der die Syntaxfarben lesbar bleiben, und kennt keine Absätze.
 \tcbset{zsf@codebox@split@base/.style={
-  zsfbox,
+  zsfboxcontract,
   unbreakable,
-  tone=chapter,
-  align=left,
   bodyparskip=inherit,
-  before upper={\ZSFBoxEnter},
   ZSF@surface=plain,
-  frame=soft,
   leftrule=\ZSFboxRuleWidth, rightrule=\ZSFboxRuleWidth,
   toprule=0pt, bottomrule=0pt,
   arc=0pt, outer arc=0pt,
@@ -169,6 +167,7 @@
 \newcommand{\ZSF@codeOpen}[3]{\begin{ZSF@box}{#1}{#2}{#3}} % chktex 9
 \NewDocumentEnvironment{codebox}{O{} O{}}
   {\renewcommand{\ZSF@codeBase}{ZSF@partBase=whole}%
+   \renewcommand{\ZSF@boxOwnKnobs}{,part,}%
    \pgfkeys{/zsf/codepart, #2}%
    \expandafter\ZSF@codeOpen\expandafter{\ZSF@codeBase}{#1}{#2}}
   {\end{ZSF@box}} % chktex 9

@@ -49,9 +49,17 @@
   auf einer Box mit Titel — vorher brauchte es dafür eine Verschachtelung.
 \end{defbox}
 
-\begin{splitbox}[split=0.34, sidebyside align=center]
+\begin{splitbox}[split=0.34, splitalign=center]
   \centering linker Block
   \tcblower
   \ZSFkeyword{splitbox} ordnet zwei beliebige Inhaltsblöcke ohne sichtbaren
-  Rahmen nebeneinander an; \ZSFkeyword*{split} legt den linken Anteil fest.
+  Rahmen nebeneinander an; \ZSFkeyword*{split} legt den linken Anteil fest,
+  \ZSFkeyword*{splitalign} die Ausrichtung der Hälften zueinander.
+\end{splitbox}
+
+\begin{splitbox}[split=0.34, splitalign=bottom]
+  \centering linker Block
+  \tcblower
+  Dieselbe Box auf Grundlinie statt Mitte. Formel neben Erklärung will meist
+  die Mitte, Diagramm neben Legende die Oberkante.
 \end{splitbox}

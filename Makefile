@@ -64,7 +64,7 @@ rebuild: build
 # 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
 check: build check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
        check-init-project check-root-clean check-pdf-identity check-guardrails check-showcase-coverage \
-       check-box-options lint check-rule-authorship check-rules
+       check-box-options check-global-knobs lint check-rule-authorship check-rules
 	@echo "make check: alle Prüfungen bestanden."
 
 check-main-full:
@@ -113,6 +113,12 @@ check-showcase-coverage:
 # Vorbelegung. Beide Fehlerarten sind stumm und deshalb nur so zu finden.
 check-box-options:
 	@bash tests/check_box_options.sh
+
+# Das Gegenstück eine Ebene höher: dreht jede globale Stellschraube einzeln und
+# verlangt eine messbare Wirkung. Ohne diesen Lauf war ausgerechnet die Ebene
+# ungeprüft, die pro ZSF tatsächlich verstellt wird.
+check-global-knobs:
+	@bash tests/check_global_knobs.sh
 
 # chktex ist stilistischer Lint (advisory): meldet, bricht den Build aber nicht.
 # Der harte Lint-Gate auf geänderten Dateien läuft über pre-commit.

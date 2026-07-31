@@ -331,6 +331,39 @@
 \newcommand{\ZSFBoxSetup}{\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext}
 \newcommand{\ZSFBoxEnter}{\ZSFBoxSetup\ZSFBoxQuietTitle}
 
+% ------------------------------------------------------------
+% Der Box-Vertrag ohne Form — Schicht 1.5
+% ------------------------------------------------------------
+% Alles, was für JEDE Inhaltsbox gilt, unabhängig davon, welche Kanten sie
+% zeichnet: Ton, Justierung, Absatzabstand, Eintritts-Sequenz, Hook-Reset und
+% das Zurücksetzen der verzögert aufgelösten Wahlen.
+%
+% Eine eigene Schicht, weil drei Stile ihre FORM selbst bestimmen und deshalb
+% nicht von zsfboxshape erben können: preset/quiet, preset/split und die
+% offenen Kanten der codebox (65_code_style). Ohne gemeinsamen Vertrag müsste
+% jeder von ihnen diese Zeilen abschreiben — und eine ausgelassene Zeile ist
+% nicht erkennbar, weil jede Box für sich plausibel aussieht. Die Prüffrage aus
+% rules/10_architecture (»Titelbalken aller Boxen entfetten — reicht eine
+% Zeile?«) hängt an genau dieser Trennung.
+%
+% Die vier Reset-Zeilen am Ende sind kein Stil, sondern Pflicht: Die Regler
+% merken sich ihre Absicht in Makros, also trüge eine Box die Wahl der
+% vorhergehenden weiter, sobald sie selbst keine trifft.
+\tcbset{zsfboxcontract/.style={
+  zsfbox,
+  tone=chapter,
+  align=left,
+  bodyparskip=box,
+  % Hooks zurücksetzen, damit eine verschachtelte Box die Einstellungen der
+  % äusseren nicht erbt — sie sind gruppenlokal, aber nicht selbstlöschend.
+  /utils/exec={\renewcommand{\ZSFBoxContext}{}\renewcommand{\ZSFBoxQuietTitle}{}},
+  before upper={\ZSFBoxEnter},
+  frame=soft,
+  ZSF@surface=auto,
+  ZSF@titlefill=tone,
+  splitalign=top,
+}}
+
 % Rahmen — der Regler wählt die STÄRKE, die Farbe dazu kommt aus dem Ton.
 %
 % Der Regler setzt `colframe` NICHT selbst, sondern merkt sich nur die Wahl;
@@ -433,16 +466,16 @@
 % Reihenfolge in den Presets festgeschrieben statt in einem Kommentar.
 \tcbset{atomic/.style={unbreakable}}
 
-% Schicht 2 — Form. Alles, was die Geometrie JEDER Inhaltsbox bestimmt.
-% Wer Rahmenstärke, Ecken oder Innenabstand des Systems ändern will, ändert
-% hier — und nur hier. padx/pady gehören dazu, damit \linewidth in jeder Box
-% identisch ist (sonst variierende Tabellen-Breiten je Box-Typ).
-% `frame=soft`, `ZSF@surface=auto` und `ZSF@titlefill=tone` stehen hier, damit
-% jede Box die verzögert aufgelösten Wahlen zurücksetzt. Ohne diese Zeilen
-% trüge eine Box die Wahl der vorhergehenden weiter, sobald sie selbst keine
-% trifft — die Regler merken sich die Absicht ja in Makros.
+% Schicht 2 — Form. Alles, was die Geometrie einer geschlossenen Inhaltsbox
+% bestimmt. Wer Rahmenstärke, Ecken oder Innenabstand des Systems ändern will,
+% ändert hier — und nur hier. padx/pady gehören dazu, damit \linewidth in jeder
+% Box identisch ist (sonst variierende Tabellen-Breiten je Box-Typ).
+%
+% Was NICHT hier steht, sondern im Vertrag darüber: alles, was auch für eine
+% Box mit eigener Form gilt (Ton, Justierung, Eintritt, Reset der verzögerten
+% Wahlen). Sonst müsste jede rahmenlose Box es abschreiben.
 \tcbset{zsfboxshape/.style={
-  zsfbox,
+  zsfboxcontract,
   breakable=false,
   boxsep=0pt,
   boxrule=\ZSFboxRuleWidth,
@@ -451,9 +484,6 @@
   outer arc=\ZSFboxArc,
   padx=normal,
   pady=normal,
-  frame=soft,
-  ZSF@surface=auto,
-  ZSF@titlefill=tone,
 }}
 
 % Farbton einer Box — der Regler, der neue Box-Varianten überflüssig macht
@@ -537,21 +567,12 @@
 % Schicht 3 — Titelbox. Der EINZIGE Vertrag für Boxen mit Titelbalken; alle
 % Presets unten stehen darauf.
 %
-% Die Eintritts-Sequenz des Boxinhalts steht hier EINMAL und setzt sich aus
-% benannten Teilen zusammen: Absatzabstand, Lesbarkeit, Ausrichtung (Regler
-% `align`), Kontext-Flag. Ein eigenes 'before upper' pro Box lässt zwangsläufig
-% mal einen Teil weg, und die Auslassung ist nicht erkennbar, weil jede Box für
-% sich plausibel aussieht.
+% Dass hier nur noch zwei Zeilen stehen, ist der Punkt: Form kommt aus
+% zsfboxshape, alles Übrige aus dem Vertrag darüber. Eine Titelbox ist damit
+% genau das, was ihr Name sagt — eine Box mit Titelbalken.
 \tcbset{zsftitlebox/.style={
   zsfboxshape,
-  tone=chapter,
-  align=left,
-  bodyparskip=box,
   zsftitlebar,
-  % Hooks zurücksetzen, damit eine verschachtelte Box die Einstellungen der
-  % äusseren nicht erbt — sie sind gruppenlokal, aber nicht selbstlöschend.
-  /utils/exec={\renewcommand{\ZSFBoxContext}{}\renewcommand{\ZSFBoxQuietTitle}{}},
-  before upper={\ZSFBoxEnter},
 }}
 
 % ------------------------------------------------------------
@@ -598,11 +619,61 @@
 % Optionsliste ausgewertet. Absolute Schlüsselpfade (/utils/exec) umgehen die
 % Familie und laufen im Vor-Lauf mit; in Kapiteln kommen sie nicht vor, und der
 % Linter meldet rohe tcolorbox-Eingriffe ohnehin.
+%
+% Derselbe Vor-Lauf ist zugleich die einzige Stelle, an der die Aufrufer-Liste
+% als Ganzes sichtbar ist — und damit der Ort, an dem die Schlüssel abgefangen
+% werden, die das System selbst besetzt (siehe \ZSF@ownedKeyError unten).
+\newcommand{\ZSF@ownedKeyError}[2]{%
+  \PackageError{ZSF}{%
+    Schluessel '#1' gehoert dem Box-System, nicht dem Aufruf%
+  }{%
+    Flaeche und Rahmen werden am Ende jeder Optionsliste aus Rolle und Ton
+    zusammengesetzt (ZSF@resolveframe / ZSF@resolvesurface). Ein '#1' im
+    Aufruf wird dabei ueberschrieben und bliebe wirkungslos -- frueher
+    stillschweigend, jetzt hier. Stattdessen den Regler '#2' verwenden;
+    fehlt dafuer ein Wert, ist das eine Luecke und gehoert gemeldet
+    (rules/02_ai_mandate -> Randverhalten I).%
+  }%
+}
+% Box-spezifische Regler gehören genau einer Box. Auf jeder anderen nimmt
+% tcolorbox sie klaglos entgegen, und niemand liest sie je wieder — dieselbe
+% stille Klasse wie die Farbschlüssel oben, nur eine Ecke weiter:
+% `\begin{defbox}[T][ordered]` setzte die Listen-Nummerierung, ohne dass eine
+% Liste existiert; `[grid=none]` leerte die Gitterwahl einer Box ohne Gitter.
+%
+% Welche Box welchen Regler besitzt, sagt sie selbst, bevor sie die Fabrik
+% ruft; leer heisst »keinen«. Die Kommas sind Begrenzer, damit ein Reglername,
+% der Teil eines anderen ist, nicht versehentlich durchgeht.
+\newcommand{\ZSF@boxOwnKnobs}{}
+\newcommand{\ZSF@requireOwnKnob}[2]{%
+  \IfSubStr{\ZSF@boxOwnKnobs}{,#1,}{}{%
+    \PackageError{ZSF}{%
+      Regler '#1' gehoert zu #2, nicht zu dieser Box%
+    }{%
+      Auf dieser Box hat '#1' nichts, worauf er wirken koennte -- er wuerde
+      stillschweigend verschwinden. Entweder die Box verwenden, der er
+      gehoert (#2), oder die Option weglassen.%
+    }%
+  }%
+}
 \pgfkeys{
-  /zsf/boxweight/.is family, /zsf/boxweight,
+  /zsf/boxpre/.is family, /zsf/boxpre,
   weight/.is choice,
   weight/loud/.code ={\ZSF@boxQuietfalse},
   weight/quiet/.code={\ZSF@boxQuiettrue},
+  ordered/.code={\ZSF@requireOwnKnob{ordered}{ZSFlist}},
+  grid/.code   ={\ZSF@requireOwnKnob{grid}{valuegrid}},
+  part/.code   ={\ZSF@requireOwnKnob{part}{codebox}},
+  % Die vier Farbschlüssel, die die Resolver am Listenende ohnehin
+  % überschreiben. Sie sind der Rest des tcolorbox-Schlüsselraums, für den die
+  % Durchreichung NICHT gilt — bis hierher fielen sie stumm unter den Tisch,
+  % und `colbacktitle` tat es je nach Box mal so und mal nicht (defbox: wirkte,
+  % formulabox: verworfen). Ein Schlüssel, der box-abhängig wirkt oder nicht,
+  % ist die teuerste Fehlerart des Systems (rules/02_ai_mandate).
+  colback/.code     ={\ZSF@ownedKeyError{colback}{tone}},
+  colframe/.code    ={\ZSF@ownedKeyError{colframe}{frame}},
+  colbacktitle/.code={\ZSF@ownedKeyError{colbacktitle}{tone}},
+  coltitle/.code    ={\ZSF@ownedKeyError{coltitle}{tone}},
   .unknown/.code={},% chktex 26
 }
 \NewDocumentEnvironment{ZSF@box}{m m m}{%
@@ -612,9 +683,13 @@
   % Stil den Merker nicht zurücksetzt, die Titelzeile der Box, in der sie steht.
   \renewcommand{\ZSFBoxQuietTitle}{}%
   \ZSF@boxQuietfalse
-  \pgfkeys{/zsf/boxweight, #3}%
+  \pgfkeys{/zsf/boxpre, #3}%
+  % Der Besitz gilt für GENAU diese Box. Zurückgesetzt direkt nach dem
+  % Vor-Lauf, damit eine verschachtelte Box ihn nicht erbt und dort ein
+  % fremder Regler wieder stumm durchginge.
+  \renewcommand{\ZSF@boxOwnKnobs}{}%
   \begin{tcolorbox}[#1, zsftitle={#2}, ZSF@weightBase, #3,
-                    ZSF@resolveframe, ZSF@resolvesurface]%
+                    ZSF@resolveframe, ZSF@resolvesurface, ZSF@resolvesplit]%
 }{%
   \end{tcolorbox}%
 }
@@ -928,12 +1003,34 @@
 % ihren Hälften (Begründung bei den beiden Makros).
 \tcbset{split/.style={
   sidebyside,
-  sidebyside align=top,
   sidebyside gap=\ZSFspaceM,
   lower separated=false,
   lefthand width=#1\linewidth,
   before lower={\ZSFBoxSetup},
 }}
+% Wie die beiden Hälften zueinander stehen — der zweite Regler des Splits.
+%
+% Er existiert, weil die Antwort pro Stelle verschieden ist: Formel neben
+% Erklärung will die Mitte, Diagramm neben Legende die Oberkante — der
+% Reglertest aus styles/README.md ist damit bestanden. Ohne Namen bleibt für
+% diesen Fall nur der rohe tcolorbox-Schlüssel im Kapitel, und eine Lücke, die
+% die Doku mit einem Beispiel überbrückt statt sie zu melden, wird zum
+% gelehrten Muster (rules/02_ai_mandate → Randverhalten I).
+%
+% Verzögert aufgelöst wie Rahmen und Fläche, und aus demselben Grund: `split`
+% und `splitalign` schrieben sonst beide `sidebyside align`, und wer zuletzt
+% käme, gewönne. `[splitalign=center, split=0.4]` verlöre die Ausrichtung,
+% `[split=0.4, splitalign=center]` behielte sie — stumm.
+\makeatletter
+\newcommand{\ZSF@splitAlign}{top}
+\tcbset{
+  splitalign/.is choice,
+  splitalign/top/.code   ={\renewcommand{\ZSF@splitAlign}{top}},
+  splitalign/center/.code={\renewcommand{\ZSF@splitAlign}{center}},
+  splitalign/bottom/.code={\renewcommand{\ZSF@splitAlign}{bottom}},
+}
+\tcbset{ZSF@resolvesplit/.code={\tcbset{sidebyside align=\ZSF@splitAlign}}}
+\makeatother
 % splitbox ist das rahmenlose, titellose Preset dieses Reglers — der mit
 % Abstand häufigste Fall, deshalb ein eigener Name statt vier Optionen.
 %
@@ -944,14 +1041,11 @@
 % Regler wäre auf dieser einen Box stillschweigend wirkungslos.
 \tcbset{preset/split/.style={
   zsfboxshape,
-  tone=chapter,
-  align=left,
   bodyparskip=inherit,
   frame=none,
   padx=none, pady=none,
   ZSF@surface=quiet,
   split=0.3,
-  before upper={\ZSFBoxEnter},
 }}
 \NewDocumentEnvironment{splitbox}{O{}}
   {\begin{ZSF@box}{preset/split}{}{#1}}{\end{ZSF@box}} % chktex 9
@@ -963,20 +1057,16 @@
 % Form wie die Titelboxen und nimmt genau das zurück, was sie rahmenlos macht
 % — Rahmen, Ecken und die obere/untere Polsterung.
 %
-% `tone=chapter` steht hier, damit der Default gesetzt ist; eine vom Aufrufer
-% übergebene Tonwahl kommt danach und gewinnt. Die Fläche setzt bewusst NICHT
-% dieser Stil, sondern die Umgebung nach den Aufrufer-Optionen — Begründung
-% dort.
+% Ton, Justierung und Eintritt kommen aus dem Vertrag (zsfboxcontract, via
+% zsfboxshape); hier steht nur noch der Unterschied. Die Fläche setzt dieser
+% Stil bewusst NICHT — sie kommt vom Flächen-Resolver am Listenende, der Rolle
+% und Ton zusammensetzt.
 \tcbset{preset/quiet/.style={
   zsfboxshape,
-  tone=chapter,
-  align=left,
   bodyparskip=inherit,
   frame=none,
   borderline west={\ZSFstatementBarWidth}{0pt}{\ZSFtoneAccent},
   padx=bar, pady=tight,
-  /utils/exec={\renewcommand{\ZSFBoxContext}{}},
-  before upper={\ZSFBoxEnter},
 }}
 
 % ------------------------------------------------------------
@@ -1040,6 +1130,7 @@
 }
 \NewDocumentEnvironment{ZSFlist}{O{} O{}}
   {\ZSF@listOrderedfalse
+   \renewcommand{\ZSF@boxOwnKnobs}{,ordered,}%
    \IfBlankTF{#1}%
      {\ZSF@listBoxedfalse\pgfkeys{/zsf/listplain, #2}\ZSF@listOpen{\ZSFspaceXS}}%
      {\ZSF@listBoxedtrue\begin{defbox}[#1][weight=quiet, #2]\ZSF@listOpen{0pt}}}
@@ -1125,27 +1216,45 @@
 % ------------------------------------------------------------
 % Interner Panel-Rahmen des Valuegrids — kein öffentlicher Baustein.
 % Kapitel greifen ausschliesslich über \begin{valuegrid}{n}[Titel] zu.
+\makeatletter
+% Die Gitterlinien sind ein Regler, keine Eigenschaft des Bausteins: Ob ein
+% Wertegitter seine Zellen einzeln umrandet, hängt am Inhalt und wird pro
+% Stelle entschieden (Reglertest, styles/README.md). Ein dichtes Zahlengitter
+% will beide Linienrichtungen, eine dreispaltige Zuordnungsliste kommt mit
+% waagrechten aus, und wo die Spalten selbst sprechen, stört jedes Lineal.
+%
+% Das Komma steht IM Wert, nicht in der Spec: `grid=none` liefert sonst einen
+% leeren Eintrag in der tblr-Optionsliste.
+\newcommand{\ZSF@gridLines}{hlines,vlines,}
+\tcbset{
+  grid/.is choice,
+  grid/both/.code      ={\renewcommand{\ZSF@gridLines}{hlines,vlines,}},
+  grid/horizontal/.code={\renewcommand{\ZSF@gridLines}{hlines,}},
+  grid/none/.code      ={\renewcommand{\ZSF@gridLines}{}},
+}
 \tcbset{preset/valuegrid/.style={
   zsftitlebox,
   padx=none, pady=tight,
   ZSF@surface=plain,
   frame=strong,
+  grid=both,
   atomic,
 }}
 \newcommand{\ZSFvaluegridCommon}{
   colsep=\ZSFtableEdgePad,
   rowsep=\ZSFvaluegridRowSep,
-  hlines,
-  vlines,
+  \ZSF@gridLines
   rows={valign=m}
 }
 % \begin{valuegrid}[<Titel>][<Optionen>]{<n_datacols>} — Spec wird automatisch
 % generiert. Titel steht wie bei jeder Box an erster Stelle; das Pflichtargument
 % folgt danach (rules/20_boxes → Aufruf-Konvention).
 \NewDocumentEnvironment{valuegrid}{O{} O{} m}
-  {\begin{ZSF@box}{preset/valuegrid}{#1}{#2}%
+  {\renewcommand{\ZSF@boxOwnKnobs}{,grid,}%
+   \begin{ZSF@box}{preset/valuegrid}{#1}{#2}%
    \begin{tblr}{colspec={l *{#3}{c}},\ZSFvaluegridCommon}}
   {\end{tblr}\end{ZSF@box}} % chktex 9
+\makeatother
 
 % ------------------------------------------------------------
 % Pack-Modus für Anhang-artige Kapitel

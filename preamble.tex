@@ -20,18 +20,52 @@
 %                       nur NICHT in lstlisting — dort native #-Kommentare.
 % Module nicht löschen — nur deaktivieren (siehe rules/10_architecture).
 %
-% ── Globale Stellschrauben: Dichte und Zeilenhöhe ────────────────────
-% Beide gelten für die ganze ZSF und müssen VOR styles/30_layout_spacing
-% stehen. Getrennt, weil unterschiedlich riskant:
-%   Dichte  — skaliert alle Abstände (Leerraum, gefahrlos)
-%   Zeilenhöhe — enthält die Schrift selbst; nur in kleinen Schritten senken
-%                und danach das PDF auf kollidierende Formelzeilen prüfen.
-% \def\ZSFDensityFactor{0.85}   % 1    = Template-Referenz, kleiner = dichter
-% \def\ZSFLeadingFactor{0.92}   % 0.95 = Template-Referenz, kleiner = enger
+% =====================================================================
+% GLOBALE STELLSCHRAUBEN — die oberste Ebene der Pyramide
+% =====================================================================
+% Das sind ALLE Gestaltungsentscheidungen, die pro ZSF getroffen werden
+% dürfen (rules/02_ai_mandate → globale Stellschrauben). Was hier nicht
+% steht, wird nicht pro ZSF entschieden, sondern pro Stelle über einen
+% Box-Regler (rules/21_box_options) — oder gar nicht.
+%
+% Alle stehen auskommentiert mit ihrem Default. Verstellen heisst: Zeile
+% einkommentieren und Wert ändern. Ein Register direkt zu setzen bleibt
+% auch hier falsch — dafür gibt es die Faktoren.
+%
+% tests/check_global_knobs.sh prüft jede dieser Zeilen: Wer eine Schraube
+% dreht, muss eine messbare Wirkung bekommen. Eine Stellschraube ohne
+% Wirkung bricht den Build.
 % ─────────────────────────────────────────────────────────────────────
+
+% ── Platz: Dichte, Zeilenhöhe, Umbruchreserve ────────────────────────
+% Müssen VOR styles/30_layout_spacing stehen.
+% Dichte und Zeilenhöhe sind getrennt, weil unterschiedlich riskant:
+% Abstände sind Leerraum und vertragen jede Skalierung, Zeilenhöhe
+% enthält die Schrift selbst — nur in kleinen Schritten senken und
+% danach das PDF auf kollidierende Formelzeilen prüfen.
+% \def\ZSFDensityFactor{0.85}     % 1    = Referenz, kleiner = dichter
+% \def\ZSFLeadingFactor{0.92}     % 0.95 = Referenz, kleiner = enger
+%
+% Bereichsfaktoren multiplizieren den globalen Faktor für IHREN Bereich —
+% für ZSF, die ungleich verteilt sind (box-lastig vs. textlastig).
+% \def\ZSFDensityBoxes{1}         % Innen-/Aussenabstände der Inhaltsboxen
+% \def\ZSFDensityText{1}          % Absatzabstand im Fliesstext
+% \def\ZSFDensityTables{1}        % Zell- und Zeilenabstand in Tabellen
+% \def\ZSFDensityStructure{1}     % Polsterung und Abstände der Titelbalken
+%
+% Freiraum, der vor einem Titelbalken übrig sein muss, sonst bricht die
+% Spalte davor um. Grösser = Balken stehen seltener knapp am Spaltenfuss.
+% \def\ZSFBreakReserveFactor{1}   % 1 = Referenz
 
 \input{styles/00_packages}
 \input{styles/10_math}
+
+% ── Formelsatz: Summen- und Limes-Grenzen ────────────────────────────
+% side = neben dem Zeichen (spart Höhe), stack = darüber/darunter,
+% auto = LaTeX entscheidet nach Kontext.
+% \SetZSFsumMode{auto}            % auto | side | stack
+% \SetZSFlimMode{auto}            % auto | side | stack
+
 \ifdefined\ZSFShowcaseMode
   \input{styles/11_math_advanced}
   \input{styles/12_plots}
@@ -40,10 +74,31 @@
   % \input{styles/12_plots}         % opt-in: pgfplots-Diagramme
 \fi
 \input{styles/20_tables}
+
+% ── Tabellen: Zebra-Ton ──────────────────────────────────────────────
+% Default folgt der Kapitelfarbe. Ein fester Ton macht Tabellen über alle
+% Kapitel hinweg gleich — sinnvoll, wenn die Kapitelfarbe schon woanders trägt.
+% \SetZSFzebraBG{\TableZebraColor}
+
 \input{styles/30_layout_spacing}
 \input{styles/40_colors_structure}
 \input{styles/50_typography_semantics}
+
+% ── Marker-Darstellung: der primäre Scan-Anker ───────────────────────
+% Default: \ZSFkeyword fett in der Kapitelfarbe, \ZSFlabel schlicht fett.
+% Der Unterschied ist gewollt — der primäre Anker soll beim Überfliegen vor
+% jeder anderen Fettung auffallen. Umstellen heisst GENAU diese eine Zeile,
+% nie ein Kapitel. Fassung ohne Farbe (z.B. für reinen S/W-Druck):
+% \renewcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
+% \renewcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
+
 \input{styles/55_readability}
+
+% ── Fliesstext: Flattersatz ──────────────────────────────────────────
+% \ZSFReadableBodyOn ist der Default, weil die ~50 mm schmalen Spalten im
+% Blocksatz entweder trennen oder Wortzwischenräume aufblähen müssen.
+% \ZSFReadableBodyOff             % zurück zu Blocksatz
+
 \input{styles/60_boxes}
 \ifdefined\ZSFShowcaseMode
   \input{styles/65_code_style}
@@ -54,6 +109,11 @@
   % \input{styles/65_code_style}    % opt-in: Informatik
   % \input{styles/66_index}         % opt-in: Stichwortverzeichnis
   % \input{styles/67_code_comments} % opt-in: annotierte Code-Zeilen
+  %
+  % ── Index-Locator (nur mit aktivem 66_index) ───────────────────────
+  % true (Default): "6.2 · (S. 4)" — Abschnittsnummer plus Druckseite.
+  % false: nur die Abschnittsnummer.
+  % \ZSFIndexShowPageNumberfalse
 \fi
 \input{styles/75_pdf_identity}
 \input{styles/70_document_settings}
