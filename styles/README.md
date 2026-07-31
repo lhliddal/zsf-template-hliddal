@@ -110,8 +110,8 @@ gegen ein Versehen.
 | --- | --- | --- |
 | `warnbox` | »Stolperfalle« ist die meistgesuchte Kategorie einer Prüfungs-ZSF; der vorbelegte Titel macht die Box ohne jedes Argument vollständig | `defbox[…][tone=warn]` |
 | `figbox` | „hier steht eine Abbildung" — der Container für selbstgezeichnete Diagramme | `defbox[…][atomic]` |
-| `goalbox` | „hier wird hergeleitet" — die Kombination aus vier Reglern ist nicht ableitbar, und Komponieren ist genau das Entwerfen, das die KI nicht tun soll | `defbox[…][align=center, pady=tight, frame=strong, atomic]` |
-| `splitbox` | der rahmenlose Zweispalter ist der häufigste Split-Fall und wäre sonst vier Optionen lang | `defbox[][split=…, frame=none, padx=none, pady=none]` |
+| `goalbox` | „hier wird hergeleitet" — die Kombination ist nicht ableitbar, und Komponieren ist genau das Entwerfen, das die KI nicht tun soll | `defbox[…][align=center, pady=tight, frame=strong, atomic]` **plus** die ungetönte Fläche, für die es keinen öffentlichen Regler gibt |
+| `splitbox` | der rahmenlose Zweispalter ist der häufigste Split-Fall und wäre sonst fünf Optionen lang | `defbox[][split=…, frame=none, padx=none, pady=none, bodyparskip=inherit]` **plus** die ruhige Fläche, für die es keinen öffentlichen Regler gibt |
 
 Gemeinsames Muster: Jeder ist ein **Ein-Zeilen-Preset** über demselben
 Reglersatz — ein Name, der nur eine Vorbelegung benennt, kostet fast nichts und
@@ -176,7 +176,7 @@ ein rohes `\bfseries` im jeweiligen Baustein, und wer eine Rolle umstellte,
 erwischte die anderen nicht.
 
 Ebenfalls intern: die tcolorbox-Basisstile (`zsfbox`, `zsfboxshape`,
-`zsftitlebox`, `zsfbar`, `zsfvaluegridshell`, …) und die Environments
+`zsftitlebox`, `zsfbar`, die `preset/*`-Stile, …) und die Environments
 `chapterbar`, `subsectionbar`, `subsubsectionbar`.
 
 Kapitel dürfen sich auf nichts davon stützen. Style-Module dürfen und sollen es.
@@ -318,7 +318,7 @@ Darüber hinaus ist jeder tcolorbox-Schlüssel erlaubt (`breakable`,
 `sidebyside align=center`, …) — das zweite optionale Argument wird
 unverändert an tcolorbox durchgereicht.
 
-Zwei Boxen erzwingen ihr Umbruchverhalten mit `unbreakable` **nach**
+Drei Boxen erzwingen ihr Umbruchverhalten mit dem Regler `atomic` **nach**
 `zsftitlebox` (`figbox`, `goalbox`, `valuegrid`), damit der Pack-Modus
 (`\ZSFBoxesBreakableOn`) sie nicht aufbricht.
 

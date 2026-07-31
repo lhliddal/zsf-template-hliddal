@@ -76,7 +76,10 @@
 % ------------------------------------------------------------
 \definecolor{ce_yellow}{rgb}{0.8,0.6,0.1}
 \definecolor{ce_pink}{rgb}{0.8,0.1,0.3}
-\definecolor{ce_white}{rgb}{0,0,0}
+% Vordergrundfarbe des Code-Blocks. Nach ihrer Rolle benannt wie code_bg und
+% code_rule — der Block ist hell, ein Token namens "white" fuer die Textfarbe
+% darauf beschreibt das Gegenteil dessen, was er tut.
+\definecolor{code_fg}{rgb}{0,0,0}
 \definecolor{ce_green}{rgb}{0.0,0.4,0.1}
 \definecolor{code_bg}{HTML}{F4F4F6}
 \definecolor{code_rule}{HTML}{D8D8DE}
@@ -118,6 +121,13 @@
 \colorlet{MutedTextColor}{black!60}
 \colorlet{IdentityMarkerColor}{black!10}
 \colorlet{ReleaseFooterColor}{black}
+% Seitenzahl im Footer — eigener Token neben der Release-Kennung, damit beide
+% Footer-Elemente unabhaengig einstellbar sind statt eines davon roh auf black.
+\colorlet{ZSFPageNumberColor}{black}
+% Link- und URL-Farbe. Als Rolle benannt statt als Palettenindex: "Linkfarbe"
+% ist eine Entscheidung, "ChapterColor0" ist ein Slot der Kapitelrotation.
+\colorlet{ZSFLinkColor}{ChapterColor0}
+\colorlet{ZSFUrlColor}{ChapterColor4}
 \colorlet{DangerTagColor}{red!80!black}
 \newcommand{\DangerTagTextColor}{white}
 
@@ -142,7 +152,11 @@
 \newcommand{\SubsubsectionTitleColor}{\chaptercolor!72!black}
 \newcommand{\FormulaboxBackColor}{\chaptercolorlight!40}
 \newcommand{\TableZebraColor}{\chaptercolorlight!70}
-\newcommand{\ScriptRefColor}{\ChapterBarTextColor!80}
+% Skriptverweis (\ZSFScriptRef): steht IM Boxinhalt, nicht auf einem Balken.
+% Deshalb der Ton für dezente Anmerkungen und nicht \ChapterBarTextColor —
+% der ist die Kontrastfarbe des Balkens und damit Weiss; auf der hellen
+% Boxfläche wäre der Verweis unsichtbar, ohne dass etwas meldet.
+\newcommand{\ScriptRefColor}{MutedTextColor}
 
 \newcommand{\BoxTitleColor}{\chaptercolorlight}
 \newcommand{\BoxTitleTextColor}{TextVorBoxColor}

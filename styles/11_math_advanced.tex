@@ -32,7 +32,11 @@
 
 % --- TikZ-Klammern für Matrix-Annotationen ---
 \usetikzlibrary{decorations.pathreplacing,calc}
-\newcommand{\tikzmark}[2][-3pt]{\tikz[remember picture, overlay, baseline=-0.5ex]\node[#1](#2){};}
+% Das optionale Argument sind KNOTEN-OPTIONEN (z.B. xshift), keine Länge. Der
+% Default ist deshalb leer: Ein Mass an dieser Stelle liest pgf als
+% Pfeilspezifikation und bricht ab ("Unknown arrow tip kind"). Der vertikale
+% Versatz der Klammer hängt ohnehin an den Koordinaten, siehe unten.
+\newcommand{\tikzmark}[2][]{\tikz[remember picture, overlay, baseline=-0.5ex]\node[#1](#2){};}
 % Die Marker von \tikzmark sitzen auf der GRUNDLINIE des Terms. Ohne Versatz
 % liegt die Klammer-Sehne genau dort und läuft als waagrechte Linie mitten
 % durch die Formel. Der Versatz muss an den Koordinaten hängen, nicht als

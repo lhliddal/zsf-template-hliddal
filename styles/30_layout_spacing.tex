@@ -208,6 +208,10 @@
 % Das Default-Register ist immutabel und dient \ResetCodeCommentThreshold
 % als Anker; \SetCodeCommentThreshold modifiziert nur das "lebende" Register.
 % ------------------------------------------------------------
+% Zeilenhoehe im Code-Block. Eigenes Register statt einer nackten Zahl im
+% Listings-Stil: Sie ist die einzige Zeilenhoehen-Entscheidung neben
+% \ZSFLeadingFactor und soll wie dieser auffindbar und drehbar sein.
+\providecommand{\ZSFcodeLeadingFactor}{0.8}
 \newlength{\ZSFcodeMiniSkip}  \setlength{\ZSFcodeMiniSkip}{1mm}
 \newlength{\ZSFcodeFrameRule} \setlength{\ZSFcodeFrameRule}{0.4pt}
 \newlength{\ZSFcodeXMargin}   \setlength{\ZSFcodeXMargin}{8pt}
@@ -229,6 +233,9 @@
 \newlength{\ZSFindexSubsubitemIndent} \setlength{\ZSFindexSubsubitemIndent}{2.6em}
 \newlength{\ZSFindexSubsubitemOffset} \setlength{\ZSFindexSubsubitemOffset}{1.8em}
 \newlength{\ZSFindexParStretch}       \setlength{\ZSFindexParStretch}{0.3pt}
+% Deckkraft der Release-Kennung im Footer. Als Makro, weil \transparent einen
+% einheitenlosen Faktor nimmt und ein solcher Wert sonst durch jede Pruefung faellt.
+\providecommand{\ZSFfooterOpacity}{0.5}
 \newlength{\ZSFfooterBottomInset}     \setlength{\ZSFfooterBottomInset}{1mm}
 \newlength{\ZSFfooterRightInset}      \setlength{\ZSFfooterRightInset}{2mm}
 % Freiraum am Satzspiegel-Fuss für das Footer-Overlay (Release-Kennung und

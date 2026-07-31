@@ -123,7 +123,7 @@
   \begingroup
     \edef\ZSF@idxTargetChap{\expandafter\ZSF@refExtractChap#1.\@nil}%
     \ZSFSetPaletteColorNameFromNumber{\ZSF@idxTargetChap}{\ZSF@idxTargetColor}%
-    {\upshape\bfseries\color{\ZSF@idxTargetColor}#1}%
+    {\ZSFfontRefLocator\color{\ZSF@idxTargetColor}#1}%
   \endgroup}
 \ExplSyntaxOn
 \seq_new:N \l__zsf_index_locator_seq

@@ -45,6 +45,10 @@
 \newcommand{\ZSFfontBoxBinding}{\small}
 % Inline-Pille für Stolperfallen (\ZSFdanger).
 \newcommand{\ZSFfontDangerTag}{\sffamily\bfseries}
+% Zielnummer eines Verweises — \ZSFref, \ZSFsectionref und der Index-Locator
+% (66_index). rules/55_index sagt zu, die Locators seien konsistent zu \ZSFref;
+% mit drei rohen Kopien derselben Auszeichnung war das nur zufällig wahr.
+\newcommand{\ZSFfontRefLocator}{\upshape\bfseries}
 
 % Dezente Anmerkung — die EINE Quelle für Schrift und Farbe aller Anmerkungen
 % in und an einer Box: \formulanote, \ZSFformulaline, \ZSFfigcaption und die
@@ -105,7 +109,7 @@
 \newcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
 \newcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
-\newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\small (S.#1)}}
+\newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\ZSFfontBoxBinding (S.#1)}}
 
 % \ZSFhl{...} — Hervorhebung des EINEN prüfungskritischsten Fakts pro Box
 % (fett + unterstrichen). Bewusst sparsam: hoechstens einmal pro Block.
@@ -150,13 +154,13 @@
 \newcommand{\ZSFref}[1]{%
   \begingroup
   \ZSF@refComputeTargetColor{#1}%
-  \hyperref[#1]{{\ZSFfontNote\upshape\bfseries\color{\ZSF@refTargetColor}($\rightarrow$\,\ref*{#1})}}%
+  \hyperref[#1]{{\ZSFfontNote\ZSFfontRefLocator\color{\ZSF@refTargetColor}($\rightarrow$\,\ref*{#1})}}%
   \endgroup
 }
 \newcommand{\ZSFsectionref}[1]{%
   \begingroup
   \ZSF@refComputeTargetColor{#1}%
-  \hyperref[#1]{{\upshape\bfseries\color{\ZSF@refTargetColor}\ref*{#1}}}%
+  \hyperref[#1]{{\ZSFfontRefLocator\color{\ZSF@refTargetColor}\ref*{#1}}}%
   \endgroup
 }
 \makeatother

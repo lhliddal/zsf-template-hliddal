@@ -39,7 +39,7 @@
 
 \lstdefinestyle{CodeExpert}{
     language=Python,
-    basicstyle=\ttfamily\linespread{0.8}\color{ce_white},
+    basicstyle=\ttfamily\linespread{\ZSFcodeLeadingFactor}\color{code_fg},
     numbers=none,
     aboveskip=\ZSFspaceM,
     belowskip=\ZSFspaceM,
@@ -56,7 +56,7 @@
     keywordstyle=\bfseries\color{ce_pink},
     commentstyle=\color{ce_green},
     stringstyle=\color{ce_yellow},
-    identifierstyle=\color{ce_white},
+    identifierstyle=\color{code_fg},
     showstringspaces=false,
     breaklines=true,
     breakatwhitespace=true,
@@ -96,9 +96,18 @@
 % Dieser Stil erbt von `zsfbox` (Fluss) statt von `zsfboxshape` (Form) und
 % bekommt die verzögert aufgelösten Wahlen deshalb nicht mit. Ohne die beiden
 % Zeilen trüge ein Codebox-Teil Rahmen und Fläche der vorhergehenden Box weiter.
+% Weil dieser Stil von `zsfbox` (Fluss) statt von `zsftitlebox` erbt, bringt er
+% keinen der dortigen Vertragsteile mit. Die vier folgenden Zeilen holen sie
+% nach; ohne sie bleibt der Titelbalken im tcolorbox-Grau statt in der
+% Kapitelfarbe, und `align` wie `bodyparskip` merken sich zwar ihre Wahl,
+% werden aber nie ausgeführt — beides stumm.
 \tcbset{zsf@codebox@split@base/.style={
   zsfbox,
   unbreakable,
+  tone=chapter,
+  align=left,
+  bodyparskip=inherit,
+  before upper={\ZSFBoxEnter},
   ZSF@surface=plain,
   frame=soft,
   leftrule=\ZSFboxRuleWidth, rightrule=\ZSFboxRuleWidth,

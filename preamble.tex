@@ -15,8 +15,9 @@
 %                       CodeExpert-Style + Code-Container (codebox).
 %   66_index          → Stichwortverzeichnis am Dokumentende (\printindex);
 %                       \ZSFkeyword indexiert dann automatisch.
-%   67_code_comments  → Smart Inline/Overflow Code-Kommentare (\CodeLine);
-%                       NUR zusammen mit 65_code_style aktivieren.
+%   67_code_comments  → Smart Inline/Overflow Code-Kommentare (\CodeLine).
+%                       Unabhängig von 65: \CodeLine wirkt in jeder Textbox,
+%                       nur NICHT in lstlisting — dort native #-Kommentare.
 % Module nicht löschen — nur deaktivieren (siehe rules/10_architecture).
 %
 % ── Globale Stellschrauben: Dichte und Zeilenhöhe ────────────────────
@@ -52,7 +53,7 @@
 \else
   % \input{styles/65_code_style}    % opt-in: Informatik
   % \input{styles/66_index}         % opt-in: Stichwortverzeichnis
-  % \input{styles/67_code_comments} % opt-in: Informatik (nach 65_code_style)
+  % \input{styles/67_code_comments} % opt-in: annotierte Code-Zeilen
 \fi
 \input{styles/75_pdf_identity}
 \input{styles/70_document_settings}

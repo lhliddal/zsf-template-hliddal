@@ -5,7 +5,7 @@
 
 % Link-Farben: stabile ETH-Slots aus der Index-Palette (Blau/Petrol),
 % unabhängig von der aktiven Kapitelfarbe.
-\hypersetup{colorlinks=true, linkcolor=ChapterColor0, urlcolor=ChapterColor4}
+\hypersetup{colorlinks=true, linkcolor=ZSFLinkColor, urlcolor=ZSFUrlColor}
 
 % Build-Kennung unten mittig, Seitenzahl unten rechts (overlay).
 % Lokal automatisch DEV + Datum; im Release-Workflow der SemVer-Tag.
@@ -24,10 +24,10 @@
 \AddToShipoutPictureFG{%
   \AtPageLowerLeft{%
     \put(\dimexpr\paperwidth/2\relax,\ZSFfooterBottomInset){%
-      \makebox(0,0)[b]{{\transparent{0.5}\ZSFfontFooter\color{ReleaseFooterColor}\ZSFReleaseLabel}}%
+      \makebox(0,0)[b]{{\transparent{\ZSFfooterOpacity}\ZSFfontFooter\color{ReleaseFooterColor}\ZSFReleaseLabel}}%
     }%
     \put(\dimexpr\paperwidth-\ZSFfooterRightInset\relax,\ZSFfooterBottomInset){%
-      \makebox(0,0)[rb]{\ZSFfontFooter\color{black}\thepage}%
+      \makebox(0,0)[rb]{\ZSFfontFooter\color{ZSFPageNumberColor}\thepage}%
     }%
   }%
 }
