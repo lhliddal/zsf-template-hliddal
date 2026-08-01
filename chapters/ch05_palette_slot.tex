@@ -35,11 +35,16 @@
       % dadurch garantiert innerhalb der Box und trifft die freie Fläche
       % zwischen den Parabelästen, statt am Rand abgeschnitten zu werden.
       \node[\chaptercolor, font=\ZSFfontDiagramLabel, anchor=center]
-        at (rel axis cs:0.68,0.72) {ZSFfontDiagramLabel};
+        at (rel axis cs:0.68,0.78) {ZSFfontDiagramLabel};
+      % Zweite Stufe: die gedrängte Zusatzangabe, die neben der regulären
+      % Marke stehen muss, ohne sie zu verdecken.
+      \node[MutedTextColor, font=\ZSFfontDiagramLabelSmall, anchor=center]
+        at (rel axis cs:0.68,0.62) {ZSFfontDiagramLabelSmall};
     \end{axis}
   \end{tikzpicture}
-  \ZSFfigcaption{Knotenbeschriftung über ZSFfontDiagramLabel statt lokalem
-    \textbackslash tiny; pgfplots kommt aus dem Opt-in-Modul 12\_plots.}
+  \ZSFfigcaption{Zwei Beschriftungsstufen statt lokalem \textbackslash tiny:
+    die reguläre Marke und die gedrängte Zusatzangabe. Für ein ganzes Bild
+    lässt sich die Stufe einmal als font-Option der tikzpicture setzen.}
 \end{figbox}
 
 \begin{defbox}[Derselbe Regler, mit Kopfzeile\ZSFTitleTag{split}][split=0.34]

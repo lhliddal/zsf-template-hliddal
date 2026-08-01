@@ -99,10 +99,16 @@
   fontupper=\ZSFfontChapter,
   #1
 }
+% \ZSFInkOwned steht in ALLEN vier Balken direkt neben der Kontrastfarbe:
+% Ein Balken ist eine gesaettigte Flaeche mit eigener Textfarbe und besitzt
+% damit die Farbe (40_colors_structure -> Ink-Vertrag). Bewusst gleich
+% behandelt, auch wo die Flaeche hell ist (Unterabschnitt) — das Kriterium
+% ist "setzt eigene Kontrastfarbe" und nicht eine Einzelfallabwaegung, sonst
+% muesste man es bei jeder Farbaenderung neu entscheiden.
 \newcommand{\ChapterBar}[1]{
   \BreakIfNotEnoughSpaceChapter
   \begin{chapterbar}
-    \textcolor{\ChapterBarTextColor}{#1}
+    \textcolor{\ChapterBarTextColor}{\ZSFInkOwned #1}
   \end{chapterbar}
 }
 
@@ -123,9 +129,9 @@
 \newcommand{\ZSFTitleHeader}[2]{%
   \ZSFBarPenalty{-500}%
   \begin{zsftitleheader}
-    {\color{ZSFDocumentTitleTextColor}\ZSFfontTitleHeader #1\par}%
+    {\color{ZSFDocumentTitleTextColor}\ZSFInkOwned\ZSFfontTitleHeader #1\par}%
     \vspace{\ZSFspaceXS}%
-    {\color{ZSFDocumentTitleBylineColor}\ZSFfontNote von~#2\par}%
+    {\color{ZSFDocumentTitleBylineColor}\ZSFInkOwned\ZSFfontNote von~#2\par}%
   \end{zsftitleheader}
 }
 
@@ -160,7 +166,7 @@
   \ZSFCollapseAfterChapterBar
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsectionbar}
-    \textcolor{\SubsectionBarTextColor}{#2#3}
+    \textcolor{\SubsectionBarTextColor}{\ZSFInkOwned #2#3}
   \end{subsectionbar}
   \ZSFMarkAfterSubsectionBar
 }
@@ -170,7 +176,7 @@
   \ZSFBarPenalty{-300}%
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \begin{subsubsectionbar}
-    \textcolor{\SubsubsectionTitleColor}{#2#3}
+    \textcolor{\SubsubsectionTitleColor}{\ZSFInkOwned #2#3}
   \end{subsubsectionbar}
   \ZSFMarkAfterSubsectionBar
 }
@@ -211,8 +217,12 @@
 % ist keine Variante, sondern eine Kopie. Sie driftet beim nächsten Eingriff
 % auseinander, und niemand sieht es, weil beide Boxen für sich genommen
 % korrekt aussehen.
+% \ZSFInkOwned im fonttitle: Der Titelbalken setzt `coltitle` und besitzt damit
+% die Farbe — in jedem Ton, nicht nur im gesaettigten Warn-Ton
+% (40_colors_structure -> Ink-Vertrag). Der Hook laeuft in der Titel-Gruppe und
+% ist deshalb auf sie beschraenkt.
 \tcbset{zsftitlebar/.style={
-  fonttitle=\ZSFfontBoxTitle\strut,
+  fonttitle=\ZSFfontBoxTitle\ZSFInkOwned\strut,
   halign title=center,
   title style={minimum height=\ZSFtitleBarHeight},
   lefttitle=0pt,
@@ -273,6 +283,28 @@
   pady/normal/.style={top=\ZSFboxPadY,    bottom=\ZSFboxPadY},
   pady/tight/.style ={top=\ZSFtextMinPad, bottom=\ZSFtextMinPad},
   pady/none/.style  ={top=0pt,            bottom=0pt},
+}
+
+% Das Gegenstück zu `padx` eine Ebene tiefer: EIN Block statt der ganzen Box.
+%
+% `padx` gilt für den gesamten Boxinhalt — richtig, solange eine Box eine Art
+% Inhalt trägt. Eine `tablebox` trägt aber zwei: die Tabelle, die bis an die
+% Kante laufen MUSS (sonst endet das Zebra kurz vor dem Rahmen), und
+% gelegentlich einen Satz Prosa darüber, der genau das nicht soll. Mit einem
+% Regler pro Box ist einer der beiden zwangsläufig falsch; bisher blieb dafür
+% nur ein handgesetztes \leftskip im Kapitel — also genau der lokale
+% Notausgang, den das System vermeiden will (rules/02_ai_mandate).
+%
+% Kein Argument, weil es nur einen sinnvollen Wert gibt: den normalen
+% Innenabstand der Box. Ein Regler drückt eine Wahl aus, die der Autor pro
+% Stelle trifft — hier gibt es keine (styles/README → Reglertest).
+%
+% \advance statt \setlength, damit Verschachtelung addiert statt überschreibt;
+% die Umgebung bildet eine TeX-Gruppe und stellt beides selbst zurück.
+\newenvironment{ZSFinset}{%
+  \par\advance\leftskip\ZSFboxPadX\advance\rightskip\ZSFboxPadX
+}{%
+  \par
 }
 
 % Ausrichtung des Boxinhalts. Als Hook statt als direktem 'before upper',
@@ -733,9 +765,15 @@
 % (\ZSFfontBoxTitle in zsftitlebar). Ein eigenes \bfseries hier hiesse: wer
 % die Box-Titel umstellt, erwischt die leise Fassung nicht — und sieht es
 % nicht, weil beide für sich plausibel aussehen.
+% \ZSFInkOwned wie in der Kopfzeile: Ein Titel darf sich nicht je nach `weight`
+% anders verhalten. Ohne diese Zeile behielte ein farbtragender Marker im Titel
+% seine Farbe in der leisen Fassung und verlöre sie in der lauten — ein Regler,
+% der die Bedeutung eines anderen Bausteins verschiebt (rules/21_box_options →
+% kein Regler verwirft einen anderen).
 \newcommand{\ZSF@emitQuietTitle}{%
   \ifZSF@boxHasTitle
-    {\ZSFfontBoxTitle\color{\ZSFtoneAccent}\ZSF@boxTitleText}\par\vspace{\ZSFspaceXS}%
+    {\ZSFfontBoxTitle\color{\ZSFtoneAccent}\ZSFInkOwned\ZSF@boxTitleText}%
+    \par\vspace{\ZSFspaceXS}%
   \fi
 }
 % Die Basis der leisen Fassung. Sie wird von der Fabrik VOR den
@@ -786,6 +824,74 @@
 % er nicht beides mitbringt (eigene Semantik UND eine sinnvolle Vorbelegung).
 \NewDocumentEnvironment{warnbox}{O{Achtung} O{}}
   {\begin{ZSF@box}{zsftitlebox, tone=warn}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+
+% ------------------------------------------------------------
+% Die Boxgruppe — die Ebene ZWISCHEN Kapitel und Box
+% ------------------------------------------------------------
+% Bis hierher kannte das System genau einen Geltungsbereich: EINE Box, EINE
+% Eigenschaft. Alles, was mehrere Boxen gemeinsam betrifft, hatte deshalb
+% keinen Ort — und das ist keine Randfrage, sondern ein häufiges Muster:
+% ein Symbol- oder Einheitenregister, dessen Blöcke je einem Kapitel gehören,
+% liest sich als EINE durchgehende Tabelle. Ohne diese Ebene entstehen daraus
+% n einzelne Boxen mit n wiederholten Kopfzeilen und n Zwischenräumen.
+%
+%   \begin{ZSFboxgroup}[cols={Y{0.7} Y{1.6} Y{0.7}},
+%                       head={\ZSFhead{Symbol} & \ZSFhead{Bedeutung}
+%                             & \ZSFhead{Einheit}}]
+%     \begin{tablebox}[1. Elektrisches Feld]
+%       \begin{ZSFtable}[header=false]{\ZSFgroupcols} … \end{ZSFtable}
+%     \end{tablebox}
+%     \begin{tablebox}[2. Potenzial] … \end{tablebox}
+%   \end{ZSFboxgroup}
+%
+% Zwei Regler:
+%   cols  die gemeinsame Spaltenaufteilung. Steht EINMAL an der Gruppe und
+%         wird von den Mitgliedern als \ZSFgroupcols gelesen — sonst stünde
+%         dieselbe Aufteilung an jedem Block, und beim n-ten einmal anders.
+%   head  die gemeinsame Kopfzeile. Weggelassen ⇒ die Gruppe schliesst nur
+%         die Zwischenräume.
+%
+% DIE KOPFZEILE IST SELBST EINE tablebox MIT EINER ZSFtable. Das ist der
+% Kern und nicht ein Implementierungsdetail: Ein eigener Balkentyp müsste
+% Rahmenstärke, Innenabstand und Kantenpolsterung der Tabelle NACHBILDEN, und
+% beim nächsten Eingriff an einer der beiden Geometrien stünden die Bandspalten
+% neben den Tabellenspalten — sichtbar, aber von keinem Test greifbar. Über
+% denselben Baustein gebaut ist die Ausrichtung keine Zusage, sondern eine
+% Folge (rules/10_architecture → Gestaltung an genau einem Ort).
+%
+% Die Gruppe trägt ihren eigenen Aussenabstand und nimmt ihn den Mitgliedern:
+% innen null, aussen genau einmal der normale Boxabstand.
+\makeatletter
+\newcommand{\ZSFgroupcols}{}
+\newcommand{\ZSF@groupHead}{}
+\newlength{\ZSF@groupOuterAfter}
+\pgfkeys{
+  /zsf/boxgroup/.is family, /zsf/boxgroup,
+  cols/.store in=\ZSFgroupcols,
+  head/.store in=\ZSF@groupHead,
+  ZSF@groupDefaults/.style={cols=, head=},
+}
+\NewDocumentEnvironment{ZSFboxgroup}{O{}}{%
+  \par
+  \setlength{\ZSF@groupOuterAfter}{\ZSFBoxAfterSkip}%
+  \addvspace{\ZSFBoxBeforeSkip}%
+  \begingroup
+  \pgfkeys{/zsf/boxgroup, ZSF@groupDefaults, #1}%
+  % Innen keine Abstände: erst dadurch liest sich der Stapel als ein Block.
+  \renewcommand{\ZSFBoxBeforeSkip}{0pt}%
+  \setlength{\ZSFBoxAfterSkip}{0pt}%
+  \ifx\ZSF@groupHead\@empty\else
+    \begin{tablebox}%
+      \begin{ZSFtable}[zebra=false]{\ZSFgroupcols}%
+        \ZSFheaderRow\ZSF@groupHead \\%
+      \end{ZSFtable}%
+    \end{tablebox}%
+  \fi
+}{%
+  \endgroup
+  \par\addvspace{\ZSF@groupOuterAfter}%
+}
+\makeatother
 
 % ------------------------------------------------------------
 % Formula-Box
@@ -921,11 +1027,47 @@
   ZSF@figDefaults/.style={width=, height=\ZSFfigMaxHeight},
 }
 
+% ------------------------------------------------------------
+% \ZSFimage — das Bild OHNE Box
+% ------------------------------------------------------------
+% \ZSFimage[width=<Anteil>, height=<Mass>]{pfad}
+%
+% Die Bild-Makros darüber liefern immer einen Block: figbox, Titel, Caption.
+% Genau das ist falsch, sobald das Bild INHALT eines anderen Bausteins ist —
+% in einer Tabellenzelle (Bauform neben Bezeichnung neben Kennwerten) gibt es
+% keinen Platz für eine zweite Box. Bis hierher gab es dafür keinen Weg: rohes
+% \includegraphics ist in Kapiteln verboten, \ZSFfig öffnet eine figbox.
+%
+% Zugleich die EINE Stelle im System, an der \includegraphics steht. Vorher
+% dreimal fast gleich (Bildreihe, Einzelbild, Bild-neben-Text) — und wer die
+% Skalierung ändern wollte, musste alle drei finden.
+%
+% Bewusst ohne \par und ohne \centering: Der Baustein, in dem das Bild steht,
+% bestimmt Ausrichtung und Umbruch. Beides hier zu setzen machte das Makro in
+% einer Tabellenzelle unbrauchbar — dem Fall, für den es existiert.
+\newcommand{\ZSF@imgWidthFrac}{1}
+\newlength{\ZSF@imgHeightLimit}
+\pgfkeys{
+  /zsf/image/.is family, /zsf/image,
+  width/.store in=\ZSF@imgWidthFrac,
+  height/.code={\setlength{\ZSF@imgHeightLimit}{#1}},
+  ZSF@imgDefaults/.style={width=1, height=\ZSFimageMaxHeight},
+}
+\newcommand{\ZSFimage}[2][]{%
+  \begingroup
+  \pgfkeys{/zsf/image, ZSF@imgDefaults, #1}%
+  \includegraphics[width=\ZSF@imgWidthFrac\linewidth,
+                   height=\ZSF@imgHeightLimit, keepaspectratio]{#2}%
+  \endgroup
+}
+
 % \ZSFfig[<Optionen>]{pfad|pfad1,pfad2,…}{Titel}{Caption}
 %   EIN Makro für ein Bild und für eine Bildreihe (rules/02_ai_mandate →
 %   Katalog-Ökonomie): Eine Pfadliste der Länge 1 IST das Einzelbild.
 %   Mehrere Pfade: gleiche Breite nebeneinander, abgeleitet aus der Anzahl;
 %   `width` begrenzt dann die Reihe insgesamt.
+%   Gezeichnet wird über \ZSFimage — dort steht die Skalierung für alle drei
+%   Bild-Layouts gemeinsam.
 \newcounter{ZSF@figNum}
 \newlength{\ZSF@figWidth}
 \newcommand{\ZSFfig}[4][]{%
@@ -943,8 +1085,7 @@
       \@for\ZSF@figItem:=#2\do{%
         \begin{minipage}[c]{\ZSF@figWidth}%
           \centering
-          \includegraphics[width=\linewidth,height=\ZSF@figHeightLimit,%
-            keepaspectratio]{\ZSF@figItem}%
+          \ZSFimage[width=1, height=\ZSF@figHeightLimit]{\ZSF@figItem}%
         \end{minipage}%
         \hfill
       }%
@@ -952,10 +1093,11 @@
       \par
     \else
       \centering
-      \setlength{\ZSF@figWidth}{\dimexpr
-        \ifx\ZSF@figWidthFrac\@empty 1\else\ZSF@figWidthFrac\fi\linewidth\relax}%
-      \includegraphics[width=\ZSF@figWidth,height=\ZSF@figHeightLimit,%
-        keepaspectratio]{#2}%
+      % Vorbelegung erst hier aufloesen: In der Optionsliste von \ZSFimage
+      % stuende sonst eine Fallunterscheidung, die pgfkeys als Wert speichert
+      % statt sie auszuwerten.
+      \ifx\ZSF@figWidthFrac\@empty\renewcommand{\ZSF@figWidthFrac}{1}\fi
+      \ZSFimage[width=\ZSF@figWidthFrac, height=\ZSF@figHeightLimit]{#2}%
     \fi
     \ZSFfigcaption{#4}%
   \end{figbox}% chktex 10
@@ -973,8 +1115,7 @@
     \noindent
     \begin{minipage}[c]{\ZSF@figWidthFrac\linewidth}%
       \centering
-      \includegraphics[width=\linewidth,height=\ZSF@figHeightLimit,%
-        keepaspectratio]{#2}%
+      \ZSFimage[width=1, height=\ZSF@figHeightLimit]{#2}%
     \end{minipage}%
     \hfill
     \begin{minipage}[c]{\dimexpr\ZSFfigUsableFraction\linewidth

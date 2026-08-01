@@ -132,6 +132,142 @@
 \newcommand{\DangerTagTextColor}{white}
 
 % ------------------------------------------------------------
+% Ink-Vertrag — wem gehoert die Farbe an dieser Stelle?
+% ------------------------------------------------------------
+% Farbtragende Inline-Makros (\ZSFref, \ZSFkeyword, \ZSFmhl*, die
+% Groessenfarben aus 10_math) setzen ihre Farbe nicht selbst, sondern durch
+% \ZSFInk. Das ist die EINE Stelle, an der entschieden wird, ob eine
+% Inline-Farbe ueberhaupt angewendet wird.
+%
+% Der Grund ist eine stille Fehlerart: Auf einer gesaettigten Flaeche, die
+% ihre eigene Kontrastfarbe setzt (Kapitel-, Abschnitts-, Unterabschnittsbalken,
+% Tabellenkopf, Boxtitel, Dokumenttitel), steht eine Inline-Farbe entweder
+% unlesbar auf der Flaeche oder ueberschreibt den Kontrast. Der Build meldet
+% nichts, der Linter auch nicht, und die Box sieht fuer sich plausibel aus.
+% Belegt an zwei realen Faellen: \ZSFref loest auf ChapterColorN auf, waehrend
+% \SubsectionBarColor \chaptercolor!75 ist — derselbe Farbton bei voller
+% Saettigung; und gefaerbte Mathematik im Balkentitel verliert denselben Weg.
+%
+% Das Kriterium ist bewusst EINES und aus dem Code ablesbar, damit es keine
+% Einzelfallabwaegung braucht:
+%
+%   Jede Flaeche, die ihre eigene Kontrast-Textfarbe setzt, besitzt die Farbe.
+%
+% Wo das gilt, steht \ZSFInkOwned direkt neben dem \color/\textcolor, das den
+% Kontrast setzt — nicht an einer entfernten Stelle, wo es beim naechsten
+% Eingriff vergessen wird. Ist die Farbe besetzt, gibt \ZSFInk den Inhalt
+% ungefaerbt aus; er erbt damit genau die Kontrastfarbe der Flaeche und bleibt
+% lesbar, statt zu verschwinden.
+%
+% Gruppenlokal: Balken und Titel sind tcolorbox-Gruppen, der Schalter faellt
+% mit ihnen zurueck. Ein manueller Reset, den man vergessen kann, existiert
+% deshalb nicht.
+\makeatletter
+\newif\ifZSF@inkOwned
+\ZSF@inkOwnedfalse
+\newcommand{\ZSFInkOwned}{\ZSF@inkOwnedtrue}
+\newcommand{\ZSFInkFree}{\ZSF@inkOwnedfalse}
+\newcommand{\ZSFInk}[2]{{\ifZSF@inkOwned\else\color{#1}\fi#2}}
+\makeatother
+
+% ------------------------------------------------------------
+% Groessenfarben — Farbe als Identitaet, nicht als Position
+% ------------------------------------------------------------
+% Diese Palette ist das Gegenstueck zu MathHLPrimary/Secondary/Tertiary/Target
+% oben. Die vier dort sind POSITIONAL ("Quelle", "Gegenstueck", "Ziel") und
+% gelten innerhalb EINER Herleitung. Diese hier sind IDENTITAET: ein Slot
+% gehoert im ganzen Dokument derselben fachlichen Groesse, damit man beim
+% Zusammensetzen einer Formel sieht, welche Groesse wo landet, ohne nachzulesen.
+%
+% Vergeben werden die Slots pro ZSF ueber \ZSFDeclareQuantity (10_math); hier
+% stehen nur die Farben. Zwoelf sind bewusst die Obergrenze: Darueber hinaus
+% sind Farben bei 8pt nicht mehr zuverlaessig unterscheidbar, und eine Palette,
+% die man nicht auseinanderhalten kann, kostet Lesezeit statt sie zu sparen.
+% Der Deklarations-Zaehler laeuft deshalb in einen Fehler und nicht in einen
+% stillen Umlauf.
+%
+% Auswahlkriterium: als TEXT bei 8pt lesbar (also durchweg dunkel) und
+% paarweise unterscheidbar — nicht "schoene Palette". Nachbarn im Farbkreis
+% sind absichtlich ausgelassen.
+\definecolor{ZSFQuantityColor1}{HTML}{B3261E}   % Rot
+\definecolor{ZSFQuantityColor2}{HTML}{1D4ED8}   % Blau
+\definecolor{ZSFQuantityColor3}{HTML}{0F766E}   % Petrol
+\definecolor{ZSFQuantityColor4}{HTML}{B45309}   % Amber
+\definecolor{ZSFQuantityColor5}{HTML}{6D28D9}   % Violett
+\definecolor{ZSFQuantityColor6}{HTML}{15803D}   % Gruen
+\definecolor{ZSFQuantityColor7}{HTML}{BE185D}   % Magenta
+\definecolor{ZSFQuantityColor8}{HTML}{334155}   % Schiefer
+\definecolor{ZSFQuantityColor9}{HTML}{0284C7}   % Himmelblau
+\definecolor{ZSFQuantityColor10}{HTML}{7C2D12}  % Rostbraun
+\definecolor{ZSFQuantityColor11}{HTML}{4D7C0F}  % Oliv
+\definecolor{ZSFQuantityColor12}{HTML}{9333EA}  % Purpur
+\newcommand{\ZSFQuantityPaletteSize}{12}
+
+% \ZSFDeclareQuantity{<Name>}{<Slot 1..12>} legt \ZSFq<Name>{...} an — ein
+% Makro, das seinen Inhalt in der Farbe des Slots setzt. Vergeben wird pro ZSF
+% in preamble.tex, weil "welche Groessen hat dieses Fach" eine einmalige
+% Entscheidung ist und keine, die pro Stelle getroffen wird:
+%
+%   \ZSFDeclareQuantity{Kraft}{1}      % danach: \ZSFqKraft{F}
+%   \ZSFDeclareQuantity{Moment}{5}     % danach: \ZSFqMoment{M}
+%
+% EIN Deklarations-Makro, nicht zwei: Ob ein Name eine Groessenfamilie (Kraft,
+% Moment) oder eine Rolle (zulaessig, resultierend) bezeichnet, ist eine
+% fachliche Unterscheidung und keine technische — zwei Makros dafuer waeren
+% derselbe Weg unter zwei Namen (rules/02_ai_mandate -> Katalog-Oekonomie).
+%
+% Steht hier und nicht in 10_math, obwohl das Ergebnis in Formeln landet: Die
+% Entscheidung, die das Makro traegt, ist eine Farbentscheidung, und 10_math
+% laedt vor diesem Modul — die Palettenpruefung unten haette dort kein
+% \ZSFQuantityPaletteSize zum Pruefen. Derselbe Grund, aus dem \ZSFkeyword in
+% 50_typography steht und nicht in 10_math.
+%
+% Zwei Fehler werden gemeldet statt still hingenommen, weil beide die
+% Grundzusage brechen (eine Farbe = eine Groesse) und beide im PDF wie eine
+% gueltige Einfaerbung aussehen:
+%   - derselbe Slot zweimal vergeben  -> zwei Groessen waeren nicht mehr
+%     unterscheidbar, obwohl die Farbe genau das verspricht;
+%   - Slot ausserhalb der Palette     -> ein stiller Umlauf faerbte die erste
+%     Groesse ein zweites Mal ein.
+\makeatletter
+\newcommand{\ZSF@quantityOwner}[1]{\csname ZSF@qslot@#1\endcsname}
+\newcommand{\ZSFDeclareQuantity}[2]{%
+  \ifnum#2<1\relax
+    \PackageError{ZSF}{Groessen-Slot #2 liegt unter 1}%
+      {Gueltig sind 1..\ZSFQuantityPaletteSize.}%
+  \else
+    \ifnum#2>\ZSFQuantityPaletteSize\relax
+      \PackageError{ZSF}{Groessen-Slot #2 existiert nicht}%
+        {Die Palette hat \ZSFQuantityPaletteSize\space Slots. Mehr Farben sind
+         in der Satzgroesse der ZSF nicht mehr zuverlaessig unterscheidbar;
+         eine weitere Groesse braucht deshalb keinen neuen Slot, sondern die
+         Entscheidung, welche Groesse die Farbe wirklich braucht.}%
+    \else
+      \@ifundefined{ZSF@qslot@#2}{}{%
+        \PackageError{ZSF}{Groessen-Slot #2 ist schon an
+          '\ZSF@quantityOwner{#2}' vergeben}%
+          {Eine Farbe gehoert genau einer Groesse — sonst sind zwei Groessen
+           gleich eingefaerbt und die Farbe sagt nichts mehr aus. Einen freien
+           Slot waehlen oder die vorhandene Deklaration aendern.}%
+      }%
+      \expandafter\gdef\csname ZSF@qslot@#2\endcsname{#1}%
+      \expandafter\newcommand\csname ZSFq#1\endcsname[1]{%
+        \ifZSFQuantityColors\ZSFInk{ZSFQuantityColor#2}{##1}\else##1\fi}%
+    \fi
+  \fi
+}
+\makeatother
+% Globaler Hauptschalter — eine der wenigen Entscheidungen pro ZSF
+% (preamble.tex). Aus, wenn die ZSF in S/W gedruckt wird oder das Fach keine
+% Groessen-Identitaet braucht: die Deklarationen bleiben stehen, nur die Farbe
+% entfaellt. Getrennt vom Ink-Vertrag, weil der KONTEXTBEZOGEN ist (diese
+% Flaeche besitzt die Farbe) und dieser hier DOKUMENTWEIT.
+\newif\ifZSFQuantityColors
+\ZSFQuantityColorstrue
+\newcommand{\ZSFQuantityColorsOn}{\ZSFQuantityColorstrue}
+\newcommand{\ZSFQuantityColorsOff}{\ZSFQuantityColorsfalse}
+
+% ------------------------------------------------------------
 % Dokumenttitel-Masthead: bewusst unabhängig von der Kapitelrotation.
 \colorlet{ZSFDocumentTitleBarColor}{ChapterColor0}
 \colorlet{ZSFDocumentTitleTextColor}{ChapterColor0Text}
@@ -307,6 +443,19 @@
 % Chapter-Start-Orchestrierung
 % ------------------------------------------------------------
 \makeatletter
+% Kurz-Wegweiser eines Front-Matter-Kapitels für das Register (siehe
+% \StartFrontChapter unten). Leer heisst »dieses Kapitel ist kein Indexziel«.
+% Steht hier und nicht in 66_index, weil das Index-Modul opt-in ist: Die
+% Aufrufform von \StartFrontChapter darf nicht davon abhängen, ob ein Schalter
+% gesetzt ist, den der Kapitelautor nicht sieht (dieselbe Begründung wie bei
+% \ZSFkeyword, rules/55_index).
+%
+% \let auf \@empty und \def zum Setzen — NICHT \newcommand. Der Leerheitstest
+% ist ein \ifx gegen \@empty, und \newcommand erzeugt ein \long-Makro, das
+% \ifx nie gleich zu \@empty ist. Mit \newcommand liefe deshalb JEDER
+% Registereintrag in den Front-Zweig, mit leerem Wegweiser statt einer
+% Abschnittsnummer — und zwar ohne Fehler, weil beide Zweige gueltig sind.
+\let\ZSF@frontIdxLabel\@empty
 \newcommand{\ZSFPostChapterSpacing}{\vspace*{\ZSFpostChapterNudge}}
 \newcommand{\StartChapter}[2][]{%
   \ifnum\value{zsfFirstChap}=1\setcounter{zsfFirstChap}{0}\fi
@@ -314,25 +463,42 @@
   \SetChapterPaletteByNumber
   \setcounter{subsection}{0}
   \setcounter{subsubsection}{0}
+  \let\ZSF@frontIdxLabel\@empty
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \ChapterBar{\thesection. #2}
   \ZSFMarkAfterChapterBar
   \ZSFPostChapterSpacing
 }
-\makeatother
 
 % Für ein Kapitel auf neuer Spalte: \ZSFNewColumn davorsetzen
 % (styles/60_boxes.tex) statt einer eigenen Kapitel-Variante.
 
 % Front-Matter-Kapitel: unnummeriert, ETH-Blau, neue Spalte ab Kapitel 2
-\newcommand{\StartFrontChapter}[1]{%
+%
+%   \StartFrontChapter{Titel}              — wie bisher, kein Indexziel
+%   \StartFrontChapter[Z\&E]{Zeichen …}    — mit Kurz-Wegweiser fürs Register
+%
+% Das optionale Argument macht ein Front-Kapitel INDEXIERBAR. Vorher war das
+% ausgeschlossen, und zwar nicht durch Absicht, sondern durch Mechanik: Ein
+% unnummeriertes Kapitel hat keine Abschnittsnummer, der Locator fiel auf die
+% zuletzt vergebene Nummer eines fremden Kapitels zurück. Die Regel verbot
+% deshalb, was das System nicht konnte — obwohl der Bedarf real ist: Ein
+% Symbol- und Einheitenregister im Front-Matter ist genau die Stelle, die man
+% unter Zeitdruck sucht. Statt der Nummer trägt der Eintrag jetzt diesen
+% Kurznamen (Details: styles/66_index.tex).
+%
+% Das Label ist reiner Text und kurz — es steht in jedem Registereintrag
+% dieses Kapitels und konkurriert dort mit den Abschnittsnummern.
+\newcommand{\StartFrontChapter}[2][]{%
   \ifnum\value{zsfFirstChap}=1\setcounter{zsfFirstChap}{0}\else\columnbreak\fi
   \renewcommand{\chaptercolor}{ChapterColor0}%
   \renewcommand{\chaptercolorlight}{ChapterColor0Light}%
   \renewcommand{\chaptercolortext}{ChapterColor0Text}%
   \setcounter{subsection}{0}%
   \setcounter{subsubsection}{0}%
-  \ChapterBar{#1}%
+  \def\ZSF@frontIdxLabel{#1}%
+  \ChapterBar{#2}%
   \ZSFMarkAfterChapterBar
   \ZSFPostChapterSpacing
 }
+\makeatother

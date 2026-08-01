@@ -1,6 +1,6 @@
 % Living Showcase: Einstieg und Navigationsübersicht (Palette Slot 0).
 \ZSFTitleHeader{ZSF Template}{\ZSFOwnerDisplayName}
-\StartFrontChapter{Living Showcase}
+\StartFrontChapter[Start]{Living Showcase}
 
 \begin{runintext}
   Diese Ausgabe ist zugleich Präsentation, Bauteilkatalog und visueller
@@ -8,9 +8,11 @@
   welcher Baustein hier steht und was er leistet.
 \end{runintext}
 
-% Kein \ZSFindex hier: Front-Matter ist unnummeriert und könnte nur auf die
-% blosse Kapitelnummer zeigen statt auf einen Abschnitt (rules/55_index).
 \SubsectionBar*{Schnellzugriff}
+% Front-Matter IST indexierbar, sobald das Kapitel einen Kurzwegweiser trägt
+% (oben: [Start]). Ohne ihn erbte der Eintrag still die Nummer eines fremden
+% Kapitels — deshalb meldet check_index.sh genau diesen Fall.
+\ZSFindex{Schnellzugriff}
 
 \begin{tablebox}[Welcher Baustein wo\ZSFTitleTag{Übersicht}]
   \begin{ZSFtable}{Y{1.05} Z{0.35} Y{1.60}}

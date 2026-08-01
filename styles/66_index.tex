@@ -64,13 +64,38 @@
       \toks1={#2}%
       \toks2={\protected@write\@indexfile{}}%
       \edef\ZSF@num{\ZSF@idxnumnow}%
-      \ifZSFIndexShowPageNumber
-        \edef\ZSF@line{%
-          \the\toks2{\string\indexentry{\the\toks0|\the\toks1}%
-            {\ZSF@num.\noexpand\thepage}}}%
+      \ifx\ZSF@frontIdxLabel\@empty
+        \ifZSFIndexShowPageNumber
+          \edef\ZSF@line{%
+            \the\toks2{\string\indexentry{\the\toks0|\the\toks1}%
+              {\ZSF@num.\noexpand\thepage}}}%
+        \else
+          \edef\ZSF@line{%
+            \the\toks2{\string\indexentry{\the\toks0|\the\toks1}{\ZSF@num}}}%
+        \fi
       \else
+        % Front-Matter: der Wegweiser ist ein NAME, keine Nummer.
+        %
+        % Warum der Name im Encap steckt und nicht im Locator: makeindex
+        % sortiert das Locator-Feld und akzeptiert dort nur Zahlen (mit
+        % page_compositor auch zusammengesetzte). Ein mehrbuchstabiges "ZE"
+        % waere eine "Illegal page number" und der Eintrag fiele aus. Der
+        % Encap dagegen wird unveraendert durchgereicht — derselbe Weg, den
+        % makeidx' eigenes |see{...} nimmt. Der Locator bleibt deshalb die
+        % 0: Sie sortiert die Front-Matter-Eintraege sauber vor alles andere
+        % und traegt zugleich die richtige Farbe (ChapterColor0 ist die
+        % Front-Matter-Farbe).
+        %
+        % Ohne Seitenzahl, wie die see-Verweise: Ein Front-Kapitel steht an
+        % einer festen Stelle, der Name IST der Wegweiser.
+        %
+        % \expandafter im \toks: Das Label wird EINMAL expandiert und dann
+        % unveraendert geschrieben. Ein \edef darueber wuerde ein \& im Label
+        % mit auseinandernehmen.
+        \toks3=\expandafter{\ZSF@frontIdxLabel}%
         \edef\ZSF@line{%
-          \the\toks2{\string\indexentry{\the\toks0|\the\toks1}{\ZSF@num}}}%
+          \the\toks2{\string\indexentry
+            {\the\toks0|ZSFidxfront{\the\toks3}}{0}}}%
       \fi
       \ZSF@line
     \endgroup}}
@@ -168,6 +193,11 @@
     \ZSF@idxrendersection{#1}%
   \fi}
 \newcommand{\ZSFidxsee}[1]{\ZSF@idxrendersection{#1}}
+% Front-Matter-Wegweiser: #1 ist der Kurzname aus \StartFrontChapter,
+% #2 der Dummy-Locator 0, den makeindex zum Sortieren braucht und der hier
+% nichts mehr zu sagen hat. Dieselbe Auszeichnung wie jede Zielnummer, damit
+% Name und Nummer im Register als dasselbe gelesen werden.
+\newcommand{\ZSFidxfront}[2]{{\ZSFfontRefLocator\color{ChapterColor0}#1}}
 \makeatother
 
 % see-Verweise zeigen zusätzlich die (farbcodierte) Abschnittsnummer des

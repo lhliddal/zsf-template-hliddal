@@ -92,6 +92,32 @@
 % \renewcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
 % \renewcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
+% ── Grössenfarben: Farbe als Identität einer Grösse ──────────────────
+% Für Fächer, in denen dieselben Grössen über das ganze Dokument hinweg in
+% Formeln auftauchen (Kraft, Moment, Spannung, Durchmesser …). Eine Farbe
+% gehört dann im ganzen Dokument EINER Grösse — beim Zusammensetzen einer
+% Formel sieht man sofort, welche Grösse wo landet.
+%
+% Nicht zu verwechseln mit \ZSFmhlA..D: Die sind POSITIONAL (»erster Strang«,
+% »Ziel«) und gelten innerhalb einer Herleitung.
+%
+% Zwölf Slots; ein doppelt vergebener bricht ab (eine Farbe, die zwei Grössen
+% bedeutet, sagt nichts mehr aus). Wo das Fach keine wiederkehrenden Grössen
+% hat, bleibt der Block leer und es ändert sich nichts.
+% \ZSFDeclareQuantity{Kraft}{1}   % danach in Kapiteln: \ZSFqKraft{F}
+% \ZSFDeclareQuantity{Moment}{5}  % danach:              \ZSFqMoment{M}
+%
+% Hauptschalter — nimmt alle Grössenfarben zurück (z.B. für S/W-Druck),
+% ohne die Deklarationen zu entfernen:
+% \ZSFQuantityColorsOff
+\ifdefined\ZSFShowcaseMode
+  % Nur für die Living Showcase: init_project.sh entfernt den Marker, ein
+  % Fach-Fork startet damit ohne Deklarationen.
+  \ZSFDeclareQuantity{Kraft}{1}
+  \ZSFDeclareQuantity{Weg}{2}
+  \ZSFDeclareQuantity{Moment}{5}
+\fi
+
 \input{styles/55_readability}
 
 % ── Fliesstext: Flattersatz ──────────────────────────────────────────

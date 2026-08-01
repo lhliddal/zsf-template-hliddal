@@ -71,7 +71,69 @@
 \newcommand{\ZSFheaderRowBG}{\chaptercolor}
 \newcommand{\ZSFheaderRowFG}{\chaptercolortext}
 \newcommand{\ZSFheaderRow}{\rowcolor{\ZSFheaderRowBG}}
-\newcommand{\ZSFhead}[1]{{\color{\ZSFheaderRowFG}\ZSFfontTableHead #1}}
+% \ZSFInkOwned steht direkt neben dem \color, das den Kontrast setzt: Die
+% Kopfzelle ist eine gesaettigte Flaeche mit eigener Textfarbe, eine
+% Inline-Farbe darin waere unlesbar (40_colors_structure -> Ink-Vertrag).
+\newcommand{\ZSFhead}[1]{{\color{\ZSFheaderRowFG}\ZSFInkOwned\ZSFfontTableHead #1}}
+
+% ------------------------------------------------------------
+% Zellen verbinden
+% ------------------------------------------------------------
+% \ZSFspan{<L|C|R>}{<Anzahl Spalten>}{<Inhalt>}
+%
+% Eine Zelle über mehrere Spalten — die Ebene, die zwischen Tabelle und Zelle
+% fehlte. Drei Rollen, ein Baustein, weil es technisch dieselbe Sache ist und
+% nur der Inhalt sie unterscheidet (rules/02_ai_mandate → Katalog-Ökonomie):
+%
+%   gruppierter Kopf      \ZSFheaderRow \ZSFhead{Querschnitt} &
+%                           \ZSFspan{C}{2}{\ZSFhead{Biegung}} & …
+%   volle Breite          \ZSFspan{C}{3}{$\displaystyle \cos(2x)=\dots$} \\
+%   Abschnittszeile       \ZSFspan{L}{2}{\ZSFlabel{Rang 2: voller Rang}} \\
+%
+% Ersetzt rohes \multicolumn, das in Kapiteln verboten ist und für das es bis
+% hierher keinen Ersatz gab — die einzige Stelle im System, an der eine
+% belegte Notwendigkeit gar keinen legalen Weg hatte.
+%
+% WARUM die Ausrichtung ein PFLICHTargument ist und kein optionaler Schlüssel
+% wie sonst überall: TeX entscheidet am Zellenanfang, ob die Spaltenvorlage
+% eingesetzt wird, und lässt sich davon nur durch ein \omit abbringen — das
+% \multicolumn als erstes setzt. Auf dem Weg dorthin darf TeX ausschliesslich
+% EXPANDIEREN. Jede Form mit optionalem Argument führt aber eine Zuweisung aus,
+% bevor \multicolumn erreicht ist (xparse ebenso wie \newcommand[..][..]), und
+% die Vorlage steht dann schon: "Misplaced \omit". Gemessen an beiden Formen,
+% nicht hergeleitet. Deshalb ist der Weg hierher bewusst der einzige im System,
+% der von der Schlüsselkonvention abweicht — mit sichtbarem Grund, damit ihn
+% niemand später "geradezieht" und den Fehler zurückholt.
+%
+% Dieselbe Einschränkung erzwingt die Form darunter: Der Spaltenbuchstabe muss
+% LITERAL bei \multicolumn ankommen. Ein Makro, das ihn liefert, geht nicht —
+% der Preamble-Parser von `array` vergleicht Tokens und expandiert dabei nicht
+% ("Illegal pream-token"). Auch das gemessen. Deshalb steht die Auswahl als
+% \if-Kette VOR \multicolumn: Sie ist rein expandierbar, hält die \omit-Regel
+% ein und übergibt am Ende ein echtes l/c/r.
+%
+% Der Fehlerfall läuft absichtlich in den Zellinhalt und nicht davor: Dort ist
+% \omit schon gesetzt, eine Meldung ist damit unschädlich. Ein stiller Rückfall
+% auf `C` sähe im PDF wie eine bewusst zentrierte Zelle aus.
+%
+% Eine verbundene Zelle bricht NICHT um: l/c/r statt einer X-Spalte, weil die
+% Breite eines Verbunds erst beim Satz feststeht. Das deckt die Rollen oben ab
+% (Kopf, Formel, kurze Abschnittszeile); für umbrechenden Fliesstext über die
+% volle Breite ist die Tabelle der falsche Baustein.
+\makeatletter
+\newcommand{\ZSF@spanBadAlign}[1]{%
+  \PackageError{ZSF}{Unbekannte Ausrichtung '#1' in \string\ZSFspan}%
+    {Gueltig sind L, C und R -- dieselben Buchstaben wie bei den
+     Spaltentypen L/C/R.}%
+}
+\newcommand{\ZSFspan}[3]{%
+  \if L#1\multicolumn{#2}{l}{#3}%
+  \else\if R#1\multicolumn{#2}{r}{#3}%
+  \else\if C#1\multicolumn{#2}{c}{#3}%
+  \else\multicolumn{#2}{c}{\ZSF@spanBadAlign{#1}#3}%
+  \fi\fi\fi
+}
+\makeatother
 
 % ------------------------------------------------------------
 % Semantische Tabellen-Umgebung (Single Point of Truth)
@@ -87,6 +149,15 @@
 %   zebra       Zebra-Streifen an (Default). 'zebra=false': aus.
 %   font=dense  eine Stufe kleiner, für lange Tabellen mit knappem
 %               Zellinhalt. Default 'font=normal'.
+%   rows        Zeilenhöhe: 'normal' (Default) | 'roomy' | 'tight'.
+%   colsep      Zellpolsterung: 'normal' (Default) | 'tight'.
+%
+% Warum `font`, `rows` und `colsep` drei Regler sind und nicht einer: Sie
+% beantworten drei verschiedene Fragen, die sich kreuzen. Eine Formeltabelle
+% will grosse Schrift UND viel Zeilenhöhe; ein siebenspaltiges Register will
+% kleine Schrift, knappe Zellpolsterung und normale Zeilenhöhe. Ein
+% gemeinsamer „Dichte"-Regler könnte nur eine dieser Kombinationen treffen und
+% müsste die anderen still verwerfen (rules/21_box_options).
 %
 % Die Zebra-Startzeile folgt automatisch der Kopfzeile: mit Header ab
 % Zeile 2, ohne ab Zeile 1.
@@ -104,6 +175,10 @@
 \newif\ifZSF@tblHeader
 \newif\ifZSF@tblZebra
 \newcommand{\ZSF@tblFont}{\ZSFfontTable}
+\newcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}
+\newlength{\ZSF@tblColSep}
+\newcommand{\ZSF@tblSpec}{}
+\newcommand{\ZSF@beginTabularx}[1]{\tabularx{\linewidth}{#1}}
 \pgfkeys{
   /zsf/table/.is family, /zsf/table,
   header/.is if=ZSF@tblHeader,
@@ -111,20 +186,54 @@
   font/.is choice,
   font/normal/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontTable}},
   font/dense/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontTableDense}},
-  ZSF@tblDefaults/.style={header=true, zebra=true, font=normal},
+  rows/.is choice,
+  rows/normal/.code={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}},
+  rows/roomy/.code ={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchRoomy}},
+  rows/tight/.code ={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchTight}},
+  % `colsep` regelt ausschliesslich den Abstand ZWISCHEN den Spalten. Der
+  % Abstand zur Boxkante haengt nicht daran — siehe der @-Eintrag unten.
+  colsep/.is choice,
+  colsep/normal/.code={\setlength{\ZSF@tblColSep}{\ZSFtableEdgePad}},
+  colsep/tight/.code ={\setlength{\ZSF@tblColSep}{\ZSFtableEdgePadTight}},
+  ZSF@tblDefaults/.style={header=true, zebra=true, font=normal,
+                          rows=normal, colsep=normal},
 }
 \NewDocumentEnvironment{ZSFtable}{O{} m}{%
   \begingroup
   \pgfkeys{/zsf/table, ZSF@tblDefaults, #1}%
-  \setlength{\tabcolsep}{\ZSFtableEdgePad}%
-  \renewcommand{\arraystretch}{\ZSFtableArrayStretch}%
+  \setlength{\tabcolsep}{\ZSF@tblColSep}%
+  \renewcommand{\arraystretch}{\ZSF@tblStretch}%
   \ZSF@tblFont
   \ifZSF@tblZebra
     \ifZSF@tblHeader\ZSFzebraStart{2}\else\ZSFzebraStart{1}\fi
   \else
     \ZSFzebraOff
   \fi
-  \tabularx{\linewidth}{#2}%
+  % Der Abstand zur BOXKANTE, getrennt vom Abstand zwischen den Spalten.
+  %
+  % \tabcolsep trug beide Rollen: In einer randlosen tablebox (padx=none, damit
+  % Zebra und Kopfzeile bis an den Rand laufen) ist der aeussere Rand genau ein
+  % \tabcolsep. Wer die Spalten enger stellte, schob damit den Text an die
+  % Kante — und das ist gerade bei der vielspaltigen Tabelle noetig, fuer die
+  % `colsep=tight` existiert.
+  %
+  % Der @-Eintrag ersetzt den \tabcolsep an der Aussenkante durch einen eigenen
+  % Wert. Bei `colsep=normal` ist er wertgleich, die Geometrie aller
+  % bestehenden Tabellen bleibt damit unveraendert; bei `colsep=tight` haelt er
+  % den Rand, waehrend innen gekuerzt wird. Deshalb ohne Fallunterscheidung —
+  % ein \if um \tabularx herum bricht ohnehin, weil die Umgebung ihren Rumpf
+  % selbst bis \end{tabularx} liest und das \fi dabei stehenbleibt.
+  %
+  % Die Spaltenaufteilung wird VORHER aufgeloest. Der Preamble-Parser von
+  % `array` vergleicht Tokens und expandiert dabei nicht: Ein Makro als colspec
+  % meldet "Illegal pream-token" (gemessen, nicht hergeleitet). Genau das
+  % braucht aber die Boxgruppe, deren Mitglieder ihre gemeinsame Aufteilung als
+  % \ZSFgroupcols lesen, statt sie in jedem Block zu wiederholen.
+  % Der \edef ist unbedenklich: Spaltenbuchstaben sind Zeichen (L/C/R/Y…
+  % stammen aus \newcolumntype und sind keine Makros), \hskip ist ein Primitiv
+  % und \ZSFtableEdgePad ein Register — nichts davon expandiert.
+  \edef\ZSF@tblSpec{@{\hskip\ZSFtableEdgePad}#2@{\hskip\ZSFtableEdgePad}}%
+  \expandafter\ZSF@beginTabularx\expandafter{\ZSF@tblSpec}%
 }{%
   \endtabularx
   \endgroup

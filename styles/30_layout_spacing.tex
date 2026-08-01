@@ -139,10 +139,35 @@
 \newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
 \newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
 \newlength{\ZSFgoalConditionBorderlineWidth}\setlength{\ZSFgoalConditionBorderlineWidth}{0.2pt}
+% Zeilenhöhe der ZSFtable in drei Stufen — der Regler `rows` wählt zwischen
+% ihnen (20_tables). Drei Werte statt eines, weil die Höhe einer Zeile nicht
+% aus der Tabellenart folgt, sondern aus ihrem Inhalt: Eine Tabelle mit
+% \dfrac-Zellen braucht mehr Höhe, ein Symbolregister mit Einzelzeichen
+% weniger. `font=dense` ist dafür die falsche Antwort — es verkleinert die
+% Schrift, während der Bedarf hier die Höhe ist.
+%
+% Als Faktoren (\newcommand) statt als Längen: \arraystretch ist ein
+% Multiplikator auf die Zeilenhöhe, kein Mass. Deshalb auch bewusst NICHT
+% über \ZSFDensityTables skaliert — der Bereichsfaktor wirkt auf die
+% Abstände der Tabelle (\ZSFtableEdgePad, \extrarowheight), und ein Faktor
+% mal einem Faktor ergäbe eine Stauchung, die niemand vorhersagt.
 \newcommand{\ZSFtableArrayStretch}{1.04}
+\newcommand{\ZSFtableArrayStretchRoomy}{1.28}
+\newcommand{\ZSFtableArrayStretchTight}{0.92}
 
 % Maximale Höhe für Bilder in figboxen (verhindert überhohe Aspect-Ratios).
 \newlength{\ZSFfigMaxHeight}\setlength{\ZSFfigMaxHeight}{2.6cm}
+
+% Vorbelegte Höhe eines Bildes OHNE Box (\ZSFimage) — der Fall ist die
+% Tabellenzelle. Eigener Wert und nicht \ZSFfigMaxHeight, weil die beiden
+% verschiedene Grössenordnungen sind: eine Abbildung füllt einen Block, ein
+% Zellenbild muss in eine Tabellenzeile passen.
+%
+% Der eigentliche Zweck ist die Gleichmässigkeit: Eine Spalte aus
+% \ZSFimage{pfad}-Aufrufen ohne Höhenangabe ist damit von selbst einheitlich
+% hoch. Stünde die Höhe stattdessen an jedem Aufruf, wäre dieselbe Entscheidung
+% fünfmal geschrieben — und beim sechsten Bild einmal anders.
+\newlength{\ZSFimageMaxHeight}\setlength{\ZSFimageMaxHeight}{1.1cm}
 
 % Nutzbarer Anteil der Zeilenbreite in mehrteiligen Bild-Layouts; der Rest ist
 % der \hfill-Steg zwischen den Elementen (Bildreihe in \ZSFfig, Bild-neben-Text
@@ -184,9 +209,16 @@
 % \ZSFtableEdgePad   — für Boxen, deren Hintergrund bis an die Kante laufen
 %                      soll (Zebra, Wertegitter). Dort trägt nicht die Box
 %                      den Abstand, sondern die äusserste Tabellenzelle.
+% \ZSFtableEdgePadTight — dasselbe knapper. Der Regler `colsep` (20_tables)
+%                      wählt zwischen beiden: Die Zellpolsterung ist pro
+%                      Tabelle verschieden, weil sie mit der Spaltenzahl
+%                      skaliert — bei sieben Spalten kostet der Standardwert
+%                      beidseitig mehr Breite als der Inhalt selbst.
 \newlength{\ZSFboxPadX}      \setlength{\ZSFboxPadX}{\ZSFDensityBoxes\ZSFspaceS}
 \newlength{\ZSFboxPadXBar}   \setlength{\ZSFboxPadXBar}{\ZSFDensityBoxes\ZSFspaceM}
 \newlength{\ZSFtableEdgePad} \setlength{\ZSFtableEdgePad}{\ZSFDensityTables\ZSFspaceM}
+\newlength{\ZSFtableEdgePadTight}
+  \setlength{\ZSFtableEdgePadTight}{\ZSFDensityTables\ZSFspaceXS}
 
 % Vertikal dasselbe: Innenabstand oben/unten und der Abstand NACH einer Box.
 % Beide als Register, damit der Abstand nach einer Box nicht pro Box-Stil

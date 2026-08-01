@@ -29,6 +29,37 @@
   \ZSFItem{Gleiche Farbe}{bedeutet immer dieselbe Grösse, nie blosse Betonung.}
 \end{ZSFlist}
 
+\SubsectionBar[sec:quantity]{Grössenfarben: Farbe als Identität}
+\ZSFindex{Grössenfarbe}
+
+\begin{runintext}
+  Die Marker oben sind \ZSFkeyword*{positional} — sie gelten innerhalb einer
+  Herleitung. Wo dieselben Grössen über das ganze Dokument hinweg auftauchen,
+  gibt es das Gegenstück: eine Farbe gehört dauerhaft einer \ZSFkeyword{Grösse}.
+\end{runintext}
+
+\begin{formulabox}[Dieselbe Farbe, quer durch die ZSF]
+  \[
+    \ZSFqMoment{M} = \ZSFqKraft{F} \cdot \ZSFqWeg{r}
+  \]
+  \ZSFsep[Andere Stelle, andere Formel]
+  \[
+    W = \ZSFqKraft{F} \cdot \ZSFqWeg{s}
+    \qquad
+    \ZSFqKraft{F} = \frac{\ZSFqMoment{M}}{\ZSFqWeg{r}}
+  \]
+  \formulanote{Kraft, Weg und Moment behalten ihre Farbe in jeder Formel.
+  Vergeben werden sie einmal in preamble.tex, nie im Kapitel.}
+\end{formulabox}
+
+\begin{defbox}[Zwei Systeme, zwei Fragen][weight=quiet]
+  \ZSFkeyword*{ZSFmhlA..D} beantwortet »welche Rolle spielt dieser Term in
+  \emph{dieser} Umformung«. \ZSFkeyword*{ZSFDeclareQuantity} beantwortet
+  »welche Grösse ist das, überall«. Beide gleichzeitig zu verwenden ist
+  möglich, aber selten sinnvoll — zwei Farbsprachen in einer Formel liest
+  niemand unter Zeitdruck.
+\end{defbox}
+
 \SubsectionBar[sec:brace]{Formelteile benennen}
 \ZSFindex{Klammer-Annotation}
 

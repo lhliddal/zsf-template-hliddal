@@ -47,13 +47,21 @@
   }[\lim_{#1}]%
 }
 
-% --- Semantisches Formel-Highlighting ---
+% --- Semantisches Formel-Highlighting (POSITIONAL) ---
 % Verknüpft visuell zusammengehörige Teile einer Formel über mehrere
 % Umformungsschritte hinweg. Farben zentral in 40_colors_structure.tex.
-\newcommand{\ZSFmhlA}[1]{{\color{MathHLPrimary}#1}}
-\newcommand{\ZSFmhlB}[1]{{\color{MathHLSecondary}#1}}
-\newcommand{\ZSFmhlC}[1]{{\color{MathHLTarget}#1}}
-\newcommand{\ZSFmhlD}[1]{{\color{MathHLTertiary}#1}}
+% Die Rolle ist die STELLE in der Herleitung, nicht die Grösse — für
+% dokumentweite Grössen-Identität siehe \ZSFDeclareQuantity unten.
+% Die Farbe läuft über \ZSFInk, damit sie auf einer Fläche, die ihre eigene
+% Kontrastfarbe setzt, nicht unlesbar wird (40_colors_structure → Ink-Vertrag).
+\newcommand{\ZSFmhlA}[1]{\ZSFInk{MathHLPrimary}{#1}}
+\newcommand{\ZSFmhlB}[1]{\ZSFInk{MathHLSecondary}{#1}}
+\newcommand{\ZSFmhlC}[1]{\ZSFInk{MathHLTarget}{#1}}
+\newcommand{\ZSFmhlD}[1]{\ZSFInk{MathHLTertiary}{#1}}
+
+% Für die dokumentweite Grössen-Identität (Farbe = Grösse statt Farbe =
+% Stelle in der Herleitung) siehe \ZSFDeclareQuantity in
+% styles/40_colors_structure.tex — dort, weil die Palette dort steht.
 
 % --- Term-Annotation mit geschweifter Klammer (Stilmittel) ---
 % Beschriftet einen Formelteil unter/über einer geschweiften Klammer.

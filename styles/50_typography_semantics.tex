@@ -61,7 +61,19 @@
 % Annotationen an Formelteilen. Ersetzt lokales \tiny/\scriptsize an
 % genau diesen Stellen — Diagramm-Inhalt ist Inhalt, seine Schriftgrösse
 % ist Gestaltung und gehört deshalb hierher.
+%
+% ZWEI Stufen, weil ein Diagramm zwei Beschriftungsrollen hat und die Wahl
+% pro Stelle fällt: die reguläre Marke (Achse, Kurve, Knoten) und die
+% gedrängte Zusatzangabe (Mass an einer engen Kote, Index an einem kleinen
+% Knoten), die neben der regulären stehen muss, ohne sie zu verdecken. Ohne
+% die zweite Stufe entsteht genau dort das lokale \tiny, das dieser Block
+% ersetzen soll.
+%
+% Für ein ganzes Bild einmal setzen statt pro Knoten:
+%   \begin{tikzpicture}[font=\ZSFfontDiagramLabel] … \end{tikzpicture}
+% Einzelne Knoten übersteuern das dann mit `font=\ZSFfontDiagramLabelSmall`.
 \newcommand{\ZSFfontDiagramLabel}{\sffamily\fontsize{5.8bp}{6.4bp}\selectfont}
+\newcommand{\ZSFfontDiagramLabelSmall}{\sffamily\fontsize{4.6bp}{5.1bp}\selectfont}
 
 % Semantische Inhaltsmakros (konsistente Skalierung und einfache Anpassung)
 %
@@ -115,7 +127,10 @@
 % \chaptercolor statt eines eigenen Tokens, damit der Anker der Kapitelrotation
 % folgt wie jedes andere farbtragende Element. Umstellen pro ZSF in
 % preamble.tex per \renewcommand, nie im Kapitel.
-\newcommand{\ZSFkeywordStyle}[1]{\textbf{\textcolor{\chaptercolor}{#1}}}
+% Die Farbe läuft über \ZSFInk: In einem Titelbalken oder einer Tabellenkopfzelle
+% besitzt die Fläche die Farbe bereits, und der Anker erbt dort deren
+% Kontrastfarbe, statt in ihr zu verschwinden (40_colors_structure → Ink-Vertrag).
+\newcommand{\ZSFkeywordStyle}[1]{\textbf{\ZSFInk{\chaptercolor}{#1}}}
 \newcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
 \newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\ZSFfontBoxBinding (S.#1)}}
@@ -160,16 +175,23 @@
     \ZSFSetPaletteColorNameFromNumber{\ZSF@refTargetChap}{\ZSF@refTargetColor}%
   }%
 }
+% Die Zielfarbe läuft über \ZSFInk. Ohne das steht ein Verweis auf das eigene
+% Kapitel im Titel einer \SubsectionBar als ChapterColorN auf \chaptercolor!75 —
+% derselbe Farbton bei voller Sättigung, also unlesbar, ohne dass Build oder
+% Linter etwas melden. Auf einer Fläche mit eigener Kontrastfarbe erbt der
+% Verweis diese und bleibt lesbar; der Farb-Wegweiser gilt dort, wo er auch
+% ankommt — im Boxinhalt (40_colors_structure → Ink-Vertrag).
 \newcommand{\ZSFref}[1]{%
   \begingroup
   \ZSF@refComputeTargetColor{#1}%
-  \hyperref[#1]{{\ZSFfontNote\ZSFfontRefLocator\color{\ZSF@refTargetColor}($\rightarrow$\,\ref*{#1})}}%
+  \hyperref[#1]{{\ZSFfontNote\ZSFfontRefLocator
+    \ZSFInk{\ZSF@refTargetColor}{($\rightarrow$\,\ref*{#1})}}}%
   \endgroup
 }
 \newcommand{\ZSFsectionref}[1]{%
   \begingroup
   \ZSF@refComputeTargetColor{#1}%
-  \hyperref[#1]{{\ZSFfontRefLocator\color{\ZSF@refTargetColor}\ref*{#1}}}%
+  \hyperref[#1]{{\ZSFfontRefLocator\ZSFInk{\ZSF@refTargetColor}{\ref*{#1}}}}%
   \endgroup
 }
 \makeatother

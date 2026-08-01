@@ -8,12 +8,12 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `10_math.tex` | Math-Macros: `\R \C \N \Z \Q`, `\dd`, `\norm \abs`, `\sgn \grad \divg \rot`, `\vect`, ZSFsumMode/ZSFlimMode |
 | `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, Klammern über Zellgrenzen (`\tikzmark`/`\drawbrace`/`\annote` + `\ZSFbraceRoom`), Pfeil-Fix |
 | `12_plots.tex` | **OPT-IN**: lädt `pgfplots` und setzt die zentrale Kompatibilitätsversion |
-| `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`, `\ZSFheaderRow`, `\ZSFhead` |
+| `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`/`rows`/`colsep`, `\ZSFheaderRow`, `\ZSFhead`, Zellverbund `\ZSFspan` |
 | `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
-| `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter` |
+| `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`, Ink-Vertrag (`\ZSFInk`/`\ZSFInkOwned`), Grössenfarben-Palette + `\ZSFDeclareQuantity` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
-| `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxcontract` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`/`splitalign`/`grid`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\ZSFsep`/`\formulanote`, `runintext`, `\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
+| `60_boxes.tex` | Box-Grundvertrag (`zsfbox` → `zsfboxcontract` → `zsfboxshape` → `zsftitlebox`, siehe unten), Instanz-Regler (`tone`/`weight`/`padx`/`pady`/`align`/`frame`/`atomic`/`split`/`splitalign`/`grid`), `chapterbar`/`subsectionbar`/`subsubsectionbar` (+ `\ZSFNewColumn`), `defbox`/`tablebox`/`figbox`/`warnbox`, `formulabox` + `\ZSFsep`/`\formulanote`, `runintext`, `\ZSFimage`/`\ZSFfig`/`\ZSFfigside`, `splitbox`, `ZSFlist` + `\ZSFItem`, `valuegrid`, Boxgruppe (`ZSFboxgroup` + `\ZSFgroupcols`), Blockpolsterung (`ZSFinset`), Goal-System (`\GoalCondition`/`\GoalTarget`/`\ZSFDerivationCase`), Pack-Modus (`\ZSFBoxesBreakableOn`/`\ZSFBreakReservesOff`), `\ZSFdanger` |
 | `65_code_style.tex` | **OPT-IN** (Informatik): lädt `listings` samt tcolorbox-Library; Style `CodeExpert`, `codebox[Titel][part=…]` (whole/first/mid/last) |
 | `66_index.tex` | **OPT-IN**: lädt `makeidx`; Stichwortverzeichnis mit `\ZSFkeyword`-Auto-Indexierung, `\ZSFindex`/`\ZSFindexsee`, `x.x`-/`x.x.x`-Locator und `zsfindex.ist` |
 | `67_code_comments.tex` | **OPT-IN** (Informatik, nach 65): Smart Code-Kommentare `\CodeLine{code}[comment]`, `\InlineComment`/`\OverlineComment` |
@@ -45,12 +45,15 @@ und `rules/55_index.md`.
   `\SubsubsectionBar`, `\ZSFNewColumn`.
 - Inhaltsboxen: `defbox`, `tablebox`, `figbox`, `formulabox`, `warnbox`,
   `ZSFlist`, `goalbox`, `valuegrid`, `splitbox`, `runintext`.
+- Boxgruppe (mehrere Boxen als ein Block): `ZSFboxgroup`, `\ZSFgroupcols`.
+- Block innerhalb einer Box: `ZSFinset`.
 - Tabellen: `ZSFtable`, Spaltentypen
-  `L`, `C`, `R`, `Y`, `Z`, `Q`, `F`, `\ZSFheaderRow`, `\ZSFhead`.
-- Bilder: `\ZSFfig`, `\ZSFfigside`, `\ZSFfigcaption`.
+  `L`, `C`, `R`, `Y`, `Z`, `Q`, `F`, `\ZSFheaderRow`, `\ZSFhead`, `\ZSFspan`.
+- Bilder: `\ZSFimage`, `\ZSFfig`, `\ZSFfigside`, `\ZSFfigcaption`.
 - Semantik und Navigation: `\ZSFkeyword`, `\ZSFlabel`, `\ZSFdanger`,
   `\ZSFconclusion`, `\ZSFhl`, `\ZSFref`, `\ZSFsectionref`, `\ZSFTitleTag`,
-  `\ZSFsep`, `\ZSFItem`, `\ZSFfontDiagramLabel`.
+  `\ZSFsep`, `\ZSFItem`, `\ZSFfontDiagramLabel`,
+  `\ZSFfontDiagramLabelSmall`.
 - Abstände in Kapiteln: `\ZSFgap`, `\ZSFSectionGap`.
 - Punktuelle Umbruchsteuerung in Kapiteln: `\ZSFbreak`, `\ZSFnobreak`,
   `\ZSFallowbreak`.
@@ -62,7 +65,11 @@ und `rules/55_index.md`.
   `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
   `\ZSFReadableBodyOn`, `\ZSFReadableBodyOff`, `\ZSFIndexShowPageNumber`
   (Index-Locator mit oder ohne Seitenzahl, siehe `rules/55_index.md`),
-  `\ZSFkeywordStyle`, `\ZSFlabelStyle` (Darstellung der beiden Marker).
+  `\ZSFkeywordStyle`, `\ZSFlabelStyle` (Darstellung der beiden Marker),
+  `\ZSFDeclareQuantity` (Grössenfarben des Fachs vergeben),
+  `\ZSFQuantityColorsOn` / `\ZSFQuantityColorsOff` (Hauptschalter dafür).
+- Grössenfarben in Kapiteln: die per `\ZSFDeclareQuantity{<Name>}{<Slot>}`
+  erzeugten `\ZSFq<Name>`.
 - Pack-Modus für Anhang-artige Kapitel (am Kapitelanfang):
   `\ZSFBoxesBreakableOn`, `\ZSFBoxesBreakableOff`, `\ZSFBreakReservesOff`.
 - Formel-API: `\R`, `\C`, `\N`, `\Z`, `\Q`, `\dd`, `\vect`, `\abs`,
@@ -245,6 +252,66 @@ alle Wahlen fest, gleichgültig wer sie getroffen hat.
 `\ZSFtoneAccent` braucht diese Behandlung **nicht**: `borderline` liest seine
 Farbe erst beim Zeichnen aus und funktioniert deshalb als reines Makro.
 
+#### Der Ink-Vertrag — wem gehört die Farbe an dieser Stelle?
+
+Die beiden Mechaniken oben sorgen dafür, dass eine Box ihre Farben aus Rolle
+und Ton bekommt. Der Ink-Vertrag beantwortet die Gegenfrage: Was passiert mit
+**Inline**-Farbe, die auf einer bereits gefärbten Fläche landet?
+
+Farbtragende Inline-Makros (`\ZSFkeyword`, `\ZSFref`, `\ZSFsectionref`,
+`\ZSFmhl*`, die Grössenfarben) setzen `\color` nicht selbst, sondern gehen
+durch **`\ZSFInk{<Farbe>}{<Inhalt>}`** (`40_colors_structure`). Ist die Fläche
+ink-besitzend, gibt `\ZSFInk` den Inhalt ungefärbt aus — er erbt damit die
+Kontrastfarbe der Fläche und bleibt lesbar.
+
+Das Kriterium ist bewusst **eines** und aus dem Code ablesbar:
+
+> Jede Fläche, die ihre eigene Kontrast-Textfarbe setzt, besitzt die Farbe.
+
+Deshalb steht `\ZSFInkOwned` immer **direkt neben** dem `\color`/`\textcolor`,
+das den Kontrast setzt — nicht an einer entfernten Stelle, wo es beim nächsten
+Eingriff vergessen wird. Heute sind das: `\ChapterBar`, `\ZSFTitleHeader`,
+Abschnitts- und Unterabschnittsbalken, `\ZSFhead` (Tabellenkopfzelle), der
+Titelbalken jeder Box (`zsftitlebar`) und die Titelzeile der leisen Fassung
+(`\ZSF@emitQuietTitle`).
+
+Die leise Titelzeile gehört ausdrücklich dazu, obwohl ihre Fläche nicht
+gesättigt ist: Ein Titel darf sich nicht je nach `weight` anders verhalten.
+Ohne sie behielte ein Marker im Titel seine Farbe in der leisen Fassung und
+verlöre sie in der lauten — ein Regler, der die Bedeutung eines anderen
+Bausteins verschiebt.
+
+Belegt wird der Vertrag als **Zustandsabfrage**, nicht als Bildvergleich: eine
+Probe, die `OWNED`/`FREE` als Text ausgibt, unterscheidet die beiden Zustände
+eindeutig; ein Bild sagt nur, dass etwas anders aussieht.
+
+Wer eine neue gefärbte Fläche anlegt, setzt `\ZSFInkOwned` mit. Wer eine neue
+farbtragende Inline-Auszeichnung anlegt, führt sie über `\ZSFInk`.
+
+#### Warum `\ZSFspan` als einziger Baustein Pflichtargumente hat
+
+`\ZSFspan{<L|C|R>}{<n>}{<Inhalt>}` weicht von der Schlüsselkonvention ab. Der
+Grund ist gemessen, nicht ästhetisch, und steht hier, damit ihn niemand
+„geradezieht":
+
+- TeX setzt am Zellenanfang die Spaltenvorlage ein, sofern das erste
+  **nicht-expandierbare** Token nicht `\omit` ist — das `\multicolumn` als
+  erstes ausführt. Jede Form mit optionalem Argument (xparse `O{…}` ebenso wie
+  `\newcommand[3][…]`) führt vorher eine Zuweisung aus; die Vorlage steht dann
+  bereits und der Verbund bricht mit „Misplaced \omit". Beide Formen wurden
+  gegengeprüft.
+- Der Spaltenbuchstabe muss **literal** bei `\multicolumn` ankommen: Der
+  Preamble-Parser von `array` vergleicht Tokens und expandiert nicht, ein
+  Makro dort meldet „Illegal pream-token". Deshalb steht die Auswahl als
+  `\if`-Kette **vor** `\multicolumn` und übergibt ein echtes `l`/`c`/`r`.
+- Der Fehlerfall für einen unbekannten Buchstaben läuft in den Zellinhalt —
+  dort ist `\omit` schon gesetzt und eine Meldung unschädlich.
+
+Dieselbe Nicht-Expansion ist der Grund, warum `ZSFtable` ihre
+Spaltenaufteilung per `\edef` auflöst, bevor sie `\tabularx` ruft: Nur so kann
+ein Gruppenmitglied `\ZSFgroupcols` als colspec verwenden, statt die
+Aufteilung in jedem Block zu wiederholen.
+
 **2 — Vor-Lauf für Regler, die einen Basisstil wählen.** `weight` und `part`
 wählen keinen *Wert*, sondern eine *Basis* — und eine Basis bringt
 Vorbelegungen mit (`padx=bar`, `frame=none`, Skips). Stünden sie wie die
@@ -307,6 +374,8 @@ deshalb nicht in der Token-Liste oben:
 | `header` | `ZSFtable` | `true`, `false` |
 | `zebra` | `ZSFtable` | `true`, `false` |
 | `font` | `ZSFtable` | `normal`, `dense` |
+| `rows` | `ZSFtable` | `normal`, `roomy`, `tight` |
+| `colsep` | `ZSFtable` | `normal`, `tight` |
 
 Diese Tabelle ist die Quelle für **drei** Verifier-Durchgänge, je einer pro
 Zusage, die ein Eintrag hier abgibt:

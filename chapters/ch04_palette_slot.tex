@@ -39,6 +39,64 @@
   \end{ZSFtable}
 \end{tablebox}
 
+\SubsectionBar[sec:table-metrics]{Zeilenhöhe und Spaltenpolsterung}
+\ZSFindex{Zeilenhöhe}
+\ZSFindex[Spaltenpolsterung]{Spaltenpolsterung}
+
+\begin{tablebox}[Mehr Höhe für Zellen mit Brüchen\ZSFTitleTag{rows=roomy}]
+  \begin{ZSFtable}[rows=roomy]{Y{1.0} Z{1.0}}
+    \ZSFheaderRow \ZSFhead{Grösse} & \ZSFhead{Term} \\
+    Steigung & $\dfrac{\Delta y}{\Delta x}$ \\
+    Mittel & $\dfrac{a+b}{2}$
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[Knappe Zeilen für Kurzinhalt\ZSFTitleTag{rows=tight}]
+  \begin{ZSFtable}[rows=tight, header=false]{Y{1.3} Q{0.7}}
+    Einzeilig & knapp \\
+    Register & dicht \\
+    Kurzinhalt & passt
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[Viele Spalten, knapper Zwischenraum\ZSFTitleTag{colsep=tight}]
+  \begin{ZSFtable}[font=dense, colsep=tight]{Y{1.6} Z{0.9} Z{0.9} Z{0.8} Z{0.8}}
+    \ZSFheaderRow \ZSFhead{Bauform} & \ZSFhead{Ax} & \ZSFhead{Rad} & \ZSFhead{Win} & \ZSFhead{Ø} \\
+    Erste & gut & gut & kaum & 12 \\
+    Zweite & kaum & sehr gut & gut & 20
+  \end{ZSFtable}
+  \begin{ZSFinset}
+    \ZSFkeyword*{colsep=tight} kürzt nur den Abstand \emph{zwischen} den
+    Spalten; der Rand zur Boxkante bleibt. Dieser Satz steht in einer
+    \ZSFkeyword{ZSFinset} und ist deshalb eingerückt, obwohl die Tabelle
+    darüber bis an die Kante läuft.
+  \end{ZSFinset}
+\end{tablebox}
+
+\SubsectionBar[sec:table-span]{Zellen verbinden}
+\ZSFindex{Zellverbund}
+
+\begin{tablebox}[Gruppierter Kopf und Abschnittszeile\ZSFTitleTag{ZSFspan}]
+  \begin{ZSFtable}{Y{1.4} Z{0.9} Z{0.9} Z{0.9} Z{0.9}}
+    \ZSFheaderRow \ZSFhead{Querschnitt} & \ZSFspan{C}{2}{\ZSFhead{Biegung}}
+                                        & \ZSFspan{C}{2}{\ZSFhead{Torsion}} \\
+    Voll & 32 & 16 & 16 & 8 \\
+    \ZSFspan{L}{5}{\ZSFlabel{Hohlprofil: zusätzlich Innendurchmesser}} \\
+    Rohr & 64 & 32 & 32 & 16
+  \end{ZSFtable}
+\end{tablebox}
+
+\SubsectionBar[sec:table-image]{Bild in der Zelle}
+\ZSFindex[Bild in Tabelle]{Bild in Tabelle}
+
+\begin{tablebox}[Bild ohne eigene Box\ZSFTitleTag{ZSFimage}]
+  \begin{ZSFtable}[colsep=tight]{Z{0.8} Y{1.0} Y{1.2}}
+    \ZSFheaderRow \ZSFhead{Bauform} & \ZSFhead{Name} & \ZSFhead{Merkmal} \\
+    \ZSFimage{example-image-a} & Erste & ohne Höhenangabe \\
+    \ZSFimage{example-image-b} & Zweite & gleich hoch von selbst
+  \end{ZSFtable}
+\end{tablebox}
+
 \begin{tablebox}[Spaltentypen im Vergleich\ZSFTitleTag{L/C/R/F}]
   \begin{ZSFtable}[header=false, zebra=false]{L C R F{1}}
     L linksbündig & C zentriert & R rechtsbündig & F{1}: x^2+1
@@ -61,6 +119,37 @@
   Zuordnung & links & rechts \\
   Wo die Spalten & selbst & sprechen
 \end{valuegrid}
+
+\SubsectionBar[sec:table-group]{Mehrere Boxen als ein Block}
+\ZSFindex{Boxgruppe}
+
+\begin{runintext}
+  Blöcke mit gleicher Spaltenstruktur brauchen die Kopfzeile nur einmal. Die
+  \ZSFkeyword{Boxgruppe} setzt sie über die ganze Gruppe und schliesst die
+  Zwischenräume — der Stapel liest sich als eine Tabelle, jeder Block behält
+  aber seinen eigenen Titel.
+\end{runintext}
+
+\begin{ZSFboxgroup}[cols={Y{0.7} Y{1.6} Q{0.7}},
+                    head={\ZSFhead{Symbol} & \ZSFhead{Bedeutung} & \ZSFhead{Einheit}}]
+  \begin{tablebox}[1. Erster Block]
+    \begin{ZSFtable}[header=false]{\ZSFgroupcols}
+      $E$ & Feldstärke & V/m \\
+      $U$ & Spannung & V
+    \end{ZSFtable}
+  \end{tablebox}
+  \begin{tablebox}[2. Zweiter Block]
+    \begin{ZSFtable}[header=false]{\ZSFgroupcols}
+      $I$ & Stromstärke & A
+    \end{ZSFtable}
+  \end{tablebox}
+\end{ZSFboxgroup}
+
+\begin{defbox}[Warum die Aufteilung an der Gruppe steht][weight=quiet]
+  \ZSFkeyword*{cols} wird einmal gesetzt, die Mitglieder lesen sie als
+  \ZSFkeyword*{ZSFgroupcols}. In jedem Block wiederholt stünde dieselbe
+  Entscheidung mehrfach — und beim n-ten einmal anders.
+\end{defbox}
 
 \begin{runintext}
   Alle Spaltenbreiten sind proportional: die Faktoren einer Tabelle müssen
