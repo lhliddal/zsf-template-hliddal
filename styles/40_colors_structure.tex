@@ -315,65 +315,184 @@
 % deshalb hierher, nicht in styles/60_boxes.tex.
 \newcommand{\GoalConditionBorderColor}{black}
 
-% ── Ton-Tokens: wie der `tone`-Regler in den zwei Box-Familien landet ──
+% ── Töne: ein Ton ist eine Deklaration ──
 % Ein Ton wirkt auf Titelboxen anders als auf rahmenlose Boxen, weil die
 % beiden verschiedene Träger haben: die Titelbox eine Kopfzeile und eine
 % getönte Fläche, die rahmenlose Box einen Akzent und eine ruhige Fläche.
 % Derselbe Regler, zwei Landepunkte — statt zweier Regler oder eines Reglers,
 % der auf halber Strecke stehenbleibt (rules/02_ai_mandate).
 %
-% Akzent: linker Balken der leisen Box, ihre Titelzeile, das
-% Aufzählungszeichen der ZSFlist.
-\newcommand{\ZSFtoneAccentChapter}{\chaptercolor}
-\newcommand{\ZSFtoneAccentNeutral}{StaticBoxTitleText}
-\newcommand{\ZSFtoneAccentWarn}{ETHRot}
-
-% ── Die drei Flächen-Rollen eines Tons ──
-% Eine Box waehlt die ROLLE ihrer Flaeche, der Ton liefert die FARBE dazu —
-% genau wie bei den drei Rahmenstaerken darunter. Deshalb muss jede Rolle in
-% jedem Ton definiert sein: Eine fehlende Kombination faellt sonst auf die
-% Farbe eines fremden Tons zurueck.
+% Ein Ton besetzt deshalb NEUN Rollen, und er muss sie alle besetzen: Eine
+% offene Rolle faellt auf die Farbe eines fremden Tons zurueck, und das sieht
+% im PDF wie eine gueltige Einfaerbung aus. Frueher stand diese Zusage als
+% Kommentar ueber einundzwanzig einzelnen Tokens, und der Regler selbst zaehlte
+% sie in drei wortgleichen Bloecken noch einmal auf — eine Kopie, keine
+% Variante (rules/10_architecture → Gestaltung an genau einem Ort). Wer einen
+% vierten Ton wollte, schrieb neun Tokens und einen zwoelfzeiligen Block ab;
+% wer eine Rolle vergass, merkte es nie.
 %
-% Laute Fläche: die Füllung einer Box mit Kopfzeile.
-\newcommand{\ZSFtoneLoudBackChapter}{\BoxBackColor}
-\newcommand{\ZSFtoneLoudBackNeutral}{StaticSubBoxBack}
-\newcommand{\ZSFtoneLoudBackWarn}{\WarnboxBackColor}
+% Jetzt ist ein Ton EINE Deklaration, und die Vollstaendigkeit wird geprueft
+% statt zugesagt. \ZSFDeclareQuantity ist das Vorbild: dieselbe Bauform fuer
+% dieselbe Art Entscheidung.
+%
+% Die Ungetoente Flaeche (Rolle `plain`) ist bewusst KEINE Rolle des Tons. Sie
+% ist die Abwesenheit einer Toenung und traegt in jedem Ton dieselbe Farbe;
+% Tabelle, Wertegitter, Zielkette und Codebox brauchen sie als neutrale Basis,
+% auf der Zebra, Gitterlinien und Syntaxfarben lesbar bleiben. Ihr Token ist
+% \BoxPlainBackColor.
+\makeatletter
+% Die Live-Landepunkte. Eine Box liest sie; welcher Ton sie zuletzt gefuellt
+% hat, entscheidet die Optionsliste. Sie stehen hier und nicht in 60_boxes,
+% weil sie Farben tragen.
+\newcommand{\ZSFtoneAccent}{}
+\newcommand{\ZSFtoneLoudBack}{}
+\newcommand{\ZSFtoneQuietBack}{}
+\newcommand{\ZSFtoneEmphasisBack}{}
+\newcommand{\ZSFtoneFrameSoft}{}
+\newcommand{\ZSFtoneFrameStrong}{}
+\newcommand{\ZSFtoneFrameHard}{}
+% Die neun Rollen — EINE Liste, aus der die Pruefung laeuft. Eine zehnte Rolle
+% einzufuehren heisst: hier eintragen, den Schluessel darunter ergaenzen, und
+% jede vorhandene Deklaration meldet sich, bis sie die Rolle besetzt.
+\newcommand{\ZSF@toneRoles}{%
+  accent,titleback,titletext,loudback,quietback,emphasisback,%
+  framesoft,framestrong,framehard}
+\pgfkeys{
+  /zsf/tone/.is family, /zsf/tone,
+  accent/.store in=\ZSF@tone@accent,
+  titleback/.store in=\ZSF@tone@titleback,
+  titletext/.store in=\ZSF@tone@titletext,
+  loudback/.store in=\ZSF@tone@loudback,
+  quietback/.store in=\ZSF@tone@quietback,
+  emphasisback/.store in=\ZSF@tone@emphasisback,
+  framesoft/.store in=\ZSF@tone@framesoft,
+  framestrong/.store in=\ZSF@tone@framestrong,
+  framehard/.store in=\ZSF@tone@framehard,
+  % Alle Rollen leeren — so ist "nicht gesetzt" von "vom Vorgaenger geerbt"
+  % unterscheidbar. Ohne das Leeren erbte ein unvollstaendiger Ton still die
+  % Farbe des zuvor deklarierten.
+  ZSF@toneClear/.style={accent=,titleback=,titletext=,loudback=,quietback=,
+    emphasisback=,framesoft=,framestrong=,framehard=},
+}
+\newcommand{\ZSF@toneName}{}
+\newcommand{\ZSF@toneCheck}[1]{%
+  \expandafter\ifx\csname ZSF@tone@#1\endcsname\@empty
+    \PackageError{ZSF}{Ton '\ZSF@toneName' laesst die Rolle '#1' offen}%
+      {Ein Ton muss alle neun Rollen besetzen (\ZSF@toneRoles). Eine offene
+       Rolle faellt auf die Farbe eines fremden Tons zurueck und sieht im PDF
+       wie eine gueltige Einfaerbung aus.}%
+  \fi
+}
+% \ZSFDeclareTone{<Name>}{<Rolle=Farbe, ...>} legt den Ton an und macht ihn
+% als `tone=<Name>` auf jeder Box verfuegbar.
+%
+% Die Rollen werden per \let in die Live-Makros kopiert, nicht per \edef
+% eingesetzt: \chaptercolor muss ungeloest bleiben, sonst truege der Ton die
+% Farbe des Kapitels, in dem er DEKLARIERT wurde, statt der des Kapitels, in
+% dem er benutzt wird.
+\newcommand{\ZSF@toneOpts}{}
+\newcommand{\ZSF@toneTmp}{}
+% Die Rollen eines Tons in die Live-Makros kopieren. Die EINE Stelle, an der
+% Rollenname und Landepunkt einander zugeordnet sind — der erzeugte Stil und
+% der Dokument-Default benutzen beide diesen Helfer.
+\newcommand{\ZSF@toneApply}[1]{%
+  \expandafter\let\expandafter\ZSFtoneAccent
+    \csname ZSF@tone@#1@accent\endcsname
+  \expandafter\let\expandafter\ZSFtoneLoudBack
+    \csname ZSF@tone@#1@loudback\endcsname
+  \expandafter\let\expandafter\ZSFtoneQuietBack
+    \csname ZSF@tone@#1@quietback\endcsname
+  \expandafter\let\expandafter\ZSFtoneEmphasisBack
+    \csname ZSF@tone@#1@emphasisback\endcsname
+  \expandafter\let\expandafter\ZSFtoneFrameSoft
+    \csname ZSF@tone@#1@framesoft\endcsname
+  \expandafter\let\expandafter\ZSFtoneFrameStrong
+    \csname ZSF@tone@#1@framestrong\endcsname
+  \expandafter\let\expandafter\ZSFtoneFrameHard
+    \csname ZSF@tone@#1@framehard\endcsname
+}
+\newcommand{\ZSFDeclareTone}[2]{%
+  \def\ZSF@toneName{#1}%
+  % \pgfkeys@spdef streift fuehrende Leerzeichen ab. Noetig, weil eine
+  % mehrzeilige Deklaration mit dem Zeilenumbruch nach der oeffnenden Klammer
+  % beginnt und pgfkeys nur nach einem KOMMA selbst abstreift, nicht am
+  % Listenanfang: Der erste Schluessel hiesse sonst ' accent' und wuerde als
+  % unbekannt gemeldet. Nachgemessen an einer Minimalprobe, nicht vermutet.
+  \pgfkeys@spdef\ZSF@toneOpts{#2}%
+  \edef\ZSF@toneOpts{/zsf/tone,ZSF@toneClear,%
+    \unexpanded\expandafter{\ZSF@toneOpts}}%
+  \expandafter\pgfkeys\expandafter{\ZSF@toneOpts}%
+  \expandafter\@for\expandafter\ZSF@toneRole\expandafter:\expandafter=%
+    \ZSF@toneRoles\do{\expandafter\ZSF@toneCheck\expandafter{\ZSF@toneRole}}%
+  % Die Rollenwerte unter den Ton-Namen ablegen. Der Umweg ueber \ZSF@toneTmp
+  % ist noetig, weil \let sonst das Literal \csname zugewiesen bekaeme statt
+  % des Makros, das es erzeugt — der Rest der Zeile liefe dann als Text weiter.
+  \expandafter\@for\expandafter\ZSF@toneRole\expandafter:\expandafter=%
+    \ZSF@toneRoles\do{%
+      \expandafter\let\expandafter\ZSF@toneTmp
+        \csname ZSF@tone@\ZSF@toneRole\endcsname
+      \expandafter\global\expandafter\let
+        \csname ZSF@tone@#1@\ZSF@toneRole\endcsname\ZSF@toneTmp}%
+  \tcbset{tone/#1/.style={
+    colbacktitle=\csname ZSF@tone@#1@titleback\endcsname,
+    coltitle=\csname ZSF@tone@#1@titletext\endcsname,
+    /utils/exec={\ZSF@toneApply{#1}}}}%
+}
+\makeatother
+\tcbset{tone/.is choice}
 
-% Ruhige Fläche: die Füllung rahmenloser Boxen. Im Kapitelton bewusst
-% ungetönt — die leise Box soll dezent bleiben und sich nicht der
-% Titelbox angleichen. Erst ein bewusst gewählter Ton färbt sie, und genau
-% dann ist die Färbung das Signal ("gehört nicht zum Kapitel" / "Warnung").
-\newcommand{\ZSFtoneQuietBackChapter}{\BoxPlainBackColor}
-\newcommand{\ZSFtoneQuietBackNeutral}{StaticSubBoxBack}
-\newcommand{\ZSFtoneQuietBackWarn}{\WarnboxBackColor}
+% Die drei mitgelieferten Toene. Jede Zeile ist eine Farbentscheidung, keine
+% Mechanik — die Mechanik steht einmal darueber.
+%
+%   chapter  folgt der Kapitelfarbe (Default)
+%   neutral  kapitelunabhaengig grau — fuer Boxen, die bewusst NICHT zum
+%            Kapitel gehoeren (Meta-Hinweise, Konventionen, Legenden)
+%   warn     rote Kopfzeile (die warnbox verwendet genau diesen Ton)
+%
+% `quietback` im Kapitelton ist bewusst ungetoent: Die leise Box soll dezent
+% bleiben und sich nicht der Titelbox angleichen. Erst ein bewusst gewaehlter
+% Ton faerbt sie, und genau dann ist die Faerbung das Signal.
+\ZSFDeclareTone{chapter}{
+  accent       = \chaptercolor,
+  titleback    = \BoxTitleColor,
+  titletext    = \BoxTitleTextColor,
+  loudback     = \BoxBackColor,
+  quietback    = \BoxPlainBackColor,
+  emphasisback = \FormulaboxBackColor,
+  framesoft    = \BoxFrameColor,
+  framestrong  = \BoxTitleColor,
+  framehard    = black,
+}
+\ZSFDeclareTone{neutral}{
+  accent       = StaticBoxTitleText,
+  titleback    = StaticBoxTitleBack,
+  titletext    = StaticBoxTitleText,
+  loudback     = StaticSubBoxBack,
+  quietback    = StaticSubBoxBack,
+  emphasisback = StaticEmphasisBack,
+  framesoft    = StaticSubBoxBorder,
+  framestrong  = StaticBoxTitleText,
+  framehard    = StaticBoxTitleText,
+}
+\ZSFDeclareTone{warn}{
+  accent       = ETHRot,
+  titleback    = \WarnboxTitleColor,
+  titletext    = \WarnboxTitleTextColor,
+  loudback     = \WarnboxBackColor,
+  quietback    = \WarnboxBackColor,
+  emphasisback = WarnboxEmphasisBack,
+  framesoft    = WarnboxFrame,
+  framestrong  = ETHRot,
+  framehard    = ETHRot,
+}
 
-% Betonte Fläche: kräftiger als die laute, für Boxen, deren Inhalt selbst die
-% Aussage ist (Formelbox). In jedem Ton eine Stufe über der lauten Fläche.
-\newcommand{\ZSFtoneEmphasisBackChapter}{\FormulaboxBackColor}
-\newcommand{\ZSFtoneEmphasisBackNeutral}{StaticEmphasisBack}
-\newcommand{\ZSFtoneEmphasisBackWarn}{WarnboxEmphasisBack}
-
-% Ungetönte Fläche (Rolle `plain`): bewusst OHNE Ton-Varianten. Sie ist die
-% Abwesenheit einer Tönung und trägt in jedem Ton dieselbe Farbe — eine
-% getönte Plain-Fläche wäre ein Widerspruch. Tabelle, Wertegitter, Zielkette
-% und Codebox brauchen sie als neutrale Basis, auf der Zebra, Gitterlinien
-% und Syntaxfarben lesbar bleiben. Der Token dafür ist \BoxPlainBackColor.
-
-% Rahmenfarbe in drei Stärken — der Regler `frame` wählt zwischen ihnen.
-% `soft` begrenzt die Box nur, `strong` grenzt sie gegen die Umgebung ab
-% (Zielketten), `hard` setzt die kräftige Kontur (Formelbox). Alle drei sind
-% Landepunkte desselben Tons, damit eine getönte Box in jeder Stärke stimmig
-% bleibt: Jede Stärke muss in jedem Ton definiert sein, sonst fällt eine
-% Kombination auf die Farbe eines fremden Tons zurück.
-\newcommand{\ZSFtoneFrameSoftChapter}{\BoxFrameColor}
-\newcommand{\ZSFtoneFrameSoftNeutral}{StaticSubBoxBorder}
-\newcommand{\ZSFtoneFrameSoftWarn}{WarnboxFrame}
-\newcommand{\ZSFtoneFrameStrongChapter}{\BoxTitleColor}
-\newcommand{\ZSFtoneFrameStrongNeutral}{StaticBoxTitleText}
-\newcommand{\ZSFtoneFrameStrongWarn}{ETHRot}
-\newcommand{\ZSFtoneFrameHardChapter}{black}
-\newcommand{\ZSFtoneFrameHardNeutral}{StaticBoxTitleText}
-\newcommand{\ZSFtoneFrameHardWarn}{ETHRot}
+% Welcher Ton gilt, wenn keine Box gefragt hat. Gebraucht wird das von
+% Bausteinen, die ohne tcolorbox auskommen — allen voran die titellose
+% ZSFlist, deren Aufzaehlungszeichen den Akzent liest, ohne dass je eine
+% Optionsliste lief. Ohne diese Zeile ist der Akzent dort die leere Farbe.
+\makeatletter
+\ZSF@toneApply{chapter}
+\makeatother
 
 % Für goalbox (semantische Ziel-Box)
 \newcommand{\GoalConditionBackColor}{white}

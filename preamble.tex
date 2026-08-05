@@ -56,6 +56,13 @@
 % Freiraum, der vor einem Titelbalken übrig sein muss, sonst bricht die
 % Spalte davor um. Grösser = Balken stehen seltener knapp am Spaltenfuss.
 % \def\ZSFBreakReserveFactor{1}   % 1 = Referenz
+%
+% Schriftgrösse der Diagramm-Beschriftung — beide Stufen gemeinsam
+% (\ZSFfontDiagramLabel und \ZSFfontDiagramLabelSmall). Kleiner für Fächer mit
+% vielen gedrängten Zeichnungen; die zwei Stufen bleiben dabei unterscheidbar.
+% Der einzige Schrift-Regler des Systems: Fliesstext- und Titelgrössen sind
+% aufeinander abgestimmt und werden nicht pro ZSF gedreht.
+% \def\ZSFDiagramLabelScale{0.85} % 1 = Referenz, kleiner = kleinere Labels
 
 \input{styles/00_packages}
 \input{styles/10_math}
@@ -110,6 +117,26 @@
 % Hauptschalter — nimmt alle Grössenfarben zurück (z.B. für S/W-Druck),
 % ohne die Deklarationen zu entfernen:
 % \ZSFQuantityColorsOff
+
+% ── Eigener Ton: eine wiederkehrende Farbwelt fürs Fach ──────────────
+% `tone` hat drei mitgelieferte Werte (chapter, neutral, warn). Braucht das
+% Fach eine WIEDERKEHRENDE visuelle Kategorie, die keiner davon trägt (ein
+% Beispiel-Block, ein Merksatz), ist die Antwort ein weiterer Ton — keine
+% weitere Box. Nach der Deklaration gilt `tone=beispiel` auf JEDER Box.
+%
+% Alle neun Rollen sind Pflicht: Eine offene Rolle bricht mit einer Meldung ab,
+% statt still die Farbe eines fremden Tons zu erben.
+%
+% Sparsam — ein Ton bedeutet im ganzen Dokument dasselbe und ist kein Weg, einer
+% einzelnen Box eine Wunschfarbe zu geben.
+% \ZSFDeclareTone{beispiel}{
+%   accent       = ChapterColor3,   titleback   = ChapterColor3,
+%   titletext    = white,           loudback    = ChapterColor3Light!12,
+%   quietback    = ChapterColor3Light!12,
+%   emphasisback = ChapterColor3Light!30,
+%   framesoft    = ChapterColor3Light!35,
+%   framestrong  = ChapterColor3,   framehard   = ChapterColor3,
+% }
 \ifdefined\ZSFShowcaseMode
   % Nur für die Living Showcase: init_project.sh entfernt den Marker, ein
   % Fach-Fork startet damit ohne Deklarationen.

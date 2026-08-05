@@ -32,14 +32,11 @@
   }%
 }
 
-% Enge Math-Display-Abstände (wie Analysis: keine grossen Lücken um Formeln)
-\AtBeginDocument{
-  \setlength{\abovedisplayskip}{\ZSFspaceXS}
-  \setlength{\belowdisplayskip}{\ZSFspaceXS}
-  \setlength{\abovedisplayshortskip}{\ZSFspaceXS}
-  \setlength{\belowdisplayshortskip}{\ZSFspaceXS}
-  \setlength{\mathsurround}{\ZSFspaceXS}
-}
+% Enge Math-Display-Abstände (wie Analysis: keine grossen Lücken um Formeln).
+% Die Werte stehen in \ZSFApplyDisplaySkips (30_layout_spacing), weil jeder
+% Schriftgrössenwechsel sie zurücksetzt und die Politik deshalb wiederholbar
+% sein muss — hier wird sie nur zum Dokumentstart einmal angewandt.
+\AtBeginDocument{\ZSFApplyDisplaySkips}
 
 % Kompakte Listen (wie Analysis: kein überschüssiges Whitespace)
 \setlist{nosep, itemsep=0pt, parsep=0pt, topsep=\ZSFspaceXS, partopsep=0pt}

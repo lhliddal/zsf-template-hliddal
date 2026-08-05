@@ -174,7 +174,7 @@
 \makeatletter
 \newif\ifZSF@tblHeader
 \newif\ifZSF@tblZebra
-\newcommand{\ZSF@tblFont}{\ZSFfontTable}
+\newcommand{\ZSF@tblFont}{\ZSFfontContent}
 \newcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}
 \newlength{\ZSF@tblColSep}
 \newcommand{\ZSF@tblSpec}{}
@@ -184,8 +184,8 @@
   header/.is if=ZSF@tblHeader,
   zebra/.is if=ZSF@tblZebra,
   font/.is choice,
-  font/normal/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontTable}},
-  font/dense/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontTableDense}},
+  font/normal/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontContent}},
+  font/dense/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontContentDense}},
   rows/.is choice,
   rows/normal/.code={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}},
   rows/roomy/.code ={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchRoomy}},

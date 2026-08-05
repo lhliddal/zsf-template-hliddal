@@ -62,16 +62,21 @@ und `rules/55_index.md`.
   `\ZSFDensityFactor`, `\ZSFLeadingFactor`,
   Bereichsfaktoren `\ZSFDensityBoxes`, `\ZSFDensityText`, `\ZSFDensityTables`,
   `\ZSFDensityStructure`, `\ZSFBreakReserveFactor` (siehe `rules/30_spacing.md`),
+  `\ZSFDiagramLabelScale` (beide Diagramm-Beschriftungsstufen gemeinsam,
+  siehe `rules/20_boxes.md`),
   `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
   `\ZSFReadableBodyOn`, `\ZSFReadableBodyOff`, `\ZSFIndexShowPageNumber`
   (Index-Locator mit oder ohne Seitenzahl, siehe `rules/55_index.md`),
   `\ZSFkeywordStyle`, `\ZSFlabelStyle` (Darstellung der beiden Marker),
   `\ZSFDeclareQuantity` (Grössenfarben des Fachs vergeben),
+  `\ZSFDeclareTone` (einen Ton anlegen, siehe `rules/25_structure_markers.md`),
   `\ZSFQuantityColorsOn` / `\ZSFQuantityColorsOff` (Hauptschalter dafür).
 - Grössenfarben in Kapiteln: die per `\ZSFDeclareQuantity{<Name>}{<Slot>}`
   erzeugten `\ZSFq<Name>`.
 - Pack-Modus für Anhang-artige Kapitel (am Kapitelanfang):
   `\ZSFBoxesBreakableOn`, `\ZSFBoxesBreakableOff`, `\ZSFBreakReservesOff`.
+- Dichte für ein einzelnes Kapitel (am Kapitelanfang):
+  `\ZSFChapterDensity`, `\ZSFChapterDensityReset` (siehe `rules/30_spacing.md`).
 - Formel-API: `\R`, `\C`, `\N`, `\Z`, `\Q`, `\dd`, `\vect`, `\abs`,
   `\norm`, `\ZSFsumAuto`, `\ZSFlimAuto`, `\ZSFbraceunder`,
   `\ZSFbraceover`, `\ZSFmhlA`, `\ZSFmhlB`, `\ZSFmhlC`, `\ZSFmhlD`,
@@ -239,10 +244,14 @@ alle Wahlen fest, gleichgültig wer sie getroffen hat.
   Syntaxfarben), `quiet` (immer die ruhige Fläche) und `emphasis` (betont,
   Formelbox). `ZSF@titlefill` beantwortet dieselbe Frage für die Kopfzeile:
   `tone` gibt ihr den Titelbalken, `surface` setzt sie auf die Fläche der Box.
-- Die Farbtokens dazu stehen in `40_colors_structure`
-  (`\ZSFtoneAccent*`, `\ZSFtoneLoudBack*`, `\ZSFtoneQuietBack*`,
-  `\ZSFtoneEmphasisBack*`). **Jede Rolle muss in jedem Ton definiert sein**,
-  sonst fällt eine Kombination auf die Farbe eines fremden Tons zurück.
+- Die Töne stehen in `40_colors_structure`, je einer als **eine**
+  `\ZSFDeclareTone`-Deklaration. **Jede Rolle muss in jedem Ton besetzt sein**,
+  sonst fällt eine Kombination auf die Farbe eines fremden Tons zurück — das
+  ist keine Bitte mehr, sondern geprüft: Eine offene Rolle bricht mit einer
+  Meldung ab, die den Ton und die Rolle nennt. Vorher stand die Zusage als
+  Kommentar über 21 Einzeltokens, und der `tone`-Regler zählte sie in drei
+  wortgleichen Blöcken erneut auf; ein vierter Ton kostete neun Tokens plus
+  einen abgeschriebenen Block, und eine vergessene Rolle fiel niemandem auf.
 - Ein Preset setzt `colback` deshalb **nie** direkt. Täte es das, verlöre es
   die Fläche an jede spätere Tonwahl des Aufrufers — und ein ausgeschriebenes
   `tone=chapter` sähe anders aus als ein weggelassenes, obwohl es dieselbe
@@ -373,7 +382,7 @@ deshalb nicht in der Token-Liste oben:
 | `part` | `codebox` | `whole`, `first`, `mid`, `last` |
 | `header` | `ZSFtable` | `true`, `false` |
 | `zebra` | `ZSFtable` | `true`, `false` |
-| `font` | `ZSFtable` | `normal`, `dense` |
+| `font` | alle Boxen, `ZSFtable` | `normal`, `dense` |
 | `rows` | `ZSFtable` | `normal`, `roomy`, `tight` |
 | `colsep` | `ZSFtable` | `normal`, `tight` |
 

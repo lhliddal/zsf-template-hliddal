@@ -22,11 +22,24 @@
 % styles/40_colors_structure.tex. Schadlos wenn das Modul deaktiviert ist.
 \newcommand{\ZSFfontCodeComment}{\ttfamily\color{ce_green}}
 
-% Semantische Tabellen-Fontgrössen. Kapitel wählen sie nicht direkt, sondern
-% über den Regler `font` der ZSFtable (`normal` | `dense`, styles/20_tables.tex).
-% `dense` ist für lange Tabellen mit vielen Zeilen und knappem Zellinhalt.
-\newcommand{\ZSFfontTable}{\normalsize}
-\newcommand{\ZSFfontTableDense}{\footnotesize}
+% Semantische Inhalts-Fontgrössen — die zwei Stufen des Reglers `font`
+% (`normal` | `dense`). Kapitel wählen sie nicht direkt, sondern über den
+% Regler an der Box (styles/60_boxes.tex) oder an der ZSFtable
+% (styles/20_tables.tex). `dense` ist die eine Stufe kleiner: lange Register,
+% Vergleichsmatrizen, gedrängte Aufzählungen.
+%
+% EIN Paar für beide Bausteine, nicht je eines: »eine Stufe kleiner« ist
+% dieselbe Entscheidung, ob sie eine Tabelle oder einen Boxinhalt trifft. Mit
+% zwei Paaren müsste jede Änderung am einen im anderen nachgezogen werden
+% (styles/README → Vereinigungstest).
+%
+% Beide holen die Display-Skips zurück: \normalsize und \footnotesize setzen
+% sie auf die Klassenwerte, und die ZSF-Entscheidung dazu ist eine andere
+% (\ZSFApplyDisplaySkips in 30_layout_spacing). Ohne diesen Nachsatz wären
+% Formeln in jeder Box luftiger als im Fliesstext — lautlos, weil beides
+% für sich korrekt aussieht.
+\newcommand{\ZSFfontContent}{\normalsize\ZSFApplyDisplaySkips}
+\newcommand{\ZSFfontContentDense}{\footnotesize\ZSFApplyDisplaySkips}
 
 % ── Auszeichnungen INNERHALB der Bausteine ──
 % Vier Rollen, die vorher als rohes \bfseries bzw. \small in den Bausteinen
@@ -72,8 +85,33 @@
 % Für ein ganzes Bild einmal setzen statt pro Knoten:
 %   \begin{tikzpicture}[font=\ZSFfontDiagramLabel] … \end{tikzpicture}
 % Einzelne Knoten übersteuern das dann mit `font=\ZSFfontDiagramLabelSmall`.
-\newcommand{\ZSFfontDiagramLabel}{\sffamily\fontsize{5.8bp}{6.4bp}\selectfont}
-\newcommand{\ZSFfontDiagramLabelSmall}{\sffamily\fontsize{4.6bp}{5.1bp}\selectfont}
+%
+% Die beiden Stufen sind ROLLEN, kein Massband: Sie sagen »reguläre Marke« und
+% »gedrängte Zusatzangabe«, nicht 5.8bp und 4.6bp. Wie gross eine Rolle
+% tatsächlich ausfällt, hängt am Fach — ein diagrammlastiges Blatt mit
+% gedrängten Zeichnungen braucht beide Stufen kleiner, ohne dass die Rollen
+% ihre Bedeutung verlieren. Deshalb steht davor ein Faktor und nicht eine
+% dritte Stufe: Mehr Regler ist richtig, mehr Namen fast nie
+% (rules/02_ai_mandate → Katalog-Ökonomie).
+%
+% \ZSFDiagramLabelScale wird wie die übrigen Faktoren in preamble.tex gesetzt,
+% VOR diesem \input.
+\providecommand{\ZSFDiagramLabelScale}{1}
+% Die Grösse wird gerechnet statt geschrieben. Über \the und damit in pt, weil
+% \fontsize sein Argument sonst als Zahl ohne Einheit lesen müsste — der Faktor
+% kommt so als fertiges Mass an und nicht als Term, den \fontsize zerlegt.
+\makeatletter
+\newlength{\ZSF@fontSize}
+\newlength{\ZSF@fontSkip}
+\newcommand{\ZSF@scaledFont}[3]{%
+  \setlength{\ZSF@fontSize}{#1\dimexpr #2\relax}%
+  \setlength{\ZSF@fontSkip}{#1\dimexpr #3\relax}%
+  \fontsize{\the\ZSF@fontSize}{\the\ZSF@fontSkip}\selectfont}
+\newcommand{\ZSFfontDiagramLabel}{%
+  \sffamily\ZSF@scaledFont{\ZSFDiagramLabelScale}{5.8bp}{6.4bp}}
+\newcommand{\ZSFfontDiagramLabelSmall}{%
+  \sffamily\ZSF@scaledFont{\ZSFDiagramLabelScale}{4.6bp}{5.1bp}}
+\makeatother
 
 % Semantische Inhaltsmakros (konsistente Skalierung und einfache Anpassung)
 %

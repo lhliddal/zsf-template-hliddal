@@ -319,6 +319,16 @@
 % Absätze, und ein eigener Wert würde nur die Liste verschieben. Als Regler
 % statt als Auslassung, damit „erbt bewusst" und „vergessen" unterscheidbar sind.
 \newcommand{\ZSFBoxParskip}{}
+% Schriftgrösse des Boxinhalts. Zwei Stufen, dieselben, die die ZSFtable schon
+% hatte — der Regler war dort richtig und nur zu eng aufgehängt: »eine Stufe
+% kleiner« ist keine Eigenschaft von Tabellen, sondern von Inhalt. Ohne ihn
+% blieb für den gedrängten Block nur ein \scriptsize im Kapitel, also der
+% lokale Notausgang, den das System vermeiden will (rules/02_ai_mandate).
+%
+% Als Hook in \ZSFBoxSetup statt als `fontupper`: Nur so bekommt auch die
+% UNTERE Hälfte des split-Reglers die Grösse. Als `fontupper` gesetzt, träfe
+% sie die obere Hälfte und liesse die untere still auf Normalgrösse stehen.
+\newcommand{\ZSFBoxFont}{}
 % Die Ausrichtung ERSETZT die Justierung, sie ergänzt sie nicht: `align=left`
 % ist der Flattersatz für schmale Spalten (55_readability), `align=center` ist
 % zentrierter Satz. Beides zusammen wäre kein zentrierter Flattersatz, sondern
@@ -333,6 +343,9 @@
     /utils/exec={\renewcommand{\ZSFBoxParskip}{\setlength{\parskip}{\ZSFspaceS}}}},
   bodyparskip/inherit/.style={
     /utils/exec={\renewcommand{\ZSFBoxParskip}{}}},
+  font/.is choice,
+  font/normal/.style={/utils/exec={\renewcommand{\ZSFBoxFont}{\ZSFfontContent}}},
+  font/dense/.style ={/utils/exec={\renewcommand{\ZSFBoxFont}{\ZSFfontContentDense}}},
 }
 % Titel-Merker der leisen Fassung. Gefüllt wird er von der Fabrik, gesetzt vom
 % Gewicht-Regler weiter unten; hier stehen nur die Deklarationen, damit sie vor
@@ -360,7 +373,9 @@
 % mit `split` den Titel zweimal — einmal über jeder Hälfte. Das ist schlimmer
 % als ein verworfener Regler, weil Inhalt entsteht statt zu verschwinden, und
 % es meldet sich nicht (rules/02_ai_mandate → Randverhalten I).
-\newcommand{\ZSFBoxSetup}{\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext}
+% \ZSFBoxFont steht zuerst: Die Grösse ändert \baselineskip und die
+% Display-Skips, und was danach kommt, soll auf der fertigen Grösse aufsetzen.
+\newcommand{\ZSFBoxSetup}{\ZSFBoxFont\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext}
 \newcommand{\ZSFBoxEnter}{\ZSFBoxSetup\ZSFBoxQuietTitle}
 
 % ------------------------------------------------------------
@@ -386,6 +401,7 @@
   tone=chapter,
   align=left,
   bodyparskip=box,
+  font=normal,
   % Hooks zurücksetzen, damit eine verschachtelte Box die Einstellungen der
   % äusseren nicht erbt — sie sind gruppenlokal, aber nicht selbstlöschend.
   /utils/exec={\renewcommand{\ZSFBoxContext}{}\renewcommand{\ZSFBoxQuietTitle}{}},
@@ -555,46 +571,11 @@
 %
 % Der Titelbalken ist die einzige Farbe, die der Ton direkt setzt: Er hat
 % keine Rollen, sondern gehört immer dem Ton.
-\newcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}
-\newcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackChapter}
-\newcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}
-\newcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackChapter}
-\newcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}
-\newcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}
-\newcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardChapter}
-\tcbset{
-  tone/.is choice,
-  tone/chapter/.style={
-    colbacktitle=\BoxTitleColor,
-    coltitle=\BoxTitleTextColor,
-    /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentChapter}%
-                 \renewcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackChapter}%
-                 \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackChapter}%
-                 \renewcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackChapter}%
-                 \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftChapter}%
-                 \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongChapter}%
-                 \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardChapter}}},
-  tone/neutral/.style={
-    colbacktitle=StaticBoxTitleBack,
-    coltitle=StaticBoxTitleText,
-    /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentNeutral}%
-                 \renewcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackNeutral}%
-                 \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackNeutral}%
-                 \renewcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackNeutral}%
-                 \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftNeutral}%
-                 \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongNeutral}%
-                 \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardNeutral}}},
-  tone/warn/.style={
-    colbacktitle=\WarnboxTitleColor,
-    coltitle=\WarnboxTitleTextColor,
-    /utils/exec={\renewcommand{\ZSFtoneAccent}{\ZSFtoneAccentWarn}%
-                 \renewcommand{\ZSFtoneLoudBack}{\ZSFtoneLoudBackWarn}%
-                 \renewcommand{\ZSFtoneQuietBack}{\ZSFtoneQuietBackWarn}%
-                 \renewcommand{\ZSFtoneEmphasisBack}{\ZSFtoneEmphasisBackWarn}%
-                 \renewcommand{\ZSFtoneFrameSoft}{\ZSFtoneFrameSoftWarn}%
-                 \renewcommand{\ZSFtoneFrameStrong}{\ZSFtoneFrameStrongWarn}%
-                 \renewcommand{\ZSFtoneFrameHard}{\ZSFtoneFrameHardWarn}}},
-}
+%
+% Die Töne selbst stehen in 40_colors_structure — sie sind Farbentscheidungen,
+% und dort steht auch \ZSFDeclareTone, das aus einer Deklaration den Schlüssel
+% `tone=<Name>` erzeugt. Hier bleibt nichts zu tun: Ein neuer Ton ist eine
+% Deklaration und braucht in dieser Datei keine Zeile.
 
 % Schicht 3 — Titelbox. Der EINZIGE Vertrag für Boxen mit Titelbalken; alle
 % Presets unten stehen darauf.

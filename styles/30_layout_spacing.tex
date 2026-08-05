@@ -32,10 +32,70 @@
 % Alles andere Vertikale hängt am Faktor. Wer etwas Neues hinzufügt, leitet es
 % ebenfalls aus den Basisregistern ab — nicht als roher pt-Wert.
 \providecommand{\ZSFDensityFactor}{1}
-\newlength{\ZSFspaceXS}\setlength{\ZSFspaceXS}{\ZSFDensityFactor\dimexpr 1pt\relax}
-\newlength{\ZSFspaceS} \setlength{\ZSFspaceS}{\ZSFDensityFactor\dimexpr 4pt\relax}
-\newlength{\ZSFspaceM} \setlength{\ZSFspaceM}{\ZSFDensityFactor\dimexpr 7pt\relax}
-\newlength{\ZSFspaceL} \setlength{\ZSFspaceL}{\ZSFDensityFactor\dimexpr 10pt\relax}
+
+% ── \ZSFderive: eine Ableitung, die man wiederholen kann ─────────────
+% Setzt das Register sofort UND merkt sich die Rechnung. \ZSFChapterDensity
+% (unten) laesst die gemerkte Kette in derselben Reihenfolge noch einmal
+% laufen und bekommt damit den ganzen Registersatz auf einen neuen Faktor.
+%
+% Der Grund fuer die Kette statt einer Handvoll Neuberechnungen: Ein Register
+% ist eine LAENGE, kein Ausdruck. \ZSFboxPadX hat den Wert, den \ZSFspaceS bei
+% seiner Berechnung hatte — die vier Basisregister nachtraeglich zu aendern
+% erreicht es nicht mehr. Wer eine neue abgeleitete Groesse anlegt, benutzt
+% deshalb \ZSFderive und nicht \setlength; sie faehrt dann von selbst mit.
+\makeatletter
+\newcommand{\ZSF@spacingChain}{}
+\newcommand{\ZSFderive}[2]{%
+  \setlength{#1}{#2}%
+  \expandafter\gdef\expandafter\ZSF@spacingChain\expandafter{%
+    \ZSF@spacingChain\setlength{#1}{#2}}%
+}
+% Der Dokumentwert, auf den \ZSFChapterDensityReset zurueckstellt. Muss VOR der
+% ersten Ableitung gesichert werden, sonst ist er beim Zuruecksetzen schon weg.
+\let\ZSF@densityDocument\ZSFDensityFactor
+
+% ── Kapitel-Dichte: die Dichte fuer EIN Kapitel ──────────────────────
+% \ZSFDensityFactor gilt fuers ganze Dokument — richtig als Grundeinstellung
+% und falsch fuer das eine Kapitel, das anders gebaut ist als der Rest. Der
+% klassische Fall ist der Anhang: eine gedraengte Formelsammlung, waehrend die
+% Kapitel davor ihre Luft behalten sollen. Ohne diese Ebene blieb dafuer nur,
+% \ZSFspace* im Kapitel zu ueberschreiben — der lokale Notausgang, den der
+% Linter meldet, und die einzige Antwort, die rules/30_spacing bisher hatte,
+% war "dann eben global", also das ganze Dokument fuer ein Kapitel zu drehen.
+%
+% Gilt ab dem Aufruf bis \ZSFChapterDensityReset oder bis zum naechsten
+% Aufruf — dieselbe Bauform wie der Pack-Modus (\ZSFBoxesBreakableOn/Off),
+% weil es dieselbe Art Entscheidung am selben Ort ist.
+\newcommand{\ZSFChapterDensity}[1]{\def\ZSFDensityFactor{#1}\ZSF@spacingChain
+  \ZSFApplyDisplaySkips}
+\newcommand{\ZSFChapterDensityReset}{%
+  \let\ZSFDensityFactor\ZSF@densityDocument \ZSF@spacingChain
+  \ZSFApplyDisplaySkips}
+\makeatother
+
+% ── Display-Skips: die EINE Stelle, und sie muss wiederholbar sein ───
+% Die engen Abstände um Formeln sind eine ZSF-Entscheidung. LaTeX legt sie
+% aber in den Groessenbefehlen ab: \normalsize und \footnotesize setzen alle
+% vier Skips auf die KLASSENWERTE zurueck. Jeder Schriftwechsel im Inhalt
+% loescht damit die Entscheidung — lautlos, denn Formeln sehen auch mit den
+% Klassenwerten korrekt aus, nur luftiger.
+%
+% Deshalb ist die Politik ein benanntes Makro und kein einmaliges \setlength:
+% Wer die Groesse wechselt, ruft sie danach erneut auf. Genutzt von
+% \ZSFfontContent/\ZSFfontContentDense (der `font`-Regler), vom
+% \AtBeginDocument in 70_document_settings und von \ZSFChapterDensity oben.
+\newcommand{\ZSFApplyDisplaySkips}{%
+  \setlength{\abovedisplayskip}{\ZSFspaceXS}%
+  \setlength{\belowdisplayskip}{\ZSFspaceXS}%
+  \setlength{\abovedisplayshortskip}{\ZSFspaceXS}%
+  \setlength{\belowdisplayshortskip}{\ZSFspaceXS}%
+  \setlength{\mathsurround}{\ZSFspaceXS}%
+}
+
+\newlength{\ZSFspaceXS}\ZSFderive{\ZSFspaceXS}{\ZSFDensityFactor\dimexpr 1pt\relax}
+\newlength{\ZSFspaceS} \ZSFderive{\ZSFspaceS}{\ZSFDensityFactor\dimexpr 4pt\relax}
+\newlength{\ZSFspaceM} \ZSFderive{\ZSFspaceM}{\ZSFDensityFactor\dimexpr 7pt\relax}
+\newlength{\ZSFspaceL} \ZSFderive{\ZSFspaceL}{\ZSFDensityFactor\dimexpr 10pt\relax}
 
 % ── Bereichsfaktoren: die mittlere Ebene der Pyramide ────────────────
 % \ZSFDensityFactor wirkt auf ALLES. Das ist richtig als Grundeinstellung und
@@ -64,8 +124,8 @@
 % Outer (Text-Box-Bindung) und Sep (Trennlinien) — beide folgen der Dichte.
 % Outer ist bewusst als \ZSFspaceM abgeleitet statt erneut ausgeschrieben:
 % es IST der Standard-Aussenabstand, kein eigener Wert.
-\newlength{\ZSFspaceOuter}\setlength{\ZSFspaceOuter}{\ZSFspaceM}
-\newlength{\ZSFspaceSep}  \setlength{\ZSFspaceSep}{\ZSFDensityBoxes\dimexpr
+\newlength{\ZSFspaceOuter}\ZSFderive{\ZSFspaceOuter}{\ZSFspaceM}
+\newlength{\ZSFspaceSep}  \ZSFderive{\ZSFspaceSep}{\ZSFDensityBoxes\dimexpr
   \ZSFDensityFactor\dimexpr 3pt\relax\relax}
 
 % Absatzabstand im Fliesstext — der grösste einzelne vertikale Posten einer
@@ -75,10 +135,10 @@
 % Skip-Register skaliert Soll-, Streck- und Schrumpfanteil gemeinsam; zwei
 % Faktoren direkt hintereinander kann TeX dagegen nicht lesen.
 \newlength{\ZSFparskipBase}
-\setlength{\ZSFparskipBase}{\ZSFDensityFactor\dimexpr 3.5pt\relax
+\ZSFderive{\ZSFparskipBase}{\ZSFDensityFactor\dimexpr 3.5pt\relax
                     plus \ZSFDensityFactor\dimexpr 1pt\relax
                    minus \ZSFDensityFactor\dimexpr 0.5pt\relax}
-\setlength{\parskip}{\ZSFDensityText\ZSFparskipBase}
+\ZSFderive{\parskip}{\ZSFDensityText\ZSFparskipBase}
 
 % ── Zeilenhöhe: die zweite globale Stellschraube ─────────────────────
 % Bewusst NICHT an \ZSFDensityFactor gekoppelt. Abstände sind Leerraum und
@@ -129,13 +189,13 @@
 % Der Wert darf verstellt werden, die Zeile nicht wegfallen.
 \newlength{\ZSFpostChapterNudge}\setlength{\ZSFpostChapterNudge}{0pt}
 \newlength{\ZSFtitleBarHeight}\setlength{\ZSFtitleBarHeight}{9.2pt}
-\newlength{\ZSFsubsectionBarBeforeSkip}\setlength{\ZSFsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceL}
-\newlength{\ZSFsubsubsectionBarBeforeSkip}\setlength{\ZSFsubsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceS}
-\newlength{\ZSFsubsectionAfterChapterGap}\setlength{\ZSFsubsectionAfterChapterGap}{\ZSFDensityStructure\ZSFspaceXS}
-\newlength{\ZSFsubsectionAfterGap}\setlength{\ZSFsubsectionAfterGap}{\ZSFDensityStructure\ZSFspaceXS}
-\newlength{\ZSFchapterBarAfterSkip}\setlength{\ZSFchapterBarAfterSkip}{\ZSFDensityStructure\dimexpr
+\newlength{\ZSFsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceL}
+\newlength{\ZSFsubsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceS}
+\newlength{\ZSFsubsectionAfterChapterGap}\ZSFderive{\ZSFsubsectionAfterChapterGap}{\ZSFDensityStructure\ZSFspaceXS}
+\newlength{\ZSFsubsectionAfterGap}\ZSFderive{\ZSFsubsectionAfterGap}{\ZSFDensityStructure\ZSFspaceXS}
+\newlength{\ZSFchapterBarAfterSkip}\ZSFderive{\ZSFchapterBarAfterSkip}{\ZSFDensityStructure\dimexpr
   \ZSFDensityFactor\dimexpr 2pt\relax\relax}
-\newlength{\ZSFboxArc}\setlength{\ZSFboxArc}{\ZSFspaceXS}
+\newlength{\ZSFboxArc}\ZSFderive{\ZSFboxArc}{\ZSFspaceXS}
 \newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
 \newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
 \newlength{\ZSFgoalConditionBorderlineWidth}\setlength{\ZSFgoalConditionBorderlineWidth}{0.2pt}
@@ -180,7 +240,7 @@
 % Abstand der TikZ-Spannklammer (\drawbrace, Opt-in 11_math_advanced) von der
 % Grundlinie des annotierten Terms. Ohne ihn läuft die Klammer als waagrechte
 % Linie mitten durch die Formel, weil die Marker auf der Grundlinie sitzen.
-\newlength{\ZSFbraceDrop}\setlength{\ZSFbraceDrop}{\ZSFspaceM}
+\newlength{\ZSFbraceDrop}\ZSFderive{\ZSFbraceDrop}{\ZSFspaceM}
 
 % Tokens für die ruhige Box-Familie und ZSFlist.
 % Der Einzug ist der einzige Wert, der sich zwischen nummerierter und
@@ -188,8 +248,8 @@
 % als ein Aufzählungszeichen. Deshalb zwei Werte unter EINEM Namen statt
 % zweier Registersätze mit verschiedenen Präfixen.
 \newlength{\ZSFstatementBarWidth}\setlength{\ZSFstatementBarWidth}{2pt}
-\newlength{\ZSFlistMarkGap}         \setlength{\ZSFlistMarkGap}{\ZSFspaceXS}
-\newlength{\ZSFlistItemSep}         \setlength{\ZSFlistItemSep}{\ZSFspaceXS}
+\newlength{\ZSFlistMarkGap}         \ZSFderive{\ZSFlistMarkGap}{\ZSFspaceXS}
+\newlength{\ZSFlistItemSep}         \ZSFderive{\ZSFlistItemSep}{\ZSFspaceXS}
 \newlength{\ZSFlistLeftMargin}      \setlength{\ZSFlistLeftMargin}{1.2em}
 \newlength{\ZSFlistLeftMarginOrdered}\setlength{\ZSFlistLeftMarginOrdered}{1.6em}
 \newlength{\ZSFlistLabelSep}        \setlength{\ZSFlistLabelSep}{0.4em}
@@ -197,7 +257,7 @@
 % Kleinstes vertikales Innenmass für Text an einer Kante: Zeilenluft in
 % Tabellen (\extrarowheight in 70_document_settings) und die knappe Polsterung
 % jeder Box mit `pady=tight` (leise Box, goalbox, valuegrid).
-\newlength{\ZSFtextMinPad}\setlength{\ZSFtextMinPad}{\ZSFDensityBoxes\ZSFspaceXS}
+\newlength{\ZSFtextMinPad}\ZSFderive{\ZSFtextMinPad}{\ZSFDensityBoxes\ZSFspaceXS}
 
 % ── Horizontaler Innenabstand: eine Stellschraube für alle Inhaltsboxen ──
 % Ein eigener Wert pro Box zwänge dazu, für eine Randkorrektur jede Box
@@ -214,23 +274,23 @@
 %                      Tabelle verschieden, weil sie mit der Spaltenzahl
 %                      skaliert — bei sieben Spalten kostet der Standardwert
 %                      beidseitig mehr Breite als der Inhalt selbst.
-\newlength{\ZSFboxPadX}      \setlength{\ZSFboxPadX}{\ZSFDensityBoxes\ZSFspaceS}
-\newlength{\ZSFboxPadXBar}   \setlength{\ZSFboxPadXBar}{\ZSFDensityBoxes\ZSFspaceM}
-\newlength{\ZSFtableEdgePad} \setlength{\ZSFtableEdgePad}{\ZSFDensityTables\ZSFspaceM}
+\newlength{\ZSFboxPadX}      \ZSFderive{\ZSFboxPadX}{\ZSFDensityBoxes\ZSFspaceS}
+\newlength{\ZSFboxPadXBar}   \ZSFderive{\ZSFboxPadXBar}{\ZSFDensityBoxes\ZSFspaceM}
+\newlength{\ZSFtableEdgePad} \ZSFderive{\ZSFtableEdgePad}{\ZSFDensityTables\ZSFspaceM}
 \newlength{\ZSFtableEdgePadTight}
-  \setlength{\ZSFtableEdgePadTight}{\ZSFDensityTables\ZSFspaceXS}
+  \ZSFderive{\ZSFtableEdgePadTight}{\ZSFDensityTables\ZSFspaceXS}
 
 % Vertikal dasselbe: Innenabstand oben/unten und der Abstand NACH einer Box.
 % Beide als Register, damit der Abstand nach einer Box nicht pro Box-Stil
 % erneut ausgeschrieben wird.
-\newlength{\ZSFboxPadY}      \setlength{\ZSFboxPadY}{\ZSFDensityBoxes\ZSFspaceS}
-\newlength{\ZSFBoxAfterSkip} \setlength{\ZSFBoxAfterSkip}{\ZSFDensityBoxes\ZSFspaceS}
+\newlength{\ZSFboxPadY}      \ZSFderive{\ZSFboxPadY}{\ZSFDensityBoxes\ZSFspaceS}
+\newlength{\ZSFBoxAfterSkip} \ZSFderive{\ZSFBoxAfterSkip}{\ZSFDensityBoxes\ZSFspaceS}
 
 % Balken haben ihren eigenen vertikalen Rhythmus — bewusst getrennt vom
 % Box-Innenabstand, damit sich Balkenhoehe und Boxpolsterung unabhaengig
 % einstellen lassen.
-\newlength{\ZSFbarPadY}      \setlength{\ZSFbarPadY}{\ZSFDensityStructure\ZSFspaceS}
-\newlength{\ZSFbarPadYTight} \setlength{\ZSFbarPadYTight}{\ZSFDensityStructure\ZSFspaceXS}
+\newlength{\ZSFbarPadY}      \ZSFderive{\ZSFbarPadY}{\ZSFDensityStructure\ZSFspaceS}
+\newlength{\ZSFbarPadYTight} \ZSFderive{\ZSFbarPadYTight}{\ZSFDensityStructure\ZSFspaceXS}
 
 % ------------------------------------------------------------
 % Code-Längen — nur für die optionalen Code-Module benötigt
@@ -250,10 +310,10 @@
 \newlength{\ZSFcodeCommentThresholdDefault}
   \setlength{\ZSFcodeCommentThresholdDefault}{\maxdimen}
 \newlength{\ZSFcodeCommentThreshold}\setlength{\ZSFcodeCommentThreshold}{\ZSFcodeCommentThresholdDefault}
-\newlength{\ZSFcodeCommentGap}      \setlength{\ZSFcodeCommentGap}{\ZSFspaceM}
+\newlength{\ZSFcodeCommentGap}      \ZSFderive{\ZSFcodeCommentGap}{\ZSFspaceM}
 
 % Valuegrid, Index, Readability und dokumentweite Overlays
-\newlength{\ZSFvaluegridRowSep}       \setlength{\ZSFvaluegridRowSep}{\ZSFDensityTables\ZSFspaceSep}
+\newlength{\ZSFvaluegridRowSep}       \ZSFderive{\ZSFvaluegridRowSep}{\ZSFDensityTables\ZSFspaceSep}
 \newlength{\ZSFreadabilityEmergencyStretch}\setlength{\ZSFreadabilityEmergencyStretch}{2.5em}
 % Flatterzone im Fliesstext: schmaler als der ragged2e-Standard (0pt plus 2em),
 % damit die schmalen 4 Spalten gut gefüllt bleiben. Wirkt nur über
