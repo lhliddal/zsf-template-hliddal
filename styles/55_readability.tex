@@ -101,4 +101,15 @@
 %   Stelle — der Name sagte damit etwas anderes als der Wert tat.
 \newcommand{\ZSFallowbreak}{\penalty0\relax}
 
+% ------------------------------------------------------------
+% Automatischer LuaLaTeX-Filter für intelligente Zeilenumbrüche
+% ------------------------------------------------------------
+% Lädt den Lua-Filter zur Vermeidung von Trennungen bei Doppelpunkten,
+% Einheiten und kurzen Inline-Formeln. Die Registrierung erfolgt
+% über \AtBeginDocument, damit Paketladevorgänge ungestört bleiben.
+\directlua{dofile(kpse.find_file("styles/zsf_filter.lua"))}
+\AtBeginDocument{%
+  \directlua{zsf_register_filter()}%
+}
+
 % ============================================================
