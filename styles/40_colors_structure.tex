@@ -570,7 +570,6 @@
 % Registereintrag in den Front-Zweig, mit leerem Wegweiser statt einer
 % Abschnittsnummer — und zwar ohne Fehler, weil beide Zweige gueltig sind.
 \let\ZSF@frontIdxLabel\@empty
-\newcommand{\ZSFPostChapterSpacing}{\vspace*{\ZSFpostChapterNudge}}
 \newcommand{\StartChapter}[2][]{%
   \ifnum\value{zsfFirstChap}=1\setcounter{zsfFirstChap}{0}\fi
   \refstepcounter{section}
@@ -581,7 +580,6 @@
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \ChapterBar{\thesection. #2}
   \ZSFMarkAfterChapterBar
-  \ZSFPostChapterSpacing
 }
 
 % Für ein Kapitel auf neuer Spalte: \ZSFNewColumn davorsetzen
@@ -613,6 +611,5 @@
   \def\ZSF@frontIdxLabel{#1}%
   \ChapterBar{#2}%
   \ZSFMarkAfterChapterBar
-  \ZSFPostChapterSpacing
 }
 \makeatother

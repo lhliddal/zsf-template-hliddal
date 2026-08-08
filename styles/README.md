@@ -9,7 +9,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, Klammern über Zellgrenzen (`\tikzmark`/`\drawbrace`/`\annote` + `\ZSFbraceRoom`), Pfeil-Fix |
 | `12_plots.tex` | **OPT-IN**: lädt `pgfplots` und setzt die zentrale Kompatibilitätsversion |
 | `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`/`rows`/`colsep`, `\ZSFheaderRow`, `\ZSFhead`, Zellverbund `\ZSFspan` |
-| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Kollaps-Merker an Balkengrenzen (`\ZSFBoxBeforeSkip`), Formel-Innenmasse (`\ZSFmathRowSep`/`\ZSFmathColSep`), Spaltenkopf (`\ZSFcolumnTopSkip`), samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
+| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Kollaps-Merker an Balkengrenzen (`\ZSFBoxBeforeSkip`, `\ZSFbarAfterGap`), Formel-Innenmasse (`\ZSFmathRowSep`/`\ZSFmathColSep`), Spaltenkopf (`\ZSFcolumnTopSkip`), samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`, Ink-Vertrag (`\ZSFInk`/`\ZSFInkOwned`), Grössenfarben-Palette + `\ZSFDeclareQuantity` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
@@ -61,7 +61,8 @@ und `rules/55_index.md`.
 - Globale Stellschrauben (in `preamble.tex`, nicht in Kapiteln):
   `\ZSFDensityFactor`, `\ZSFLeadingFactor`,
   Bereichsfaktoren `\ZSFDensityBoxes`, `\ZSFDensityText`, `\ZSFDensityTables`,
-  `\ZSFDensityStructure`, `\ZSFBreakReserveFactor` (siehe `rules/30_spacing.md`),
+  `\ZSFDensityStructure`, `\ZSFBreakReserveFactor`,
+  `\ZSFBarGapFactor` (Abstand nach einem Titelbalken, siehe `rules/30_spacing.md`),
   `\ZSFDiagramLabelScale` (beide Diagramm-Beschriftungsstufen gemeinsam,
   siehe `rules/20_boxes.md`),
   `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
@@ -315,6 +316,28 @@ Mit ihm lagen zwei weitere Zusagen brach: die Kollaps-Mechanik nach einem
 Balken rechnete einen Wert aus, den niemand las, und `ZSFboxgroup` schloss
 seine Zwischenräume nicht. Wer hier etwas ändert, prüft es am Satz — ein
 Register, das keiner liest, sieht im Code korrekt aus.
+
+**Der Abstand NACH einem Titelbalken** gehört `\ZSFbarAfterGap`, gesetzt in
+`\ZSFTitleBarAfter` (`60_boxes`) für alle vier Balken. Derselbe Fehlertyp wie
+oben, nur eine Ebene höher: Es gab zwei Register (`\ZSFchapterBarAfterSkip`,
+`\ZSFsubsectionAfterGap`), und beide setzten je *einen* Posten von dreien.
+Die anderen zwei setzte niemand — `\parskip`, weil der Text nach dem Balken ein
+neuer Absatz ist, und die Zeilenschaltung. Am Satz gemessen ergab das drei
+verschiedene Abstände an derselben Stelle des Systems: Balken → Box 1pt,
+Abschnittsbalken → Fliesstext 6.8pt, Kapitelbalken → Fliesstext 9.5pt. Keiner
+davon war gewählt; der grösste stand in keinem Register.
+
+Der Weg zur Exaktheit ist `\ZSFInterlude` — dasselbe Makro, das die Zielkette
+benutzt, und aus demselben Grund. Es zieht `\parskip` ab und nimmt mit
+`\nointerlineskip` die Zeilenschaltung heraus; danach ist der Abstand von der
+Balken-Unterkante zur Oberkante des folgenden Blocks genau `\ZSFbarAfterGap`,
+unabhängig davon, ob dort Text, eine Box oder ein Bild folgt. Zwei Dinge
+mussten dafür weichen: `\ZSFPostChapterSpacing` (ein `\vspace*{0pt}` direkt
+nach dem Kapitelbalken — eine nicht verwerfbare 0pt-Glue, an der `\addvspace`
+seine Max-Semantik verliert und den Abstand deshalb *addierte* statt ihn zu
+kollabieren; genau daher kam der Unterschied 9.5 zu 6.8) und der Merker
+`\ifzsfAfterSubsectionBar`, dessen Aussage die Balken-Sperre
+`\ifzsfTitleBarPending` bereits trug — für alle vier Balken statt nur für zwei.
 
 **Die Inventur ist vollständig gemacht worden**, nicht angenommen: Alle
 TeX- und LaTeX-Abstandsparameter wurden im laufenden Dokument ausgelesen und

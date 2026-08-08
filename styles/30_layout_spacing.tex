@@ -185,21 +185,38 @@
   \setlength{\ZSFbreakThreshold}{\ZSFBreakReserveFactor\dimexpr 7\baselineskip\relax}
 \newlength{\ZSFbreakThresholdSubsubsection}
   \setlength{\ZSFbreakThresholdSubsubsection}{\ZSFBreakReserveFactor\dimexpr 5\baselineskip\relax}
-% Feinjustierung des Abstands direkt nach einem Kapitelbalken. Steht auf 0pt und
-% sieht dadurch nach totem Code aus — ist es nicht: Das zugehörige
-% \ZSFPostChapterSpacing (40_colors_structure) setzt ein \vspace*, und ein
-% \vspace* ist auch bei 0pt nicht verwerfbar. Es erzwingt den Übergang in den
-% vertikalen Modus und verankert den Absatzanfang nach dem Balken. Entfernt man
-% es, verschiebt sich der Satz messbar (geprüft: alle drei Seiten ändern sich).
-% Der Wert darf verstellt werden, die Zeile nicht wegfallen.
-\newlength{\ZSFpostChapterNudge}\setlength{\ZSFpostChapterNudge}{0pt}
 \newlength{\ZSFtitleBarHeight}\setlength{\ZSFtitleBarHeight}{9.2pt}
 \newlength{\ZSFsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceL}
 \newlength{\ZSFsubsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceS}
 \newlength{\ZSFsubsectionAfterChapterGap}\ZSFderive{\ZSFsubsectionAfterChapterGap}{\ZSFDensityStructure\ZSFspaceXS}
-\newlength{\ZSFsubsectionAfterGap}\ZSFderive{\ZSFsubsectionAfterGap}{\ZSFDensityStructure\ZSFspaceXS}
-\newlength{\ZSFchapterBarAfterSkip}\ZSFderive{\ZSFchapterBarAfterSkip}{\ZSFDensityStructure\dimexpr
-  \ZSFDensityFactor\dimexpr 2pt\relax\relax}
+
+% ── Der Abstand NACH einem Titelbalken ───────────────────────────────
+% EIN Register für alle vier Balken, und es ist der GANZE Abstand von der
+% Unterkante des Balkens bis zur Oberkante des folgenden Blocks — Fliesstext
+% wie Box. Der Weg dorthin ist \ZSFInterlude (unten), aufgerufen im
+% after-Hook \ZSFTitleBarAfter (60_boxes).
+%
+% Vorher war dieser Abstand herrenlos, und zwar nach demselben Muster wie
+% \ZSFBoxBeforeSkip (styles/README → »Abstand hat genau einen Schreiber«):
+% Zwei Register (\ZSFchapterBarAfterSkip 2pt, \ZSFsubsectionAfterGap 1pt)
+% setzten je EINEN Posten von dreien. Dazu kamen \parskip (3.5pt, weil der
+% Text nach dem Balken ein neuer Absatz ist) und die Zeilenschaltung
+% (\baselineskip − Höhe der ersten Zeile). Gemessen am Satz: Balken → Box
+% 1pt, Balken → Fliesstext 6.8pt, Kapitelbalken → Fliesstext 9.5pt. Drei
+% Abstände an derselben Stelle des Systems, keiner davon gewählt.
+%
+% Der Wert (3pt) liegt zwischen den beiden Zuständen von vorher: enger als der
+% Fliesstext-Fall (6.8/9.5pt, den niemand gewählt hatte), etwas luftiger als
+% der Box-Fall (1pt, der nur deshalb so knapp war, weil dort kein \parskip
+% dazukam). Am Satz geprüft, nicht gerechnet: 2pt drückt den ersten Satz an
+% den Balken, 4pt bringt die alte Lücke zurück.
+%
+% Die Staffelung Kapitel > Abschnitt ist bewusst aufgegeben: Die Ebene wird
+% über Balkenhöhe, Farbe und den Abstand DAVOR unterschieden
+% (\ZSFsubsectionBarBeforeSkip), nicht über einen Punkt danach.
+\providecommand{\ZSFBarGapFactor}{1}
+\newlength{\ZSFbarAfterGap}\ZSFderive{\ZSFbarAfterGap}{\ZSFBarGapFactor\dimexpr
+  \ZSFDensityStructure\dimexpr\ZSFDensityFactor\dimexpr 3pt\relax\relax\relax}
 \newlength{\ZSFboxArc}\ZSFderive{\ZSFboxArc}{\ZSFspaceXS}
 \newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
 \newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
@@ -417,9 +434,10 @@
 % Spacing-Kollaps an Kapitel- und Abschnittsgrenzen
 % ------------------------------------------------------------
 % Steht ein Block direkt unter einem Titelbalken, soll der Balken-Abstand
-% gelten und nicht zusätzlich der normale Blockabstand. Zwei Merker halten
-% fest, ob gerade ein Balken vorausging; \ZSF@blockBefore (60_boxes) liest
-% sie und verbraucht sie — für JEDEN Block, Box wie runintext.
+% gelten und nicht zusätzlich der normale Blockabstand. Der Merker hält fest,
+% ob eine ChapterBar vorausging (ein Abschnittsbalken zieht dann seinen
+% Vorabstand zusammen); \ZSF@blockBefore (60_boxes) verbraucht ihn — für
+% JEDEN Block, Box wie runintext.
 %
 % Aus 40_colors_structure hierher gezogen: Der Mechanismus entscheidet
 % Abstände, nicht Farben (rules/10_architecture → Was wo hingehört). Dass er
@@ -430,15 +448,18 @@
 \newcommand{\ZSFMarkAfterChapterBar}{\global\zsfAfterChapterBartrue}
 \newcommand{\ZSFConsumeAfterChapterBar}{\global\zsfAfterChapterBarfalse}
 
-\newif\ifzsfAfterSubsectionBar
-\zsfAfterSubsectionBarfalse
-\newcommand{\ZSFMarkAfterSubsectionBar}{\global\zsfAfterSubsectionBartrue}
-\newcommand{\ZSFConsumeAfterSubsectionBar}{\global\zsfAfterSubsectionBarfalse}
-
-% Der Abstand VOR einem Block. Direkt nach einem Abschnittsbalken der knappe
-% Balkenabstand, sonst der normale Blockabstand.
+% Der Abstand VOR einem Block. Direkt nach einem Titelbalken der Balken-Abstand,
+% sonst der normale Blockabstand.
+%
+% Gelesen wird die Balken-SPERRE (\ifzsfTitleBarPending, 60_boxes) und kein
+% eigener Merker: Sie sagt bereits genau das, was hier gebraucht wird — »ein
+% Balken steht da, und es kam noch kein Inhalt«. Ein zweiter Merker daneben
+% wäre dieselbe Aussage ein zweites Mal, und die Sperre gilt für ALLE vier
+% Balken, während der frühere \ifzsfAfterSubsectionBar nur die beiden
+% Abschnittsebenen kannte — nach einem Kapitelbalken zog derselbe Block
+% deshalb einen anderen Abstand.
 \newcommand{\ZSFBoxBeforeSkip}{%
-  \ifzsfAfterSubsectionBar\ZSFsubsectionAfterGap\else\ZSFspaceS\fi
+  \ifzsfTitleBarPending\ZSFbarAfterGap\else\ZSFspaceS\fi
 }
 
 % Kollabiert den before-skip der SubsectionBar auf \ZSFsubsectionAfterChapterGap,

@@ -57,6 +57,13 @@
 % Spalte davor um. Grösser = Balken stehen seltener knapp am Spaltenfuss.
 % \def\ZSFBreakReserveFactor{1}   % 1 = Referenz
 %
+% Der Abstand NACH einem Titelbalken — der ganze Abstand bis zum ersten
+% Block darunter, Fliesstext wie Box. Eigener Regler und nicht Teil von
+% \ZSFDensityStructure: Wie eng eine Überschrift an ihrem Inhalt klebt, ist
+% eine Bindungs-Entscheidung und keine Frage der Gesamtdichte — in einer
+% ZSF mit vielen kurzen Abschnitten will man ihn enger als alles andere.
+% \def\ZSFBarGapFactor{1}         % 1 = Referenz (3pt), kleiner = enger
+%
 % Schriftgrösse der Diagramm-Beschriftung — beide Stufen gemeinsam
 % (\ZSFfontDiagramLabel und \ZSFfontDiagramLabelSmall). Kleiner für Fächer mit
 % vielen gedrängten Zeichnungen; die zwei Stufen bleiben dabei unterscheidbar.

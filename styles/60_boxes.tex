@@ -72,8 +72,19 @@
 % Steht die Sperre davor, ist die Glue durch ein Penalty abgeschirmt und
 % damit kein Umbruchpunkt mehr. Deshalb ersetzen die Balken "after skip"
 % durch diesen Hook — "after" ersetzt die Default-Aktion von tcolorbox.
-\newcommand{\ZSFTitleBarAfter}[1]{%
-  \par\penalty10000\vskip#1\relax\ZSFTitleBarLockOn
+%
+% Der Abstand selbst ist \ZSFbarAfterGap und steht deshalb NICHT mehr als
+% Argument hier: Ein Balken ist ein Balken, und was unter ihm frei bleibt, ist
+% eine Entscheidung des Systems und keine der vier Balkendefinitionen
+% (rules/02_ai_mandate → Katalog-Ökonomie). Gesetzt wird er über
+% \ZSFInterlude (30_layout_spacing) statt über ein rohes \vskip — nur so ist
+% der Abstand der GANZE Abstand: \ZSFInterlude zieht \parskip ab, den der
+% folgende Absatz selbst setzt, und nimmt mit \nointerlineskip die
+% Zeilenschaltung heraus. Ohne beides kamen zu jedem gesetzten Wert noch 3.5pt
+% Absatzabstand und eine inhaltsabhängige Zeilenschaltung hinzu — der Abstand
+% war dann das Nebenprodukt der Tinte und nicht der gesetzte Wert.
+\newcommand{\ZSFTitleBarAfter}{%
+  \par\penalty10000\ZSFInterlude{\ZSFbarAfterGap}\ZSFTitleBarLockOn
 }
 
 \tcbset{
@@ -95,7 +106,7 @@
   top=\ZSFbarPadY,
   bottom=\ZSFbarPadY,
   before skip=\ZSFspaceL,
-  after={\ZSFTitleBarAfter{\ZSFchapterBarAfterSkip}},
+  after={\ZSFTitleBarAfter},
   fontupper=\ZSFfontChapter,
   #1
 }
@@ -122,7 +133,7 @@
   right=\ZSFboxPadXBar,
   top=\ZSFbarPadY,
   bottom=\ZSFbarPadY,
-  after={\ZSFTitleBarAfter{\ZSFspaceXS}},
+  after={\ZSFTitleBarAfter},
   halign=center,
   #1
 }
@@ -143,7 +154,7 @@
   zsfbarcolor=\SubsectionBarColor,
   top=\ZSFbarPadY,
   bottom=\ZSFbarPadY,
-  after={\ZSFTitleBarAfter{\ZSFsubsectionAfterGap}},
+  after={\ZSFTitleBarAfter},
   fontupper=\ZSFfontSection,
   #1
 }
@@ -152,7 +163,7 @@
   zsfbarcolor=\SubsubsectionBarColor,
   top=\ZSFbarPadYTight,
   bottom=\ZSFbarPadYTight,
-  after={\ZSFTitleBarAfter{\ZSFsubsectionAfterGap}},
+  after={\ZSFTitleBarAfter},
   fontupper=\ZSFfontSubsubsection,
   #1
 }
@@ -168,7 +179,6 @@
   \begin{subsectionbar}
     \textcolor{\SubsectionBarTextColor}{\ZSFInkOwned #2#3}
   \end{subsectionbar}
-  \ZSFMarkAfterSubsectionBar
 }
 \newcommand{\ZSF@subsubsectionBarBody}[3]{%
   \BreakIfNotEnoughSpaceSubsubsection
@@ -178,7 +188,6 @@
   \begin{subsubsectionbar}
     \textcolor{\SubsubsectionTitleColor}{\ZSFInkOwned #2#3}
   \end{subsubsectionbar}
-  \ZSFMarkAfterSubsectionBar
 }
 
 \newcommand{\SubsectionBar}{\@ifstar{\SubsectionBarStar}{\SubsectionBarNumbered}}
@@ -272,7 +281,7 @@
 %
 % Die Folgen reichten weiter als der eine Wert: Der Abstand vor JEDER Box kam
 % damit allein aus \parskip und gehoerte keinem Register. Die Kollaps-Mechanik
-% nach einem Balken (\ifzsfAfterSubsectionBar) rechnete einen Wert aus, den
+% nach einem Balken (damals \ifzsfAfterSubsectionBar) rechnete einen Wert aus, den
 % niemand las, und \ZSFboxgroup schloss seine Zwischenraeume nicht wirklich.
 %
 % Deshalb EIN `before`, das beides tut. Die Skip-Logik ist die von tcolorbox
@@ -295,7 +304,7 @@
   % Abschnittsbalken heisst, dass die beiden Balken NICHT aneinanderstossen —
   % blieb der Kapitel-Merker stehen, zog der Abschnittsbalken seinen Vorabstand
   % trotzdem zusammen. Derselbe Fehler eine Ebene hoeher.
-  \ZSFConsumeAfterSubsectionBar\ZSFConsumeAfterChapterBar\ZSFTitleBarLockOff
+  \ZSFConsumeAfterChapterBar\ZSFTitleBarLockOff
 }
 \tcbset{zsfbox/.style={
   enhanced jigsaw,
