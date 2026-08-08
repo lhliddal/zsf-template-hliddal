@@ -34,10 +34,10 @@ IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTI
 # Optional local-only automation; Makefile.local is gitignored.
 -include Makefile.local
 
-.PHONY: build rebuild check clean all \
+.PHONY: build rebuild check check-deep check-all clean all \
         check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules check-init-project \
         check-root-clean check-pdf-identity check-guardrails check-showcase-coverage check-box-options \
-        check-ink-contract check-spacing-registers lint \
+        check-global-knobs check-ink-contract check-spacing-registers check-scopes lint \
         sync-rules check-rules check-rule-authorship \
         release-proof print-pdf-basename print-release-id
 
@@ -53,20 +53,36 @@ build:
 rebuild: LATEXMK_FORCE := -g
 rebuild: build
 
-# --- Verifier ----------------------------------------------------------
-# 'make check' ist das lokale Feedback-Loop: Struktur-, Tabellen-, Ref-,
-# Index-, Style-Token-, Root-, PDF-Identity-, Guardrail-, Lint- und
-# Rule-Drift-Prüfung.
+# --- Verifier: drei Stufen ---------------------------------------------
+# 'make check'      — Alltags-Gate (<30 s): Build + alle Schnellprüfungen
+#                     (Struktur, Tabellen, Refs, Index, Style-Tokens, Root,
+#                     PDF-Identity, Guardrails, Showcase, Scopes, Lint,
+#                     Rule-Drift). Meldet veraltete Tiefenprüfungen am Ende,
+#                     führt sie aber NICHT aus — das Alltags-Budget gehört
+#                     dem Arbeitsfluss (tests/README.md → Stufen).
+# 'make check-deep' — die Satz-Verifier (Box-Regler, Spacing-Register,
+#                     Stellschrauben, Ink-Vertrag, Modul-Isolation). Läuft
+#                     nur, was seit dem letzten grünen Lauf veraltet ist
+#                     (Stempel in build/checkstamps/), parallel. FORCE=1
+#                     erzwingt alle. Fällig nach Arbeit an styles/ oder
+#                     preamble.tex.
+# 'make check-all'  — vor Push/Release: check + check-deep + Fork-E2E.
 # 'check' baut zuerst: check-pdf-identity und die .ind-Prüfungen brauchen ein
 # aktuelles PDF. Der Build ist inkrementell und damit fast gratis, wenn nichts
 # geändert wurde — dafür kann 'make check' nicht mehr an einem PDF von gestern
 # scheitern (RELEASE_ID trägt das Build-Datum).
 # Läuft NICHT in CI: tests/ tools/ rules/ sind git-excluded und fehlen im Clone.
-# 'make check' ist der lokale Gate (+ pre-commit); CI baut nur das PDF.
-check: build check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules \
-       check-init-project check-root-clean check-pdf-identity check-guardrails check-showcase-coverage \
-       check-box-options check-global-knobs check-ink-contract check-spacing-registers check-scopes lint check-rule-authorship check-rules
-	@echo "make check: alle Prüfungen bestanden."
+check: build check-main-full check-chapters check-tables check-refs check-index check-styles \
+       check-root-clean check-pdf-identity check-guardrails check-showcase-coverage \
+       check-scopes lint check-rule-authorship check-rules
+	@bash tests/run_deep_checks.sh status
+	@echo "make check: alle Schnellprüfungen bestanden."
+
+check-deep:
+	@bash tests/run_deep_checks.sh run
+
+check-all: check check-deep check-init-project
+	@echo "make check-all: alle Prüfungen bestanden."
 
 check-main-full:
 	@bash tests/check_main_full.sh
@@ -86,8 +102,9 @@ check-index:
 check-styles:
 	@bash tests/check_style_tokens.sh
 
+# Tiefenprüfung — läuft über den Stempel-Treiber (FORCE=1 erzwingt).
 check-optional-modules:
-	@bash tests/check_optional_modules.sh
+	@bash tests/run_deep_checks.sh run optional-modules
 
 # E2E-Test des Fork-Generators: initialisiert und baut eine temporäre Kopie.
 # Teil von 'make check', weil ein sauberer Fork die erste Pflicht des
@@ -113,27 +130,27 @@ check-showcase-coverage:
 # jedes Reglerpaar in beiden Reihenfolgen, und jeder Reglerwert gegen die
 # Vorbelegung. Beide Fehlerarten sind stumm und deshalb nur so zu finden.
 check-box-options:
-	@bash tests/check_box_options.sh
+	@bash tests/run_deep_checks.sh run box-options
 
 # Das Gegenstück eine Ebene höher: dreht jede globale Stellschraube einzeln und
 # verlangt eine messbare Wirkung. Ohne diesen Lauf war ausgerechnet die Ebene
 # ungeprüft, die pro ZSF tatsächlich verstellt wird.
 check-global-knobs:
-	@bash tests/check_global_knobs.sh
+	@bash tests/run_deep_checks.sh run global-knobs
 
 # Belegt den Ink-Vertrag am Satz: Auf einer Flaeche, die ihre eigene
 # Kontrastfarbe setzt, muss ein farbtragender Marker sie abgeben — und im
 # freien Boxinhalt behalten. Die zweite Haelfte ist die Negativkontrolle;
 # ohne sie bestuende der Lauf auch, wenn die Farbe ueberall verlorenginge.
 check-ink-contract:
-	@bash tests/check_ink_contract.sh
+	@bash tests/run_deep_checks.sh run ink-contract
 
 # Die Ebene unter den Stellschrauben: dreht jedes Spacing-Register einzeln und
 # verlangt eine Wirkung am Satz, haelt die Fremdparameter an ihr Register und
 # prueft die Umbruchreserve am echten Dokument. Anlass war ein Register, das
 # jahrelang niemand las, ohne dass es im Code danach aussah.
 check-spacing-registers:
-	@bash tests/check_spacing_registers.sh
+	@bash tests/run_deep_checks.sh run spacing-registers
 
 # Die dritte Achse: nicht "wirkt jeder Regler", sondern "welche
 # Geltungsbereiche gibt es ueberhaupt". check-box-options prueft
