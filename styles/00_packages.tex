@@ -26,8 +26,11 @@
 % Fira Math nachweislich Glyphen fehlen, die das Template braucht (gemessen:
 % U+211C/U+2111 Re/Im, U+229B \circledast) — Vollstaendigkeit schlaegt hier
 % die Duktus-Naehe zu Carlito.
+% Die Schrift liegt gevendort in styles/fonts/ (GUST-Lizenz): Ubuntus
+% TeX Live 2023 in der CI liefert NewCMSansMath noch nicht aus, und der
+% feste Pfad macht CI- und lokale Builds glyphengleich.
 \usepackage{unicode-math}
-\setmathfont{NewCMSansMath-Regular.otf}
+\setmathfont{NewCMSansMath-Regular.otf}[Path=styles/fonts/]
 \usepackage{siunitx}
 \sisetup{
   mode=match,
