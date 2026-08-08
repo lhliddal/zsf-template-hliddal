@@ -6,9 +6,8 @@
 % ergänzt nur das Delta — keine Basis-Makros duplizieren.
 %
 % Voraussetzungen (aus 00_packages.tex):
-%   - mathtools, amssymb   (Operatoren, Symbole)
-%   - tikz                 (drawbrace / tikzmark / annote)
-%   - sansmath             (Pfeil-Fix, nur bei Sans-Math-Setup relevant)
+%   - mathtools, unicode-math   (Operatoren, Symbole)
+%   - tikz                      (drawbrace / tikzmark / annote)
 % ============================================================
 
 % --- Lineare-Algebra-Operatoren ---
@@ -25,10 +24,14 @@
 \DeclareMathOperator{\Adj}{Adj}
 
 % --- Gotisches Im/Re -> moderne aufrechte Operatoren ---
-\let\oldIm\Im
-\renewcommand{\Im}{\operatorname{Im}}
-\let\oldRe\Re
-\renewcommand{\Re}{\operatorname{Re}}
+% AtBeginDocument, weil unicode-math seine Symbole ebenfalls erst dort
+% definiert — eine Praeambel-Renewcommand wuerde still ueberschrieben.
+\AtBeginDocument{%
+  \let\oldIm\Im
+  \renewcommand{\Im}{\operatorname{Im}}%
+  \let\oldRe\Re
+  \renewcommand{\Re}{\operatorname{Re}}%
+}
 
 % --- TikZ-Klammern für Matrix-Annotationen ---
 \usetikzlibrary{decorations.pathreplacing,calc}
@@ -83,13 +86,6 @@
 % Abstand zur Grundlinie + Klammerhöhe + Zeile für die Beschriftung.
 \newcommand{\ZSFbraceRoom}{\vspace{\dimexpr\ZSFbraceDrop+\ZSFspaceM\relax}}
 
-% --- Asterisk-Definitionen (mathabx -> amssymb) ---
+% --- Asterisk-Definitionen (mathabx-Namen auf Standard-Symbole) ---
 \newcommand{\asterisk}{\ast}
 \newcommand{\oasterisk}{\circledast}
-
-% --- Fix für überlappende/kaputte Doppelpfeile in sansmath ---
-\DeclareSymbolFont{ZSFMathArrowFont}{OT1}{cmss}{m}{n}
-\DeclareMathSymbol{\zsfEqual}{\mathrel}{ZSFMathArrowFont}{`=}
-\DeclareMathSymbol{\zsfMinus}{\mathrel}{ZSFMathArrowFont}{`-}
-\renewcommand{\Relbar}{\mathrel{\zsfEqual}}
-\renewcommand{\relbar}{\mathrel{\zsfMinus}}

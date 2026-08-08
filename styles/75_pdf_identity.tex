@@ -2,7 +2,7 @@
 % 75_pdf_identity.tex — PDF-Identitaet und Ownership-Nachweis
 % ============================================================
 % Alle dynamischen Felder (Titel, Release-ID, Build-Stamp, Git-Commit)
-% werden vom Makefile via -pdflatex="...\def\Foo{...}..." injiziert.
+% werden vom Makefile via -pdflualatex="...\def\Foo{...}..." injiziert.
 % Lokale Defaults via \providecommand sorgen dafür, dass das Dokument
 % auch ohne Makefile (z.B. direkter latexmk-Aufruf) baubar bleibt.
 
@@ -51,9 +51,17 @@
   pdfproducer={latexmk}
 }
 
+% Engine-Weiche: LuaTeX (>= 0.85) kennt \pdfinfo nicht mehr, sondern
+% \pdfextension info; pdfTeX kennt nur \pdfinfo. Eine Quelle, beide Engines.
+\ifdefined\pdfextension
+  \protected\def\ZSFpdfinfo{\pdfextension info }
+\else
+  \let\ZSFpdfinfo\pdfinfo
+\fi
+
 \AtBeginDocument{
   % Low-level pdfinfo fallback (stabil bei Toolchains, die Author/Keywords sonst verwerfen).
-  \pdfinfo{
+  \ZSFpdfinfo{
     /Author (\ZSFOwnerNameASCII)
     /Title (\ZSFSubjectTitle)
     /Subject (Originalfassung; owner=\ZSFOwnerID; release=\ZSFReleaseID)

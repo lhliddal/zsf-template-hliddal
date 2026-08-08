@@ -7,7 +7,7 @@ OUTPUT_PDF := $(PDF_BASENAME).pdf
 OUTPUT_SYNC := $(PDF_BASENAME).synctex.gz
 SYNCTEX ?= 1
 LATEXMK_FORCE ?=
-LATEXMK_FLAGS := -interaction=nonstopmode -file-line-error -pdf
+LATEXMK_FLAGS := -interaction=nonstopmode -file-line-error -lualatex
 ifeq ($(SYNCTEX),1)
 LATEXMK_FLAGS += -synctex=1
 endif
@@ -41,11 +41,17 @@ IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTI
         sync-rules check-rules check-rule-authorship \
         release-proof print-pdf-basename print-release-id
 
+# Index: upmendex statt makeindex (ICU sortiert Umlaute nach DIN 5007-1 ohne
+# Sortkeys, rules/55_index). Die ||-Weiche gleicht EINEN Verhaltensunterschied
+# aus: Bei leerem .idx (frischer Fork, Modul 66 aktiv, noch kein Eintrag)
+# schreibt upmendex nichts und beendet mit Fehler, wo makeindex still eine
+# leere .ind schrieb — dann ist die leere .ind korrekt und kein Fehler.
+# Bei echtem Fehler (Einträge vorhanden, Lauf scheitert) bricht der Build.
 build:
 	INDEXSTYLE="$(CURDIR)/styles:" \
 	latexmk $(LATEXMK_FORCE) $(IDENTITY_FORCE) $(LATEXMK_FLAGS) -outdir=$(BUILD_DIR) -auxdir=$(BUILD_DIR) \
-		-e '$$makeindex = q{makeindex -r -s zsfindex.ist %O -o %D %S};' \
-		-pdflatex="pdflatex %O '$(LATEX_DEFS)\input{%S}'" $(MAIN)
+		-e '$$makeindex = q{upmendex -r -s zsfindex.ist %O -o %D %S || { test ! -s %S && touch %D; }};' \
+		-pdflualatex="lualatex %O '$(LATEX_DEFS)\input{%S}'" $(MAIN)
 	@cp $(BUILD_DIR)/main.pdf "$(OUTPUT_PDF)"
 	@if [ "$(SYNCTEX)" = "1" ] && [ -f "$(BUILD_DIR)/main.synctex.gz" ]; then cp "$(BUILD_DIR)/main.synctex.gz" "$(OUTPUT_SYNC)"; fi
 	@printf '%s\n' "$(IDENTITY_KEY)" > "$(IDENTITY_STAMP)"

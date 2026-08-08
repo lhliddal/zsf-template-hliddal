@@ -4,12 +4,15 @@
 % Hinweis: Reihenfolge ist relevant. Schriften vor Mathe, xcolor mit
 % [table]-Option vor allem, was Tabellen-Farben braucht.
 
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
+% LuaLaTeX: Fonts kommen als OTF/TTF ueber fontspec — fontenc/inputenc sind
+% dort obsolet (Unicode ist nativ), das carlito-LaTeX-Paket entfaellt.
+\usepackage{fontspec}
 \usepackage[nswissgerman]{babel}
-\usepackage[sfdefault,lf]{carlito}  % Calibri-Aequivalent (Google), lf = Lining Figures
-\usepackage{sansmath}               % Mathe-Modus auch in Sans-Serif
-\sansmath
+% Carlito (Calibri-Aequivalent, Google) als Dokumentschrift; Lining Figures
+% explizit, entspricht der frueheren lf-Option. Sans ist die Hauptschrift.
+\setmainfont{Carlito}[Numbers=Lining]
+\setsansfont{Carlito}[Numbers=Lining]
+\renewcommand{\familydefault}{\sfdefault}
 % Zeilenhöhe liegt als \ZSFLeadingFactor in styles/30_layout_spacing.tex —
 % sie ist Layout, nicht Paket-Setup (rules/10_architecture).
 
@@ -18,8 +21,13 @@
 \usepackage{multicol}
 
 \usepackage{mathtools}              % Superset von amsmath
-\let\Bbbk\relax                     % Konfliktvermeidung mit newpxmath/amssymb
-\usepackage{amssymb}
+% unicode-math ersetzt sansmath+amssymb: eine echte Sans-Mathe-Schrift (OTF)
+% statt per Makro nachgebauter Symbole. NewCMSansMath statt Fira Math, weil
+% Fira Math nachweislich Glyphen fehlen, die das Template braucht (gemessen:
+% U+211C/U+2111 Re/Im, U+229B \circledast) — Vollstaendigkeit schlaegt hier
+% die Duktus-Naehe zu Carlito.
+\usepackage{unicode-math}
+\setmathfont{NewCMSansMath-Regular.otf}
 \usepackage{siunitx}
 \sisetup{
   mode=match,

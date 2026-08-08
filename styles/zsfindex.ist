@@ -1,6 +1,9 @@
-% zsfindex.ist — makeindex-Style für das Stichwortverzeichnis
+% zsfindex.ist — Index-Style für das Stichwortverzeichnis (upmendex)
 % "Seitenzahlen" sind Abschnittsnummern (6.2): page_compositor "." laesst
-% makeindex sie als zusammengesetzte Nummern parsen und sortieren.
+% den Prozessor sie als zusammengesetzte Nummern parsen und sortieren.
+% icu_locale: deutsche Sortierung nach DIN 5007-1 (ä wie a, ß wie ss) —
+% ersetzt die frueheren Pflicht-Sortkeys; [sort@Anzeige] bleibt als Override.
+icu_locale "de"
 page_compositor "."
 headings_flag 1
 heading_prefix "\\ZSFIndexLetter{"
