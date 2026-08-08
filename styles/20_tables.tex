@@ -46,6 +46,64 @@
 \newcolumntype{F}[1]{>{\hsize=#1\hsize\Centering\arraybackslash$}X<{$}}
 
 % ------------------------------------------------------------
+% Luft zwischen Zellinhalt und Zeilenkante
+% ------------------------------------------------------------
+% Der Regler `rows` versprach »mehr Höhe für Zellen mit Brüchen« und konnte
+% das nicht halten: \arraystretch skaliert das Zeilenstreben, und ein Streben
+% ist ein MINDESTmass. Inhalt, der höher ist als es — ein \dfrac, eine Wurzel,
+% ein Bild —, bleibt davon unberührt. Gemessen: an einer Textabelle +22 %
+% Höhe, an derselben Tabelle mit \dfrac-Zellen +5 %.
+%
+% Bündig steht der Inhalt zusätzlich, und zwar unten. Grund ist die
+% Ausrichtung der m-Spalte in array.sty (\ar@align@mcell): Ist eine Zelle
+% höher als ein Streben, senkt sie den Block um
+%   0.5 * (Zellhöhe - Strebenhöhe + \baselineskip)
+% und schiebt ihn damit so weit nach unten, dass die Tiefe der Zelle die Tiefe
+% der Zeile bestimmt — die ganze verbleibende Luft landet oben. Die Formel ist
+% für mehrzeiligen Text gedacht; für eine einzelne hohe Zeile bedeutet sie
+% Unterkante bündig. Im Satz sichtbar: Der Nenner eines \dfrac berührte die
+% Zeilengrenze, in der letzten Zeile lief er aus der Box.
+%
+% Kein strebenbasierter Weg behebt das, weil jede Strebe ein Mindestmass ist
+% und die Zeilentiefe das Maximum aus Strebe und Zellinhalt. Deshalb meldet
+% der Ausrichter die Zelle um \ZSFtableCellPadY höher UND tiefer, ohne sie zu
+% verschieben — dieselbe \raisebox-Geste wie bei \ZSFimage, nur eine Ebene
+% höher und damit für JEDEN hohen Zellinhalt.
+%
+% Nur der hohe Zweig wird angefasst. Kurzer Text läuft weiter über die
+% Grundlinien-Ausrichtung von array.sty; an ihm ändert sich nichts.
+%
+% \ar@align@mcell ist ein Hook und keine Interna-Bastelei: array.sty prüft ihn
+% selbst mit \ifx\ar@align@mcell\@undefined und setzt ihn in anderen Pfaden
+% auf \relax. Die Wache darunter hält den Fall offen, dass eine ältere
+% array.sty ihn gar nicht kennt — dann bleibt alles beim Alten.
+%
+% Bewusst mit TeX-Primitiven und einem EIGENEN Register: \raisebox und die
+% \@tempdim*-Register sind hier belegt — colortbl haelt den Farbueberhang der
+% Zeile in \@tempdimb/\@tempdimc, und eine Zuweisung darauf wuerde die
+% Zeilenflaeche verschieben. Mit \raisebox gemessen: die Zellen kamen leer
+% heraus.
+\newlength{\ZSFtableCellPadY}
+\makeatletter
+\newdimen\ZSF@cellShift
+\@ifundefined{ar@align@mcell}{}{%
+  \def\ar@align@mcell{%
+    \ifdim \ht\ar@mcellbox > \ht\strutbox
+      \ZSF@cellShift\ht\ar@mcellbox
+      \advance\ZSF@cellShift-\ht\@arstrutbox
+      \advance\ZSF@cellShift\baselineskip
+      \ZSF@cellShift=.5\ZSF@cellShift
+      \setbox\ar@mcellbox\hbox{\lower\ZSF@cellShift\box\ar@mcellbox}%
+      \ht\ar@mcellbox\dimexpr\ht\ar@mcellbox+\ZSFtableCellPadY\relax
+      \dp\ar@mcellbox\dimexpr\dp\ar@mcellbox+\ZSFtableCellPadY\relax
+      \box\ar@mcellbox
+    \else
+      \box\ar@mcellbox
+    \fi}%
+}
+\makeatother
+
+% ------------------------------------------------------------
 % Zebra-Streifen (Scannbarkeit)
 % ------------------------------------------------------------
 \newcommand{\ZSFzebraBG}{\TableZebraColor}
@@ -150,7 +208,9 @@
 %   font=dense  eine Stufe kleiner, für lange Tabellen mit knappem
 %               Zellinhalt. Default 'font=normal'.
 %   rows        Zeilenhöhe: 'normal' (Default) | 'roomy' | 'tight'.
-%   colsep      Zellpolsterung: 'normal' (Default) | 'tight'.
+%   colsep      Zellpolsterung: 'normal' (Default) | 'tight'. Gilt zwischen
+%               den Spalten UND an der Boxkante — beides ist derselbe Wert,
+%               weil die Farbfläche einer Zeile genau um ihn überragt.
 %
 % Warum `font`, `rows` und `colsep` drei Regler sind und nicht einer: Sie
 % beantworten drei verschiedene Fragen, die sich kreuzen. Eine Formeltabelle
@@ -177,6 +237,42 @@
 \newcommand{\ZSF@tblFont}{\ZSFfontContent}
 \newcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}
 \newlength{\ZSF@tblColSep}
+
+% ------------------------------------------------------------
+% Die Zeilen- und Spaltenmasse — EINE Entscheidung, zwei Leser
+% ------------------------------------------------------------
+% Das System hat zwei Tabellen-Engines: die ZSFtable auf tabularx, das
+% valuegrid auf tabularray. Sie zu vereinigen scheitert an \ZSFspan —
+% tabularray verlangt die überspannten Zellen als leere `&`, und ein Makro
+% kann sie nicht liefern, weil sein `&` vom Parser nicht als Zellgrenze
+% gesehen wird ("Misplaced alignment tab character", nachgemessen). Ein
+% Umbau bräche damit jede Kapitelquelle.
+%
+% Was bleibt und was zählt: Beide stellen DIESELBEN zwei Fragen — wie hoch
+% ist eine Zeile, wie weit steht der Inhalt von der Kante. Die Antwort steht
+% deshalb hier, einmal, und beide lesen sie. Vorher beantwortete das
+% valuegrid sie mit festen Eigenwerten; `rows=roomy` bedeutete auf den beiden
+% Bausteinen verschiedene Dinge, ohne dass es jemand sah
+% (rules/02_ai_mandate → gleiche Sache, gleiche Bedienung).
+%
+% \ZSF@tblStretch trifft nur die tabularx-Seite: tabularray hat kein
+% Zeilenstreben, dort erledigt \ZSFtableCellPadY als `rowsep` beides.
+\newcommand{\ZSF@setRows}[1]{%
+  \IfStrEqCase{#1}{%
+    {normal}{\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}%
+             \setlength{\ZSFtableCellPadY}{\ZSFDensityTables\ZSFspaceXS}}%
+    {roomy} {\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchRoomy}%
+             \setlength{\ZSFtableCellPadY}{\ZSFDensityTables\ZSFspaceS}}%
+    {tight} {\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchTight}%
+             \setlength{\ZSFtableCellPadY}{0pt}}%
+  }%
+}
+\newcommand{\ZSF@setColsep}[1]{%
+  \IfStrEqCase{#1}{%
+    {normal}{\setlength{\ZSF@tblColSep}{\ZSFtableEdgePad}}%
+    {tight} {\setlength{\ZSF@tblColSep}{\ZSFtableEdgePadTight}}%
+  }%
+}
 \newcommand{\ZSF@tblSpec}{}
 \newcommand{\ZSF@beginTabularx}[1]{\tabularx{\linewidth}{#1}}
 \pgfkeys{
@@ -186,15 +282,18 @@
   font/.is choice,
   font/normal/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontContent}},
   font/dense/.code={\renewcommand{\ZSF@tblFont}{\ZSFfontContentDense}},
+  % `rows` und `colsep` beantworten ihre Frage EINMAL — die beiden Schlüssel
+  % hier reichen sie nur durch (\ZSF@setRows / \ZSF@setColsep, oben). Das
+  % valuegrid stellt dieselben zwei Fragen und liest dieselbe Antwort; stünde
+  % die Zuordnung an beiden Bausteinen, hiesse `rows=roomy` beim nächsten
+  % Eingriff auf einem der beiden etwas anderes.
   rows/.is choice,
-  rows/normal/.code={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}},
-  rows/roomy/.code ={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchRoomy}},
-  rows/tight/.code ={\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchTight}},
-  % `colsep` regelt ausschliesslich den Abstand ZWISCHEN den Spalten. Der
-  % Abstand zur Boxkante haengt nicht daran — siehe der @-Eintrag unten.
+  rows/normal/.code={\ZSF@setRows{normal}},
+  rows/roomy/.code ={\ZSF@setRows{roomy}},
+  rows/tight/.code ={\ZSF@setRows{tight}},
   colsep/.is choice,
-  colsep/normal/.code={\setlength{\ZSF@tblColSep}{\ZSFtableEdgePad}},
-  colsep/tight/.code ={\setlength{\ZSF@tblColSep}{\ZSFtableEdgePadTight}},
+  colsep/normal/.code={\ZSF@setColsep{normal}},
+  colsep/tight/.code ={\ZSF@setColsep{tight}},
   ZSF@tblDefaults/.style={header=true, zebra=true, font=normal,
                           rows=normal, colsep=normal},
 }
@@ -209,20 +308,32 @@
   \else
     \ZSFzebraOff
   \fi
-  % Der Abstand zur BOXKANTE, getrennt vom Abstand zwischen den Spalten.
+  % Der Abstand zur BOXKANTE. Er ist DERSELBE Wert wie der zwischen den
+  % Spalten, und das ist eine Eigenschaft von colortbl, keine Sparsamkeit:
   %
-  % \tabcolsep trug beide Rollen: In einer randlosen tablebox (padx=none, damit
-  % Zebra und Kopfzeile bis an den Rand laufen) ist der aeussere Rand genau ein
-  % \tabcolsep. Wer die Spalten enger stellte, schob damit den Text an die
-  % Kante — und das ist gerade bei der vielspaltigen Tabelle noetig, fuer die
-  % `colsep=tight` existiert.
+  % Die Farbflaeche einer Zeile wird pro Zelle gezeichnet und ragt um genau
+  % \col@sep (= \tabcolsep) ueber sie hinaus — \CT@setup legt diesen Ueberhang
+  % fest, und weder \rowcolor ohne Argumente noch \rowcolors reichen einen
+  % anderen durch. Ein Rand, der GROESSER ist als \tabcolsep, bleibt deshalb
+  % ungefaerbt: Kopfzeile und Zebra enden dann vor dem Rahmen, waehrend der
+  % Titelbalken der Box darueber die volle Breite behaelt.
   %
-  % Der @-Eintrag ersetzt den \tabcolsep an der Aussenkante durch einen eigenen
-  % Wert. Bei `colsep=normal` ist er wertgleich, die Geometrie aller
-  % bestehenden Tabellen bleibt damit unveraendert; bei `colsep=tight` haelt er
-  % den Rand, waehrend innen gekuerzt wird. Deshalb ohne Fallunterscheidung —
-  % ein \if um \tabularx herum bricht ohnehin, weil die Umgebung ihren Rumpf
-  % selbst bis \end{tabularx} liest und das \fi dabei stehenbleibt.
+  % Genau das war der Fall, solange hier \ZSFtableEdgePad stand und
+  % `colsep=tight` nur \tabcolsep senkte: Bei `normal` waren beide zufaellig
+  % gleich und es sah richtig aus, bei `tight` blieben rund 6 pt Weiss an
+  % beiden Kanten. Der Zebra-Kontrakt der tablebox (padx=none + clip upper)
+  % war damit an einen Regler gekoppelt, der ihn nicht kennt — stumm, weil
+  % beide Werte fuer sich gueltig sind (rules/21_box_options).
+  %
+  % Deshalb ein Wert: `colsep` waehlt die Zellpolsterung, und die Boxkante
+  % bekommt dieselbe. `colsep=tight` ist dafuer auf \ZSFboxPadX angehoben
+  % (30_layout_spacing) — knapp genug, um bei sieben Spalten Breite zu sparen,
+  % und weit genug, um als Rand einer Box zu taugen. Bei `colsep=normal`
+  % bleibt die Geometrie unveraendert.
+  %
+  % Ohne Fallunterscheidung — ein \if um \tabularx herum bricht ohnehin, weil
+  % die Umgebung ihren Rumpf selbst bis \end{tabularx} liest und das \fi dabei
+  % stehenbleibt.
   %
   % Die Spaltenaufteilung wird VORHER aufgeloest. Der Preamble-Parser von
   % `array` vergleicht Tokens und expandiert dabei nicht: Ein Makro als colspec
@@ -231,8 +342,8 @@
   % \ZSFgroupcols lesen, statt sie in jedem Block zu wiederholen.
   % Der \edef ist unbedenklich: Spaltenbuchstaben sind Zeichen (L/C/R/Y…
   % stammen aus \newcolumntype und sind keine Makros), \hskip ist ein Primitiv
-  % und \ZSFtableEdgePad ein Register — nichts davon expandiert.
-  \edef\ZSF@tblSpec{@{\hskip\ZSFtableEdgePad}#2@{\hskip\ZSFtableEdgePad}}%
+  % und \ZSF@tblColSep ein Register — nichts davon expandiert.
+  \edef\ZSF@tblSpec{@{\hskip\ZSF@tblColSep}#2@{\hskip\ZSF@tblColSep}}%
   \expandafter\ZSF@beginTabularx\expandafter{\ZSF@tblSpec}%
 }{%
   \endtabularx

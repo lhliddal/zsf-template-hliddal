@@ -9,7 +9,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, Klammern über Zellgrenzen (`\tikzmark`/`\drawbrace`/`\annote` + `\ZSFbraceRoom`), Pfeil-Fix |
 | `12_plots.tex` | **OPT-IN**: lädt `pgfplots` und setzt die zentrale Kompatibilitätsversion |
 | `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`/`rows`/`colsep`, `\ZSFheaderRow`, `\ZSFhead`, Zellverbund `\ZSFspan` |
-| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
+| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Kollaps-Merker an Balkengrenzen (`\ZSFBoxBeforeSkip`), Formel-Innenmasse (`\ZSFmathRowSep`/`\ZSFmathColSep`), Spaltenkopf (`\ZSFcolumnTopSkip`), samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`, Ink-Vertrag (`\ZSFInk`/`\ZSFInkOwned`), Grössenfarben-Palette + `\ZSFDeclareQuantity` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
@@ -67,7 +67,7 @@ und `rules/55_index.md`.
   `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
   `\ZSFReadableBodyOn`, `\ZSFReadableBodyOff`, `\ZSFIndexShowPageNumber`
   (Index-Locator mit oder ohne Seitenzahl, siehe `rules/55_index.md`),
-  `\ZSFkeywordStyle`, `\ZSFlabelStyle` (Darstellung der beiden Marker),
+  `\ZSFkeywordStyle`, `\ZSFlabelStyle`, `\ZSFhlStyle` (Darstellung der drei Marker),
   `\ZSFDeclareQuantity` (Grössenfarben des Fachs vergeben),
   `\ZSFDeclareTone` (einen Ton anlegen, siehe `rules/25_structure_markers.md`),
   `\ZSFQuantityColorsOn` / `\ZSFQuantityColorsOff` (Hauptschalter dafür).
@@ -261,6 +261,72 @@ alle Wahlen fest, gleichgültig wer sie getroffen hat.
 `\ZSFtoneAccent` braucht diese Behandlung **nicht**: `borderline` liest seine
 Farbe erst beim Zeichnen aus und funktioniert deshalb als reines Makro.
 
+#### Abstand hat genau einen Schreiber — waagrecht wie senkrecht
+
+Die Mechaniken oben halten *Farbe* an einer Stelle. Für *Abstand* gilt dasselbe,
+und beide Achsen hatten hier je einen Defekt, den kein Blick auf eine einzelne
+Box findet: Jede Zahl für sich war gültig, falsch war erst ihr Verhältnis.
+
+**Waagrecht — Titel und Inhalt teilen sich eine Kante.** Sie wird von `padx`
+gesetzt, und nur dort. `left`/`right` sind Sammelschlüssel von tcolorbox
+(`left={lefttitle=#1, leftupper=#1, leftlower=#1}`), der Titel folgt also von
+selbst; ihn danebenzuschreiben wäre derselbe Wert zweimal. Genau das war der
+Fall — `zsftitlebar` nagelte `lefttitle=0pt` fest, während der Inhalt
+`\ZSFboxPadX` einhielt, und die `formulabox` hatte es als einzige lokal
+repariert. `padx=none` ist der eine Fall, in dem die beiden auseinandergehen
+müssen: Dort polstert die Box nicht, *weil ihr Inhalt es selbst tut*
+(`\ZSFtableEdgePad` in der äussersten Tabellenzelle). Der Titel hat keine Zelle
+und nennt den Wert deshalb direkt. Geprüft in `check_box_options.sh`,
+Durchgang 10 — als Beziehung, nicht als Zahl.
+
+**Senkrecht — der Abstand ist ein optischer, kein Leim.** Zwischen zwei Blöcken
+im vertikalen Satz liegt nicht nur die gesetzte Glue, sondern zusätzlich die
+Zeilenschaltung; der sichtbare Abstand ist `Wert + (\baselineskip − Höhe der
+folgenden Zeile)`. Solange alle Zeilen gleich hoch sind, fällt das nicht auf —
+sobald die Höhen wechseln (Pillen einer Zielkette, Displaymathe, ein Bild),
+wird der Rhythmus zum Nebenprodukt der Tinte. `\ZSFInterlude`
+(`30_layout_spacing`) nimmt die Zeilenschaltung deshalb mit
+`\nointerlineskip` heraus; danach ist der Abstand von Unterkante zu Oberkante
+genau der gesetzte, unabhängig vom Inhalt. Wer einen neuen vertikalen Einschub
+baut, geht durch dieses Makro und nicht durch `\vspace`.
+
+Dieselbe Frage eine Ebene tiefer, in der Tabellenzelle. Ein Streben ist ein
+**Mindestmass**: `\arraystretch` und `\extrarowheight` skalieren es, und Inhalt,
+der höher ist als es — ein `\dfrac`, ein `\includegraphics` —, bleibt davon
+unberührt. Die Zeilentiefe ist zudem `max(Strebe, Zellinhalt)`, und die
+`m`-Ausrichtung von `array.sty` senkt einen hohen Block genau so weit, dass die
+Zelle diese Tiefe bestimmt: Die verbleibende Luft landet vollständig **oben**,
+unten steht der Inhalt bündig. Deshalb meldet `\ar@align@mcell` (überschrieben
+in `20_tables`) einen hohen Zellinhalt um `\ZSFtableCellPadY` höher und tiefer,
+ohne ihn zu verschieben. Kurzer Text läuft weiter über die
+Grundlinien-Ausrichtung und ist unberührt.
+
+Das ist zugleich der Grund, warum es **kein** eigenes Bild-Register gibt: „Ein
+Bild hält Abstand zur Zeilenkante" und „ein Bruch hält Abstand zur Zeilenkante"
+sind derselbe Satz (Vereinigungstest). Der Regler `rows` entscheidet ihn.
+
+**Der Abstand VOR einem Block** gehört `\ZSFBoxBeforeSkip`, gesetzt in
+`\ZSF@blockBefore` (`60_boxes`) — und zwar für jede Box *und* für `runintext`.
+Er war lange herrenlos: `zsfbox` setzte `before skip` und danach `before`, und
+in tcolorbox ist `before skip` kein eigener Schlüssel, sondern ein Stil, der
+`before` schreibt (`before skip/.style={before={…}}`). Der spätere gewann, der
+Wert war wirkungslos, und der Abstand vor jeder Box kam allein aus `\parskip`.
+Mit ihm lagen zwei weitere Zusagen brach: die Kollaps-Mechanik nach einem
+Balken rechnete einen Wert aus, den niemand las, und `ZSFboxgroup` schloss
+seine Zwischenräume nicht. Wer hier etwas ändert, prüft es am Satz — ein
+Register, das keiner liest, sieht im Code korrekt aus.
+
+**Die Inventur ist vollständig gemacht worden**, nicht angenommen: Alle
+TeX- und LaTeX-Abstandsparameter wurden im laufenden Dokument ausgelesen und
+gegen die Registerliste gehalten. Auf Klassenvorgaben standen zuletzt nur
+noch `\jot` und `\arraycolsep` — der Zeilen- und Spaltenabstand *innerhalb*
+einer Formel, also ausgerechnet in den zwei Konstrukten, in die
+`rules/30_spacing` Autoren schickt. Beide hängen jetzt als `\ZSFmathRowSep`
+und `\ZSFmathColSep` an der Skala und werden in `\ZSFApplyDisplaySkips`
+gesetzt. Ohne Besitzer bleiben nur Parameter, die dieses System nicht
+benutzt (Floats, `\fbox`, `\smallskip`-Familie) oder die bewusst draussen
+sind (`\columnsep`, siehe `30_layout_spacing`).
+
 #### Der Ink-Vertrag — wem gehört die Farbe an dieser Stelle?
 
 Die beiden Mechaniken oben sorgen dafür, dass eine Box ihre Farben aus Rolle
@@ -383,8 +449,8 @@ deshalb nicht in der Token-Liste oben:
 | `header` | `ZSFtable` | `true`, `false` |
 | `zebra` | `ZSFtable` | `true`, `false` |
 | `font` | alle Boxen, `ZSFtable` | `normal`, `dense` |
-| `rows` | `ZSFtable` | `normal`, `roomy`, `tight` |
-| `colsep` | `ZSFtable` | `normal`, `tight` |
+| `rows` | `ZSFtable`, `valuegrid` | `normal`, `roomy`, `tight` |
+| `colsep` | `ZSFtable`, `valuegrid` | `normal`, `tight` |
 
 Diese Tabelle ist die Quelle für **drei** Verifier-Durchgänge, je einer pro
 Zusage, die ein Eintrag hier abgibt:

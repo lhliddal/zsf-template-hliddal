@@ -221,12 +221,21 @@
 % die Farbe — in jedem Ton, nicht nur im gesaettigten Warn-Ton
 % (40_colors_structure -> Ink-Vertrag). Der Hook laeuft in der Titel-Gruppe und
 % ist deshalb auf sie beschraenkt.
+% Der WAAGRECHTE Innenabstand steht bewusst NICHT hier, sondern beim Regler
+% `padx` weiter unten. Er ist keine Eigenschaft des Titelbalkens, sondern die
+% eine Kante, an der Titel und Inhalt gemeinsam stehen: Steht sie zweimal,
+% steht sie beim naechsten Eingriff einmal anders — und genau das war der Fall.
+% `lefttitle`/`righttitle` waren hier auf 0pt festgenagelt, waehrend der Inhalt
+% \ZSFboxPadX (4 pt) bzw. in der tablebox \ZSFtableEdgePad (7 pt) einhielt. Der
+% Titel klebte damit in JEDER Box an der Kante, und die formulabox hatte es als
+% einzige lokal repariert — eine Kopie statt einer Variante
+% (rules/10_architecture → Gestaltung an genau einem Ort).
+% Der Titelbalken fuellt die Box ohnehin in voller Breite; `lefttitle` ruecken
+% nur den Text ein und kosten nichts.
 \tcbset{zsftitlebar/.style={
   fonttitle=\ZSFfontBoxTitle\ZSFInkOwned\strut,
   halign title=center,
   title style={minimum height=\ZSFtitleBarHeight},
-  lefttitle=0pt,
-  righttitle=0pt,
   toptitle=\ZSFspaceXS,
   bottomtitle=\ZSFspaceXS,
   before title={},
@@ -252,12 +261,48 @@
 % nicht pro Box wiederholt werden, wo man es vergessen kann.
 % Schicht 1 — Fluss. Auch rahmenlose Boxen (weight=quiet, splitbox) laufen
 % hierüber, damit Abstände und Balken-Bindung überall identisch greifen.
+% DER ABSTAND VOR EINEM BLOCK — eine Stelle, und sie muss es sein.
+%
+% Hier standen `before skip` und `before` nebeneinander. In tcolorbox ist
+% `before skip` aber KEIN eigener Schluessel, sondern ein Stil, der `before`
+% schreibt (tcolorbox.sty: `before skip/.style={before={...}}`). Beide
+% schreiben also dasselbe Makro, und der spaetere gewinnt — `before` stand
+% hinten, damit war \ZSFBoxBeforeSkip wirkungslos. Nachgemessen: auf 40pt
+% gesetzt aendert sich am Satz nichts.
+%
+% Die Folgen reichten weiter als der eine Wert: Der Abstand vor JEDER Box kam
+% damit allein aus \parskip und gehoerte keinem Register. Die Kollaps-Mechanik
+% nach einem Balken (\ifzsfAfterSubsectionBar) rechnete einen Wert aus, den
+% niemand las, und \ZSFboxgroup schloss seine Zwischenraeume nicht wirklich.
+%
+% Deshalb EIN `before`, das beides tut. Die Skip-Logik ist die von tcolorbox
+% selbst — dieselben Faelle (nichts auf der Liste, vertikaler Modus), damit
+% hier keine zweite Auslegung derselben Frage entsteht. Gelesen wird
+% \ZSFBoxBeforeSkip VOR dem Verbrauch des Merkers: Der Merker waehlt den Wert.
+%
+% Den Minipage-Sonderfall von tcolorbox braucht es nicht: \addvspace prueft
+% LaTeXs eigenes @minipage selbst und tut am Anfang einer Minipage nichts —
+% genau das, was jener Zweig von Hand herstellt. Ihn nachzubauen hiesse,
+% \iftcb@minipage zu lesen, und das existiert ausserhalb einer tcolorbox gar
+% nicht (gemessen: undefined im runintext).
+\makeatletter
+\newcommand{\ZSF@blockBefore}{%
+  \ifnum\lastnodetype=-1\relax\else
+    \par
+    \ifvmode\addvspace{\glueexpr\ZSFBoxBeforeSkip-\parskip\relax}\fi
+  \fi
+  % BEIDE Merker, nicht nur der eine. Ein Block zwischen Kapitelbalken und
+  % Abschnittsbalken heisst, dass die beiden Balken NICHT aneinanderstossen —
+  % blieb der Kapitel-Merker stehen, zog der Abschnittsbalken seinen Vorabstand
+  % trotzdem zusammen. Derselbe Fehler eine Ebene hoeher.
+  \ZSFConsumeAfterSubsectionBar\ZSFConsumeAfterChapterBar\ZSFTitleBarLockOff
+}
 \tcbset{zsfbox/.style={
   enhanced jigsaw,
-  before skip=\ZSFBoxBeforeSkip,
   after skip=\ZSFBoxAfterSkip,
-  before={\par\ZSFConsumeAfterSubsectionBar\ZSFTitleBarLockOff},
+  before={\ZSF@blockBefore},
 }}
+\makeatother
 
 % ------------------------------------------------------------
 % Instanz-Regler — Ebene 3 der Pyramide
@@ -274,11 +319,27 @@
 % Polsterung ist zweidimensional: waagrecht entscheidet über Kante und
 % Balkenfreiraum, senkrecht über die Höhe. Getrennt, weil die Fälle sich
 % tatsächlich kreuzen (Wertegitter: waagrecht bündig, senkrecht knapp).
+%
+% `padx` setzt den Abstand von Inhalt UND Titel zur Kante — es ist eine Kante
+% und deshalb ein Wert (Begründung bei zsftitlebar oben). Für zwei der drei
+% Werte steht deshalb NUR `left`/`right` da: Das sind Sammelschlüssel von
+% tcolorbox (`left={lefttitle=#1, leftupper=#1, leftlower=#1}`), der Titel
+% folgt also von selbst. Ihn danebenzuschreiben wäre derselbe Wert zweimal —
+% und beim nächsten Eingriff einmal anders.
+%
+% `padx=none` ist der Fall, in dem Titel und Inhalt auseinandergehen MÜSSEN,
+% und deshalb der einzige, der beide nennt: Die Box polstert nicht, weil ihr
+% Inhalt es selbst tut — tablebox und valuegrid lassen ihre Farbfläche bis an
+% den Rahmen laufen und halten den Rand in der äussersten Zelle
+% (\ZSFtableEdgePad, siehe 20_tables). Der Titel hat keine Zelle und muss den
+% Wert direkt lesen; ohne diese Zeile stünde er als einziges Element der Box
+% an der blanken Kante.
 \tcbset{
   padx/.is choice,
   padx/normal/.style={left=\ZSFboxPadX,    right=\ZSFboxPadX},
   padx/bar/.style   ={left=\ZSFboxPadXBar, right=\ZSFboxPadX},
-  padx/none/.style  ={left=0pt,            right=0pt},
+  padx/none/.style  ={left=0pt,            right=0pt,
+                      lefttitle=\ZSFtableEdgePad, righttitle=\ZSFtableEdgePad},
   pady/.is choice,
   pady/normal/.style={top=\ZSFboxPadY,    bottom=\ZSFboxPadY},
   pady/tight/.style ={top=\ZSFtextMinPad, bottom=\ZSFtextMinPad},
@@ -406,6 +467,13 @@
   % äusseren nicht erbt — sie sind gruppenlokal, aber nicht selbstlöschend.
   /utils/exec={\renewcommand{\ZSFBoxContext}{}\renewcommand{\ZSFBoxQuietTitle}{}},
   before upper={\ZSFBoxEnter},
+  % Der Abstand zwischen oberer und unterer Haelfte, wenn sie gestapelt
+  % stehen. Er gehoert in den Vertrag und nicht in ein Preset: JEDE Box kann
+  % ein \tcblower tragen. Gesetzt hatte ihn nur die formulabox — alle
+  % uebrigen bekamen tcolorbox' 2mm, ein Mass, das niemand gewaehlt hat und
+  % das der Dichte nicht folgt. Derselbe Wert wie \ZSFsep: Es ist derselbe
+  % Blockwechsel, nur von tcolorbox gezogen statt vom Autor.
+  middle=\ZSFspaceSep,
   frame=soft,
   ZSF@surface=auto,
   ZSF@titlefill=tone,
@@ -893,12 +961,13 @@
   ZSF@surface=emphasis,
   ZSF@titlefill=surface,
   frame=hard,
-  lefttitle=\ZSFboxPadX,
-  righttitle=\ZSFboxPadX,
+  % Der waagrechte Titelabstand stand hier, weil er in zsftitlebar auf 0pt
+  % festgenagelt war und auf der Fläche der Formelbox besonders auffiel. Er
+  % kommt jetzt aus `padx` und gilt damit auf jeder Box — der Unterschied der
+  % Formelbox ist allein, dass ihr Titel keine eigene Fläche hat.
   bottomtitle=0pt,
   /utils/exec={\renewcommand{\ZSFBoxContext}{\ZSF@inFormulaBoxtrue}},
   after upper={\par},
-  middle=\ZSFspaceSep,
 }}
 \NewDocumentEnvironment{formulabox}{O{} O{}}
   {\begin{ZSF@box}{preset/formula}{#1}{#2}}{\end{ZSF@box}} % chktex 9
@@ -927,10 +996,21 @@
 % Verfahrensabschnitte). Ein Regler, kein zweiter Baustein: Ob der neue Block
 % einen Namen trägt, entscheidet der Autor pro Stelle — genau die Frage, für
 % die es Optionen gibt (rules/02_ai_mandate → Reglertest).
+%
+% DIE BESCHRIFTUNG STEHT UNTER DER LINIE, nicht darüber. Sie benennt den
+% FOLGENDEN Block (rules/20_boxes) — über der Linie gesetzt lag sie noch beim
+% Block davor, und die Linie trennte sie von dem, was sie benennt. Im Satz war
+% das messbar: über der Beschriftung 5,3 pt, darunter 11,3 pt. Jetzt gehören
+% Linie und Name zusammen und der kleinere Abstand liegt zum benannten Block.
+%
+% Die Beschriftung erbt die Ausrichtung der Box, statt sich selbst zu
+% zentrieren. Ein eigenes \centering hätte `align=left` an dieser einen Stelle
+% stumm verworfen (rules/21_box_options → kein Regler verwirft einen anderen);
+% in den zentrierten Boxen, in denen \ZSFsep bisher vorkam, ändert sich nichts.
 \NewDocumentCommand{\ZSFsep}{o}{%
   \ZSFInterlude{\ZSFspaceSep}%
-  \IfValueT{#1}{{\centering\ZSFfontBlockLabel #1\par}\ZSFInterlude{\ZSFspaceS}}%
   \ZSFBoxRule
+  \IfValueT{#1}{\ZSFInterlude{\ZSFspaceS}{\ZSFfontBlockLabel #1\par}}%
   \ZSFInterlude{\ZSFspaceSep}%
   \penalty-50%
 }
@@ -952,10 +1032,17 @@
 % ------------------------------------------------------------
 % Runintext + Grafik-Helpers
 % ------------------------------------------------------------
+% Der Fliesstext-Block nimmt seinen Vorabstand aus DERSELBEN Quelle wie jede
+% Box (\ZSF@blockBefore). Vorher stand hier ein fester \ZSFspaceS: Nach einem
+% Abschnittsbalken zog eine Box ihren Abstand zusammen, ein runintext nicht —
+% derselbe Ort, zwei Abstände, je nachdem was folgt. Sichtbar war das als
+% auffällige Lücke zwischen Balken und erstem Satz.
+\makeatletter
 \newenvironment{runintext}{%
-  \ZSFConsumeAfterChapterBar\ZSFTitleBarLockOff
-  \par\addvspace{\ZSFspaceS}\noindent\ZSFReadableAuto\ignorespaces
+  \ZSF@blockBefore
+  \noindent\ZSFReadableAuto\ignorespaces
 }{\par}
+\makeatother
 
 % Dezente Bildunterschrift (leerer Text -> nichts)
 \newcommand{\ZSFfigcaption}[1]{%
@@ -1034,6 +1121,12 @@
   height/.code={\setlength{\ZSF@imgHeightLimit}{#1}},
   ZSF@imgDefaults/.style={width=1, height=\ZSFimageMaxHeight},
 }
+%
+% Die senkrechte Luft in einer Tabellenzelle bringt das Bild NICHT selbst mit.
+% Sie kommt von \ZSFtableCellPadY (20_tables): »Zellinhalt haelt Abstand zur
+% Zeilenkante« gilt fuer ein Bild wie fuer einen Bruch, und der Regler `rows`
+% entscheidet darueber. Ein eigener Bildwert waere dieselbe Aussage ein
+% zweites Mal.
 \newcommand{\ZSFimage}[2][]{%
   \begingroup
   \pgfkeys{/zsf/image, ZSF@imgDefaults, #1}%
@@ -1277,15 +1370,23 @@
 % Wie die Titelbox, aber ungetönt, mit kräftigerem Rahmen und knapper
 % Polsterung. 'unbreakable' bewusst nach zsftitlebox: eine Zielkette bleibt
 % auch im Pack-Modus atomar (rules/30_spacing → Anhang).
+% `pady=normal` statt `tight`: Der Abstand zum Rahmen ist derselbe Wert wie der
+% zwischen zwei Kettengliedern (\ZSFboxPadY = \ZSFgoalLinkSep). Erst dadurch
+% liest sich die Kette als gleichmässiger Stapel statt als Reihe von Elementen,
+% die oben und unten enger stehen als untereinander.
+\makeatletter
+\newif\ifZSF@goalStarted
 \tcbset{preset/goal/.style={
   zsftitlebox,
   align=center,
-  pady=tight,
+  pady=normal,
   frame=strong,
   ZSF@surface=plain,
+  /utils/exec={\ZSF@goalStartedfalse},
   after upper={\par},
   atomic,
 }}
+\makeatother
 \NewDocumentEnvironment{goalbox}{O{} O{}}
   {\begin{ZSF@box}{preset/goal}{#1}{#2}}{\end{ZSF@box}} % chktex 9
 
@@ -1311,19 +1412,46 @@
   tcbox raise base,
 }
 
-\newcommand{\GoalCondition}[1]{\par\centering\GoalConditionBox{\ZSFfontNote #1}\par}
-\newcommand{\GoalStep}[1]{\par\centering$\displaystyle #1$\par}
-\newcommand{\GoalTarget}[1]{\par\centering\GoalTargetBox{$\displaystyle #1$}\par}
+% Ein Kettenglied — die EINE Stelle, an der der Abstand zwischen zwei Gliedern
+% entschieden wird. Vorher setzte jedes der drei Primitive nur `\par …\par`;
+% der sichtbare Abstand ergab sich damit aus \parskip plus Zeilenschaltung und
+% schwankte mit der Höhe der Nachbarn (4,1 bis 11,3 pt bei nominell gleichen
+% Elementen). Über \ZSFInterlude ist er ein optischer und ein gewählter.
+%
+% Der erste Block bekommt keinen Vorabstand — dort polstert die Box (pady).
+% Ohne das Merk-Flag stünde das erste Glied um ein Kettenmass tiefer als das
+% letzte, und der Stapel wäre oben und unten ungleich.
+%
+% KEIN eigenes \centering mehr: Die Glieder erben die Ausrichtung der Box.
+% preset/goal setzt `align=center`, am Satz ändert sich dadurch nichts — aber
+% `align=left` wurde vorher an dieser Stelle stumm verworfen
+% (rules/21_box_options → kein Regler verwirft einen anderen).
+\makeatletter
+\newcommand{\ZSF@goalLink}[1]{%
+  \ifZSF@goalStarted\ZSFInterlude{\ZSFgoalLinkSep}\else\par\ZSF@goalStartedtrue\fi
+  #1\par
+}
+\newcommand{\GoalCondition}[1]{\ZSF@goalLink{\GoalConditionBox{\ZSFfontNote #1}}}
+\newcommand{\GoalStep}[1]{\ZSF@goalLink{$\displaystyle #1$}}
+\newcommand{\GoalTarget}[1]{\ZSF@goalLink{\GoalTargetBox{$\displaystyle #1$}}}
 % \ZSFDerivationCase{Bedingung}{Ausdruck}{Resultat} — Fall über mehrere
 % Zeilen; die Sternform setzt denselben Fall einzeilig. Zwei Schreibweisen
 % derselben Sache sind eine Option, kein zweiter Baustein
 % (rules/02_ai_mandate → Katalog-Ökonomie).
+%
+% Beide Formen setzen denselben Satz »Ausdruck = Resultat«; sie unterscheiden
+% sich allein darin, WO er umbricht. Deshalb steht das Gleichheitszeichen in
+% der mehrzeiligen Form am ANFANG der zweiten Zeile und nicht am Ende der
+% ersten — dieselbe Konvention wie in `aligned`. Am Zeilenende hing es zuvor
+% als Operator ohne Gegenstück in der Luft und las sich wie ein Fehler statt
+% wie eine Fortsetzung.
 \NewDocumentCommand{\ZSFDerivationCase}{s m m m}{%
   \GoalCondition{#2}%
   \IfBooleanTF{#1}%
     {\GoalStep{#3 = \GoalTargetBox{$\displaystyle #4$}}}%
-    {\GoalStep{#3 =}\GoalTarget{#4}}%
+    {\GoalStep{#3}\GoalStep{{}= \GoalTargetBox{$\displaystyle #4$}}}%
 }
+\makeatother
 % Inline-Danger-Tag (rotes Pill-Label für Stolperfallen im Fliesstext)
 \newtcbox{\ZSFdanger}{
   colback=DangerTagColor, colframe=DangerTagColor, coltext=\DangerTagTextColor,
@@ -1347,34 +1475,84 @@
 %
 % Das Komma steht IM Wert, nicht in der Spec: `grid=none` liefert sonst einen
 % leeren Eintrag in der tblr-Optionsliste.
-\newcommand{\ZSF@gridLines}{hlines,vlines,}
+% Die Linienstaerke ist \ZSFboxRuleWidth und nicht tabularrays Vorgabe: Eine
+% Linie ist in diesem System EIN Mass — der Boxrahmen zog 0.5pt, das Gitter
+% daneben 0.4pt, und entschieden hatte das niemand.
+\newcommand{\ZSF@gridSpec}{{wd=\ZSFboxRuleWidth}}
+\newcommand{\ZSF@gridLines}{hlines=\ZSF@gridSpec,vlines=\ZSF@gridSpec,}
 \tcbset{
   grid/.is choice,
-  grid/both/.code      ={\renewcommand{\ZSF@gridLines}{hlines,vlines,}},
-  grid/horizontal/.code={\renewcommand{\ZSF@gridLines}{hlines,}},
+  grid/both/.code      ={\renewcommand{\ZSF@gridLines}{hlines=\ZSF@gridSpec,vlines=\ZSF@gridSpec,}},
+  grid/horizontal/.code={\renewcommand{\ZSF@gridLines}{hlines=\ZSF@gridSpec,}},
   grid/none/.code      ={\renewcommand{\ZSF@gridLines}{}},
+  % Dieselben zwei Fragen wie an der ZSFtable, unter denselben Namen und mit
+  % derselben Antwort (\ZSF@setRows / \ZSF@setColsep in 20_tables). Sie stehen
+  % hier als tcolorbox-Schlüssel, weil das valuegrid eine Box ist und seine
+  % Optionsliste die der Box IST — die ZSFtable hat dafür ihre eigene Familie.
+  % Zwei Aufrufwege, eine Bedeutung; die Werte kommen aus einer Hand.
+  rows/.is choice,
+  rows/normal/.code={\ZSF@setRows{normal}},
+  rows/roomy/.code ={\ZSF@setRows{roomy}},
+  rows/tight/.code ={\ZSF@setRows{tight}},
+  colsep/.is choice,
+  colsep/normal/.code={\ZSF@setColsep{normal}},
+  colsep/tight/.code ={\ZSF@setColsep{tight}},
 }
+% `rows` und `colsep` gehören in die Vorbelegung: Die Register sind sonst das,
+% was die zuletzt gesetzte ZSFtable hinterlassen hat — ausserhalb ihrer Gruppe
+% also null, und das Gitter stünde ohne jede Polsterung da.
 \tcbset{preset/valuegrid/.style={
   zsftitlebox,
   padx=none, pady=tight,
   ZSF@surface=plain,
   frame=strong,
   grid=both,
+  rows=normal, colsep=normal,
   atomic,
 }}
+% `width` ist Pflicht, nicht Kosmetik: Ohne sie setzt tabularray die Spalten
+% auf ihre natuerliche Breite, und das Gitter endet mitten in der Box —
+% sichtbar, seit die Optionen ueberhaupt ankommen (siehe unten). Eine Tabelle
+% fuellt in diesem System immer die Zeilenbreite (20_tables, Kopf).
+%
+% Zellpolsterung und Zeilenluft kommen aus DENSELBEN Registern wie bei der
+% ZSFtable (\ZSF@setColsep / \ZSF@setRows in 20_tables). Vorher standen hier
+% Eigenwerte: `rows=roomy` und `colsep=tight` bedeuteten auf den beiden
+% Tabellen-Bausteinen verschiedene Dinge, und \ZSFvaluegridRowSep war ein
+% zweites Register fuer dieselbe Frage.
 \newcommand{\ZSFvaluegridCommon}{
-  colsep=\ZSFtableEdgePad,
-  rowsep=\ZSFvaluegridRowSep,
+  width=\linewidth,
+  colsep=\ZSF@tblColSep,
+  rowsep=\ZSFtableCellPadY,
   \ZSF@gridLines
   rows={valign=m}
 }
 % \begin{valuegrid}[<Titel>][<Optionen>]{<n_datacols>} — Spec wird automatisch
 % generiert. Titel steht wie bei jeder Box an erster Stelle; das Pflichtargument
 % folgt danach (rules/20_boxes → Aufruf-Konvention).
+%
+% DIE OPTIONSLISTE WIRD VORHER AUFGELOEST, und daran hing ein stiller
+% Totalausfall: tabularray liest seine aeussere Optionsliste mit l3keys und
+% expandiert dabei NICHT. Ein Makro darin ist kein Schluesselpaar, sondern ein
+% unbekannter Schluessel — und tabularray verwirft ihn wortlos. Damit war
+% \ZSFvaluegridCommon vollstaendig wirkungslos: keine Gitterlinien, keine
+% Zellpolsterung, kein Zeilenabstand, keine vertikale Zentrierung. Alle drei
+% Werte des Reglers `grid` sahen deshalb gleich aus — nicht weil der Regler
+% nicht schaltete, sondern weil seine Wahl nie ankam.
+%
+% Gemessen, nicht hergeleitet: dieselbe Liste inline gesetzt zeichnet die
+% Linien, ueber ein Makro uebergeben nicht, nach \expandafter wieder.
+%
+% Der \edef ist unbedenklich und aus demselben Grund wie in 20_tables: Der
+% Gitter-Merker ist ein \newcommand und soll expandieren, die Masse sind
+% Register und tun es nicht.
+\newcommand{\ZSF@vgOpts}{}
+\newcommand{\ZSF@vgOpen}[1]{\begin{tblr}{#1}} % chktex 9
 \NewDocumentEnvironment{valuegrid}{O{} O{} m}
-  {\renewcommand{\ZSF@boxOwnKnobs}{,grid,}%
+  {\renewcommand{\ZSF@boxOwnKnobs}{,grid,rows,colsep,}%
    \begin{ZSF@box}{preset/valuegrid}{#1}{#2}%
-   \begin{tblr}{colspec={l *{#3}{c}},\ZSFvaluegridCommon}}
+   \edef\ZSF@vgOpts{colspec={X[l] *{#3}{X[c]}},\ZSFvaluegridCommon}%
+   \expandafter\ZSF@vgOpen\expandafter{\ZSF@vgOpts}}
   {\end{tblr}\end{ZSF@box}} % chktex 9
 \makeatother
 

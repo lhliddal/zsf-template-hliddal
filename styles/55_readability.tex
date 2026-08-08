@@ -67,16 +67,38 @@
 % ------------------------------------------------------------
 % Semantische Break-Helfer (optional, punktuell)
 % ------------------------------------------------------------
-% \ZSFbreak — weicher bevorzugter Umbruch (kein Zwang).
-%   Nutzbar z.B. vor einem langen Wort, das sonst die Zeile sprengt:
+% Die drei bilden EINE Skala über denselben Mechanismus — die Umbruchstrafe an
+% dieser Stelle: bevorzugt (negativ), erlaubt (neutral), verboten (10000). Nur
+% als Skala sind drei Namen gerechtfertigt; als drei Einzelfälle wären es drei
+% Wege zu derselben Sache (rules/02_ai_mandate → Katalog-Ökonomie).
+%
+% \ZSFbreak — weicher bevorzugter Umbruch ZWISCHEN ZWEI WÖRTERN.
 %   "... und das ist\ZSFbreak besonders wichtig ..."
-\newcommand{\ZSFbreak}{\penalty-50\relax}
+%
+%   ES BRINGT DAS LEERZEICHEN SELBST MIT, und das ist kein Komfort, sondern
+%   Pflicht: \ZSFbreak ist ein Kontrollwort, und TeX schluckt das Leerzeichen
+%   dahinter. Als reines \penalty definiert rendert genau das Beispiel oben
+%   »istbesonders« — ohne Fehler und ohne Warnung. Das \unskip davor fängt die
+%   andere Schreibweise ab (»ist \ZSFbreak besonders«), damit beide Formen
+%   dasselbe ergeben und keine von beiden eine Falle ist.
+%
+%   Die Glue ist der echte Wortzwischenraum der laufenden Schrift samt Dehnung
+%   und Schrumpfung — ein \  wäre starr und fiele im Blocksatz auf.
+\newcommand{\ZSFbreak}{\unskip\penalty-50\hskip\fontdimen2\font
+  plus\fontdimen3\font minus\fontdimen4\font\relax}
 
 % \ZSFnobreak — verhindert Umbruch an dieser Stelle (gebundenes Leerzeichen).
 %   Nutzbar für Einheiten: "5\ZSFnobreak kg", "Punktladung\ZSFnobreak q_1"
 \newcommand{\ZSFnobreak}{\nobreak\ }
 
-% \ZSFallowbreak — erlaubt Umbruch an sonst fester Stelle.
-\newcommand{\ZSFallowbreak}{\penalty100\relax}
+% \ZSFallowbreak — erlaubt Umbruch an einer sonst FESTEN Stelle, also dort, wo
+%   kein Leerzeichen steht ("Wortgrenze\ZSFallowbreak Fortsetzung" bleibt ein
+%   Wort). Deshalb bringt es bewusst KEINEN Zwischenraum mit — das ist der
+%   Unterschied zu \ZSFbreak und nicht eine vergessene Zeile.
+%
+%   \penalty0 statt \penalty100: »erlaubt« heisst neutral. Eine positive Strafe
+%   erlaubt den Umbruch zwar auch, macht ihn aber teurer als jede andere
+%   Stelle — der Name sagte damit etwas anderes als der Wert tat.
+\newcommand{\ZSFallowbreak}{\penalty0\relax}
 
 % ============================================================

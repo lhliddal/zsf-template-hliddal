@@ -84,12 +84,17 @@
 % Wer die Groesse wechselt, ruft sie danach erneut auf. Genutzt von
 % \ZSFfontContent/\ZSFfontContentDense (der `font`-Regler), vom
 % \AtBeginDocument in 70_document_settings und von \ZSFChapterDensity oben.
+% \jot und \arraycolsep laufen hier mit, obwohl kein Groessenbefehl sie
+% zuruecksetzt: Sie gehoeren zur selben Frage — »wie viel Luft hat eine
+% Formel« — und eine zweite Anwendungsstelle waere eine zweite Auslegung.
 \newcommand{\ZSFApplyDisplaySkips}{%
   \setlength{\abovedisplayskip}{\ZSFspaceXS}%
   \setlength{\belowdisplayskip}{\ZSFspaceXS}%
   \setlength{\abovedisplayshortskip}{\ZSFspaceXS}%
   \setlength{\belowdisplayshortskip}{\ZSFspaceXS}%
   \setlength{\mathsurround}{\ZSFspaceXS}%
+  \setlength{\jot}{\ZSFmathRowSep}%
+  \setlength{\arraycolsep}{\ZSFmathColSep}%
 }
 
 \newlength{\ZSFspaceXS}\ZSFderive{\ZSFspaceXS}{\ZSFDensityFactor\dimexpr 1pt\relax}
@@ -199,6 +204,15 @@
 \newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
 \newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
 \newlength{\ZSFgoalConditionBorderlineWidth}\setlength{\ZSFgoalConditionBorderlineWidth}{0.2pt}
+% Abstand zwischen zwei Gliedern einer Zielkette (Bedingung, Schritt, Ziel).
+% Ein eigenes Register, weil der Abstand in der goalbox eine ENTSCHEIDUNG ist
+% und nicht das Nebenprodukt der Zeilenschaltung: Die Glieder sind verschieden
+% hoch (Pille, Displayzeile, gerahmtes Ziel), und ohne einen benannten Wert
+% ergibt sich der Rhythmus aus der Tinte statt aus dem Satz (siehe
+% \ZSFInterlude). Gleich \ZSFboxPadY, damit der Abstand zum Rahmen derselbe
+% ist wie der zwischen den Gliedern — die Kette liest sich dadurch als ein
+% gleichmässiger Stapel.
+\newlength{\ZSFgoalLinkSep}  \ZSFderive{\ZSFgoalLinkSep}{\ZSFDensityBoxes\ZSFspaceS}
 % Zeilenhöhe der ZSFtable in drei Stufen — der Regler `rows` wählt zwischen
 % ihnen (20_tables). Drei Werte statt eines, weil die Höhe einer Zeile nicht
 % aus der Tabellenart folgt, sondern aus ihrem Inhalt: Eine Tabelle mit
@@ -229,6 +243,14 @@
 % fünfmal geschrieben — und beim sechsten Bild einmal anders.
 \newlength{\ZSFimageMaxHeight}\setlength{\ZSFimageMaxHeight}{1.1cm}
 
+% Es gab hier ein \ZSFimagePadY — die senkrechte Luft, die ein Bild in einer
+% Tabellenzelle braucht, weil ein \includegraphics Höhe und keine Tiefe hat
+% und dadurch an der Oberkante der Zeile klebt. Der Wert ist ENTFALLEN: Es ist
+% derselbe Satz wie »der Inhalt einer Zeile hält Abstand zur Zeilenkante«, und
+% der gilt für einen \dfrac genauso. Zwei Register für eine Aussage sind eine
+% Kopie (styles/README → Vereinigungstest); geblieben ist \ZSFtableCellPadY
+% in 20_tables, gesetzt vom Regler `rows`.
+
 % Nutzbarer Anteil der Zeilenbreite in mehrteiligen Bild-Layouts; der Rest ist
 % der \hfill-Steg zwischen den Elementen (Bildreihe in \ZSFfig, Bild-neben-Text
 % in \ZSFfigside) — EIN Wert, damit die beiden Layouts nicht um einen Punkt
@@ -241,6 +263,39 @@
 % Grundlinie des annotierten Terms. Ohne ihn läuft die Klammer als waagrechte
 % Linie mitten durch die Formel, weil die Marker auf der Grundlinie sitzen.
 \newlength{\ZSFbraceDrop}\ZSFderive{\ZSFbraceDrop}{\ZSFspaceM}
+
+% ── Die zwei Masse INNERHALB einer Formel ────────────────────────────
+% \jot ist der zusätzliche Zeilenabstand zwischen den Zeilen eines `aligned`,
+% \arraycolsep der Spaltenabstand in `array` und jeder Matrix. Beide standen
+% auf den LaTeX-Vorgaben (3pt und 5pt) und gehörten damit niemandem: Sie
+% folgten weder \ZSFDensityFactor noch einem Bereichsfaktor, obwohl
+% rules/30_spacing Autoren ausdrücklich in beide Konstrukte schickt (»Lange
+% Gleichungen über `aligned` aufteilen«, »Matrizen vertikal stapeln«). In
+% einer formellastigen ZSF sind sie damit die einzigen Abstände, die eine
+% Dichte-Änderung nicht mitnimmt.
+%
+% Aus der Skala abgeleitet statt als eigene Zahl: Der Zeilenabstand ist
+% derselbe Trenner wie zwischen zwei Blöcken (\ZSFspaceSep, wertgleich zur
+% bisherigen Vorgabe), der Spaltenabstand die Standard-Zellpolsterung
+% (\ZSFspaceS). Letzteres ist zugleich eine Verengung um 1pt je Seite — in
+% einer 50-mm-Spalte ist eine Matrix mit 10pt Spaltenluft breiter als nötig.
+\newlength{\ZSFmathRowSep}\ZSFderive{\ZSFmathRowSep}{\ZSFspaceSep}
+\newlength{\ZSFmathColSep}\ZSFderive{\ZSFmathColSep}{\ZSFDensityText\ZSFspaceS}
+
+% ── Der Abstand von der Spaltenoberkante zur ersten Grundlinie ───────
+% \topskip beim Anfang einer Spalte, \splittopskip am Anfang einer
+% fortgesetzten. Beide standen auf den Klassenvorgaben (9pt und 10pt) und
+% waren damit die einzigen Masse, die JEDE Spalte anfasst und die niemand
+% gesetzt hat — sie sind nicht »klein«, sie waren nur unsichtbar, weil eine
+% Spalte meist mit einem Balken beginnt und der die Glue aufbraucht.
+%
+% EIN Register für beide: Es ist dieselbe Frage, nur einmal am Anfang und
+% einmal in der Fortsetzung. Und bewusst an \baselineskip statt an der
+% Dichte — der Wert muss die Oberlänge der ersten Zeile tragen, sonst rutscht
+% sie nach oben aus dem Satzspiegel. Damit folgt er \ZSFLeadingFactor und
+% nicht \ZSFDensityFactor, aus demselben Grund wie die Zeilenhöhe selbst.
+% Gesetzt wird er in 70_document_settings, wo \baselineskip feststeht.
+\newlength{\ZSFcolumnTopSkip}
 
 % Tokens für die ruhige Box-Familie und ZSFlist.
 % Der Einzug ist der einzige Wert, der sich zwischen nummerierter und
@@ -274,11 +329,21 @@
 %                      Tabelle verschieden, weil sie mit der Spaltenzahl
 %                      skaliert — bei sieben Spalten kostet der Standardwert
 %                      beidseitig mehr Breite als der Inhalt selbst.
+%
+% BEIDE SIND ZUGLEICH DER RAND ZUR BOXKANTE, und das ist keine Bequemlichkeit,
+% sondern eine Eigenschaft von colortbl: Die Farbfläche einer Tabellenzeile
+% ragt um genau \tabcolsep über die äusserste Zelle hinaus (\CT@setup liest
+% \col@sep). Ein Rand, der grösser ist als \tabcolsep, bleibt deshalb
+% ungefärbt — Kopfzeile und Zebra enden dann sichtbar vor dem Rahmen, obwohl
+% die tablebox (padx=none, clip upper) gerade dafür gebaut ist, dass sie es
+% nicht tun. Genau das war der Fall, solange der Rand ein eigener Wert war.
+% Deshalb ist \ZSFtableEdgePadTight kein Minimalwert mehr, sondern der
+% kleinste Rand, den eine Boxkante verträgt: derselbe wie \ZSFboxPadX.
 \newlength{\ZSFboxPadX}      \ZSFderive{\ZSFboxPadX}{\ZSFDensityBoxes\ZSFspaceS}
 \newlength{\ZSFboxPadXBar}   \ZSFderive{\ZSFboxPadXBar}{\ZSFDensityBoxes\ZSFspaceM}
 \newlength{\ZSFtableEdgePad} \ZSFderive{\ZSFtableEdgePad}{\ZSFDensityTables\ZSFspaceM}
 \newlength{\ZSFtableEdgePadTight}
-  \ZSFderive{\ZSFtableEdgePadTight}{\ZSFDensityTables\ZSFspaceXS}
+  \ZSFderive{\ZSFtableEdgePadTight}{\ZSFDensityTables\ZSFspaceS}
 
 % Vertikal dasselbe: Innenabstand oben/unten und der Abstand NACH einer Box.
 % Beide als Register, damit der Abstand nach einer Box nicht pro Box-Stil
@@ -304,7 +369,11 @@
 % Listings-Stil: Sie ist die einzige Zeilenhoehen-Entscheidung neben
 % \ZSFLeadingFactor und soll wie dieser auffindbar und drehbar sein.
 \providecommand{\ZSFcodeLeadingFactor}{0.8}
-\newlength{\ZSFcodeMiniSkip}  \setlength{\ZSFcodeMiniSkip}{1mm}
+% \ZSFcodeMiniSkip ist ENTFALLEN. Es war der Abstand um ein Listing im
+% globalen \lstset — der Stil CodeExpert setzte an derselben Stelle
+% \ZSFspaceM, und welcher Wert galt, hing daran, ob der Autor den Stil
+% angefordert hatte. Seit der Stil global gilt (65_code_style), gibt es nur
+% noch eine Antwort, und sie kommt aus der Skala.
 \newlength{\ZSFcodeFrameRule} \setlength{\ZSFcodeFrameRule}{0.4pt}
 \newlength{\ZSFcodeXMargin}   \setlength{\ZSFcodeXMargin}{8pt}
 \newlength{\ZSFcodeCommentThresholdDefault}
@@ -313,7 +382,10 @@
 \newlength{\ZSFcodeCommentGap}      \ZSFderive{\ZSFcodeCommentGap}{\ZSFspaceM}
 
 % Valuegrid, Index, Readability und dokumentweite Overlays
-\newlength{\ZSFvaluegridRowSep}       \ZSFderive{\ZSFvaluegridRowSep}{\ZSFDensityTables\ZSFspaceSep}
+% \ZSFvaluegridRowSep ist ENTFALLEN. Es war der Zeilenabstand des Wertegitters
+% und damit ein zweites Register für dieselbe Frage, die der Regler `rows` an
+% der ZSFtable beantwortet. Beide Tabellen-Bausteine lesen jetzt
+% \ZSFtableCellPadY (20_tables) — ein Wert, zwei Engines.
 \newlength{\ZSFreadabilityEmergencyStretch}\setlength{\ZSFreadabilityEmergencyStretch}{2.5em}
 % Flatterzone im Fliesstext: schmaler als der ragged2e-Standard (0pt plus 2em),
 % damit die schmalen 4 Spalten gut gefüllt bleiben. Wirkt nur über
@@ -340,6 +412,43 @@
 \newlength{\ZSFitemizeLeftMargin}     \setlength{\ZSFitemizeLeftMargin}{3mm}
 \newlength{\ZSFenumerateLeftMargin}   \setlength{\ZSFenumerateLeftMargin}{4mm}
 \newlength{\ZSFidentityMarkerInset}   \setlength{\ZSFidentityMarkerInset}{2mm}
+
+% ------------------------------------------------------------
+% Spacing-Kollaps an Kapitel- und Abschnittsgrenzen
+% ------------------------------------------------------------
+% Steht ein Block direkt unter einem Titelbalken, soll der Balken-Abstand
+% gelten und nicht zusätzlich der normale Blockabstand. Zwei Merker halten
+% fest, ob gerade ein Balken vorausging; \ZSF@blockBefore (60_boxes) liest
+% sie und verbraucht sie — für JEDEN Block, Box wie runintext.
+%
+% Aus 40_colors_structure hierher gezogen: Der Mechanismus entscheidet
+% Abstände, nicht Farben (rules/10_architecture → Was wo hingehört). Dass er
+% dort lag, hatte einen Grund — er hängt an den Balken —, aber der Ort war
+% trotzdem falsch, und die Modultabelle behauptete das Gegenteil.
+\newif\ifzsfAfterChapterBar
+\zsfAfterChapterBarfalse
+\newcommand{\ZSFMarkAfterChapterBar}{\global\zsfAfterChapterBartrue}
+\newcommand{\ZSFConsumeAfterChapterBar}{\global\zsfAfterChapterBarfalse}
+
+\newif\ifzsfAfterSubsectionBar
+\zsfAfterSubsectionBarfalse
+\newcommand{\ZSFMarkAfterSubsectionBar}{\global\zsfAfterSubsectionBartrue}
+\newcommand{\ZSFConsumeAfterSubsectionBar}{\global\zsfAfterSubsectionBarfalse}
+
+% Der Abstand VOR einem Block. Direkt nach einem Abschnittsbalken der knappe
+% Balkenabstand, sonst der normale Blockabstand.
+\newcommand{\ZSFBoxBeforeSkip}{%
+  \ifzsfAfterSubsectionBar\ZSFsubsectionAfterGap\else\ZSFspaceS\fi
+}
+
+% Kollabiert den before-skip der SubsectionBar auf \ZSFsubsectionAfterChapterGap,
+% wenn sie direkt nach einer ChapterBar steht.
+\newcommand{\ZSFCollapseAfterChapterBar}{%
+  \ifzsfAfterChapterBar
+    \vspace*{\dimexpr\ZSFsubsectionAfterChapterGap-\ZSFsubsectionBarBeforeSkip\relax}%
+    \ZSFConsumeAfterChapterBar
+  \fi
+}
 
 % ============================================================
 % TEXT-BOX-BINDUNGEN
@@ -376,6 +485,13 @@
 % eigene Schrift und Farbe. rules/20_boxes sagt zu, dass sich \formulanote,
 % \ZSFformulaline und \textNachBox in der Platzierung unterscheiden und nicht
 % im Stil — mit einer zweiten Quelle war das nicht wahr, sondern nur beinahe.
+%
+% Nach der Notzeile wird die Justierung der BOX wiederhergestellt, nicht
+% \centering. Die Note steht im Flattersatz und muss das zurücknehmen; welche
+% Justierung danach gilt, entscheidet aber der Regler `align` und nicht diese
+% Stelle. Hart gesetzt hat sie ein `formulabox[…][align=left]` ab der ersten
+% Notzeile stumm wieder zentriert — ein Regler, der von einem Baustein
+% verworfen wird (rules/21_box_options).
 \newcommand{\textVorBox}[1]{%
   \ifZSF@inFormulaBox
     \par
@@ -384,7 +500,7 @@
     \noindent\raggedright\ZSFBoxNote{#1}\par
     \endgroup
     \vspace{\ZSFspaceXS}%
-    \centering
+    \ZSFBoxAlign
   \else
     \par
     \addvspace{\ZSFspaceOuter}%
@@ -408,7 +524,7 @@
     \setlength{\parskip}{0pt}%
     \noindent\raggedright\ZSFBoxNote{#1}\par
     \endgroup
-    \centering
+    \ZSFBoxAlign
   \else
     \par
     \ZSFRobustUnskip
@@ -438,11 +554,43 @@
 % ------------------------------------------------------------
 % Vertikaler Einschub INNERHALB einer Box
 % ------------------------------------------------------------
-% Formelnote, Trennlinie, Item-Heading und Folgerung setzen alle denselben
-% Einschub: laufenden \parskip zurücknehmen, definierten Abstand setzen.
-% Als Makro statt von Hand, damit der Abstand an der Dichte-Stellschraube hängt
-% und der Rhythmus an einer Stelle änderbar bleibt.
-\newcommand{\ZSFInterlude}[1]{\par\vspace{-\parskip}\vspace{#1}}
+% Formelnote, Trennlinie, Item-Heading, Folgerung und die Glieder einer
+% Zielkette setzen alle denselben Einschub. Als Makro statt von Hand, damit der
+% Abstand an der Dichte-Stellschraube hängt und der Rhythmus an einer Stelle
+% änderbar bleibt.
+%
+% DER ABSTAND IST EIN OPTISCHER, KEIN LEIM. Das ist der ganze Punkt dieser drei
+% Zeilen und der Grund, warum sie nicht `\vspace{#1}` heissen:
+%
+% Zwischen zwei Blöcken im vertikalen Satz liegt nicht nur die gesetzte Glue,
+% sondern zusätzlich die Zeilenschaltung — TeX schiebt vor jede Box so viel
+% Leim ein, dass der Grundlinienabstand \baselineskip ergibt. Der SICHTBARE
+% Abstand ist damit `#1 + (\baselineskip - Höhe der folgenden Zeile)`. Solange
+% alle Zeilen gleich hoch sind (Fliesstext), faellt das nicht auf. Sobald die
+% Hoehen wechseln — Pillen einer Zielkette, Displaymathe, ein Bild —, wird der
+% Rhythmus zum Nebenprodukt der Tinte: gemessen an der Zielkette der Showcase
+% lagen zwischen benannt gleichen Elementen 4,1 bis 11,3 pt, obwohl der Autor
+% genau zwei Werte gesetzt hatte.
+%
+% \nointerlineskip nimmt die Zeilenschaltung für den naechsten Block heraus.
+% Danach ist der Abstand von der UNTERKANTE des vorigen Blocks zur OBERKANTE
+% des naechsten genau #1 — unabhaengig davon, was in den beiden steht. Weil
+% Hoehe und Tiefe einer Zeile der Tinte folgen (Oberlaenge, Unterlaenge), ist
+% das zugleich der optische Abstand.
+%
+% Das `-\parskip` bleibt aus demselben Grund wie zuvor: Der folgende Block ist
+% ein Absatz, und TeX setzt \parskip beim Absatzbeginn selbst. Ohne den Abzug
+% käme er zu #1 hinzu.
+%
+% Die erste Zeile faengt den Fall ab, dass zwei Einschuebe direkt aufeinander
+% treffen (\ZSFsep, unmittelbar gefolgt vom naechsten Kettenglied): Dann gilt
+% der zweite, statt dass sich beide addieren.
+\newcommand{\ZSFInterlude}[1]{%
+  \par
+  \ifdim\lastskip>0pt\relax \vskip-\lastskip \fi
+  \vskip\dimexpr#1-\parskip\relax
+  \nointerlineskip
+}
 % Trenner-Abstand um den Mittelpunkt im Index-Locator "6.2 · (S. 4)" (66_index).
 % Bewusst als Makro statt \newlength: das em soll an der Verwendungsstelle in der
 % Index-Schrift ausgewertet werden. Eine Länge würde es in der Präambel-Schrift

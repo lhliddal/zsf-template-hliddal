@@ -25,15 +25,12 @@
 % -------------------------
 % CodeExpert Listings Style
 % -------------------------
+% Was NICHT zum Stil gehört: Satzmechanik, die für jedes Listing gilt.
+% Alles, was CodeExpert unten ohnehin setzt, stand hier ein zweites Mal —
+% andere Rahmenart, andere Skips — und welcher Wert galt, hing daran, ob der
+% Autor den Stil angefordert hatte.
 \lstset{
-    basicstyle=\ttfamily,
-    frame=tb,
-    aboveskip=\ZSFcodeMiniSkip,
-    belowskip=\ZSFcodeMiniSkip,
-    showstringspaces=true,
     columns=flexible,
-    breaklines=true,
-    breakatwhitespace=true,
     tabsize=2,
 }
 
@@ -62,6 +59,15 @@
     breakatwhitespace=true,
     literate={->}{{$\rightarrow$}}2 {ü}{{\"u}}1 {ä}{{\"a}}1 {ö}{{\"o}}1 {Ü}{{\"U}}1 {Ä}{{\"A}}1 {Ö}{{\"O}}1 {—}{{---}}1 {−}{{-}}1 {„}{{\glqq}}1 {“}{{\grqq}}1 {”}{{''}}1 {’}{{'}}1 {–}{{--}}1 {→}{{$\rightarrow$}}1
 }
+
+% DER STIL GILT AB HIER FÜR JEDES LISTING. Vorher musste ihn jedes einzelne
+% mit `[style=CodeExpert]` anfordern — und wer es vergass, bekam kein Fehler,
+% keine Warnung und keinen Linter-Treffer, sondern ein Listing ohne Farben,
+% ohne Rahmen und mit fremden Abständen. Ein Baustein, dessen Erscheinung
+% davon abhängt, ob der Autor eine Option wiederholt hat, ist keine stabile
+% API (rules/02_ai_mandate → gleiche Sache, gleiche Bedienung).
+% Die Angabe in den Kapiteln bleibt gültig und ist ab jetzt redundant.
+\lstset{style=CodeExpert}
 
 % ------------------------------------------------------------
 % codebox — Container für Code-Snippets (optional mit Titel)
@@ -113,7 +119,12 @@
   arc=0pt, outer arc=0pt,
   boxsep=0pt,
   padx=normal, pady=none,
-  before skip=0pt,
+  % Der Vorabstand wird über das REGISTER genullt, nicht über `before skip`.
+  % Letzteres ist in tcolorbox ein Stil, der `before` schreibt, und überschriebe
+  % damit den Eintritts-Hook aus zsfbox (\ZSF@blockBefore): Der Abstand käme an,
+  % die Balken-Merker und das \par gingen verloren. Über /utils/exec gilt der
+  % Wert nur für diese Box — nachgemessen, der Hook bleibt.
+  /utils/exec={\renewcommand{\ZSFBoxBeforeSkip}{0pt}},
   after skip=\ZSFspaceXS,
 }}
 % Die vier Kantenformen als Auswahl-Schlüssel. 'whole' ist der Default und
@@ -135,7 +146,10 @@
     toprule=\ZSFboxRuleWidth,
     arc=\ZSFboxArc, outer arc=\ZSFboxArc,
     sharp corners=south,
-    before skip=\ZSFBoxBeforeSkip,
+    % KEIN `before skip` hier. Es ist in tcolorbox ein Stil, der `before`
+    % schreibt, und ueberschriebe damit den Eintritts-Hook aus zsfbox
+    % (\ZSF@blockBefore) — der Abstand kaeme an, die Balken-Merker gingen
+    % verloren. Der Abstand kommt ohnehin von dort, aus demselben Register.
     zsftitlebar,
   },
   ZSF@partBase/mid/.style={zsf@codebox@split@base},

@@ -161,12 +161,13 @@
 %
 % Gruppenlokal: Balken und Titel sind tcolorbox-Gruppen, der Schalter faellt
 % mit ihnen zurueck. Ein manueller Reset, den man vergessen kann, existiert
-% deshalb nicht.
+% deshalb nicht — und genau deshalb steht hier auch keiner mehr. Es gab ein
+% \ZSFInkFree, das den Schalter von Hand zuruecknahm: nirgends benutzt,
+% nirgends dokumentiert, und es widersprach dem Satz eine Zeile darueber.
 \makeatletter
 \newif\ifZSF@inkOwned
 \ZSF@inkOwnedfalse
 \newcommand{\ZSFInkOwned}{\ZSF@inkOwnedtrue}
-\newcommand{\ZSFInkFree}{\ZSF@inkOwnedfalse}
 \newcommand{\ZSFInk}[2]{{\ifZSF@inkOwned\else\color{#1}\fi#2}}
 \makeatother
 
@@ -312,8 +313,8 @@
 
 % Zielketten-Bedingung trägt bewusst eine harte Kontur statt des dezenten
 % Kapitelrahmens; auch das ist eine Gestaltungsentscheidung und gehört
-% deshalb hierher, nicht in styles/60_boxes.tex.
-\newcommand{\GoalConditionBorderColor}{black}
+% deshalb hierher, nicht in styles/60_boxes.tex. Die Farben der Kette stehen
+% weiter unten bei den Tönen — sie lesen deren Rollen.
 
 % ── Töne: ein Ton ist eine Deklaration ──
 % Ein Ton wirkt auf Titelboxen anders als auf rahmenlose Boxen, weil die
@@ -494,11 +495,27 @@
 \ZSF@toneApply{chapter}
 \makeatother
 
-% Für goalbox (semantische Ziel-Box)
-\newcommand{\GoalConditionBackColor}{white}
-\newcommand{\GoalConditionFrameColor}{\chaptercolorlight!22}
-\newcommand{\GoalTargetBackColor}{\chaptercolorlight!22}
-\newcommand{\GoalTargetFrameColor}{\chaptercolor}
+% Für goalbox (semantische Ziel-Box) — die beiden Pillen der Kette.
+%
+% SIE LESEN DIE ROLLEN DES TONS und nicht die Kapitelfarbe direkt. Vorher
+% standen hier \chaptercolor und \chaptercolorlight!22: Ein
+% `goalbox[…][tone=warn]` bekam damit roten Rahmen und rote Kopfzeile — und
+% darin kapitelfarbene Bedingungs- und Zielpillen. Der Ton blieb an der
+% Boxkante stehen, obwohl rules/21_box_options zusagt, dass er die ganze Box
+% erfasst. Stumm, weil beide Farben für sich gültig aussehen.
+%
+% Die Zuordnung folgt der Bedeutung der Rollen, nicht der Ähnlichkeit der
+% Farbwerte: Die Bedingung ist Voraussetzung auf ungetönter Fläche mit harter
+% Kontur (`plain` + `framesoft` + `framehard`), das Ziel ist das Resultat und
+% damit betont (`emphasisback` + `accent` — der Akzent ist die Farbe, die eine
+% rahmenlose Box anstelle der Kopfzeile trägt). Im Kapitelton ergibt das
+% dieselben Werte wie zuvor, ausser dass die Zielfläche eine Stufe kräftiger
+% ist — das Ziel ist die Aussage der Kette.
+\newcommand{\GoalConditionBackColor}{\BoxPlainBackColor}
+\newcommand{\GoalConditionFrameColor}{\ZSFtoneFrameSoft}
+\newcommand{\GoalConditionBorderColor}{\ZSFtoneFrameHard}
+\newcommand{\GoalTargetBackColor}{\ZSFtoneEmphasisBack}
+\newcommand{\GoalTargetFrameColor}{\ZSFtoneAccent}
 
 % ------------------------------------------------------------
 % Index-basierte Palette (automatisch via \StartChapter)
@@ -531,32 +548,10 @@
   \ZSFSetChapterPaletteByIndex{\the\ZSFchapterPaletteIndex}%
 }
 
-% ------------------------------------------------------------
-% Flag-System: Spacing-Kollaps an Kapitel-/Subsection-Grenzen
-% ------------------------------------------------------------
-\newif\ifzsfAfterChapterBar
-\zsfAfterChapterBarfalse
-\newcommand{\ZSFMarkAfterChapterBar}{\global\zsfAfterChapterBartrue}
-\newcommand{\ZSFConsumeAfterChapterBar}{\global\zsfAfterChapterBarfalse}
-
-\newif\ifzsfAfterSubsectionBar
-\zsfAfterSubsectionBarfalse
-\newcommand{\ZSFMarkAfterSubsectionBar}{\global\zsfAfterSubsectionBartrue}
-\newcommand{\ZSFConsumeAfterSubsectionBar}{\global\zsfAfterSubsectionBarfalse}
-
-% Reduzierter "before skip" für Boxen direkt nach einer SubsectionBar.
-\newcommand{\ZSFBoxBeforeSkip}{%
-  \ifzsfAfterSubsectionBar\ZSFsubsectionAfterGap\else\ZSFspaceS\fi
-}
-
-% Kollabiert den before-skip der SubsectionBar auf \ZSFsubsectionAfterChapterGap,
-% wenn sie direkt nach einer ChapterBar steht.
-\newcommand{\ZSFCollapseAfterChapterBar}{%
-  \ifzsfAfterChapterBar
-    \vspace*{\dimexpr\ZSFsubsectionAfterChapterGap-\ZSFsubsectionBarBeforeSkip\relax}%
-    \ZSFConsumeAfterChapterBar
-  \fi
-}
+% Das Flag-System für den Spacing-Kollaps an Kapitel- und Abschnittsgrenzen
+% stand hier und ist nach styles/30_layout_spacing.tex gezogen: Es entscheidet
+% Abstände, nicht Farben, und rules/10_architecture ordnet Abstände genau
+% einem Modul zu. Es lag hier nur, weil es an den Balken hängt.
 
 % ------------------------------------------------------------
 % Chapter-Start-Orchestrierung

@@ -186,7 +186,13 @@
 % Aussage, nicht ein Wort. \uline bricht mit dem Absatz um.
 % Fett als Deklaration, nicht als Argument von \uline: ein \textbf{...} als
 % Argument macht den Inhalt für ulem wieder zu einer Einheit.
-\newcommand{\ZSFhl}[1]{{\bfseries\uline{#1}}}
+%
+% Die Darstellung liegt wie bei \ZSFkeyword und \ZSFlabel in einem eigenen
+% Hook. Ohne ihn erwischte »die Hervorhebung dieser ZSF umstellen« zwei von
+% drei Markern — der dritte war der einzige mit fest verdrahteter Erscheinung,
+% und man sah es erst am Satz (styles/README → Auszeichnungs-Hooks).
+\newcommand{\ZSFhlStyle}[1]{{\bfseries\uline{#1}}}
+\newcommand{\ZSFhl}[1]{\ZSFhlStyle{#1}}
 
 % Papierorientierte Referenzrollen:
 %   * \ZSFref{label}: hilfreicher Querverweis mit farbiger Abschnittsnummer.

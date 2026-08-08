@@ -36,10 +36,28 @@
 % Die Werte stehen in \ZSFApplyDisplaySkips (30_layout_spacing), weil jeder
 % Schriftgrössenwechsel sie zurücksetzt und die Politik deshalb wiederholbar
 % sein muss — hier wird sie nur zum Dokumentstart einmal angewandt.
-\AtBeginDocument{\ZSFApplyDisplaySkips}
+% Zusammen mit dem Spaltenkopf-Abstand: \baselineskip steht erst hier fest
+% (\ZSFLeadingFactor wirkt über \linespread und damit erst zu Dokumentbeginn).
+% Vorher trugen \topskip und \splittopskip die Klassenvorgaben und folgten der
+% Zeilenhöhe deshalb nicht — wer die ZSF enger setzte, bekam am Spaltenkopf
+% weiterhin den Abstand der Vorgabe.
+\AtBeginDocument{%
+  \ZSFApplyDisplaySkips
+  \setlength{\ZSFcolumnTopSkip}{\baselineskip}%
+  \setlength{\topskip}{\ZSFcolumnTopSkip}%
+  \setlength{\splittopskip}{\ZSFcolumnTopSkip}%
+  % Das Gegenstück am Spaltenfuss: wie tief die letzte Zeile reichen darf.
+  % TeX koppelt es konventionell an die Hälfte von \topskip; die Klassenvorgabe
+  % hielt diese Kopplung nur zufällig ein und hätte sie bei jeder Änderung der
+  % Zeilenhöhe verloren.
+  \setlength{\maxdepth}{0.5\ZSFcolumnTopSkip}%
+}
 
 % Kompakte Listen (wie Analysis: kein überschüssiges Whitespace)
-\setlist{nosep, itemsep=0pt, parsep=0pt, topsep=\ZSFspaceXS, partopsep=0pt}
+% Dieselben Register, die \ZSFlist seinen Listen mitgibt (60_boxes). Vorher
+% stand hier itemsep=0pt und dort \ZSFlistItemSep — zwei Antworten auf eine
+% Frage, je nachdem welcher Weg in die Liste fuehrte.
+\setlist{nosep, itemsep=\ZSFlistItemSep, parsep=0pt, topsep=\ZSFspaceXS, partopsep=0pt}
 \setlist[itemize]{leftmargin=\ZSFitemizeLeftMargin}
 \setlist[enumerate]{leftmargin=\ZSFenumerateLeftMargin}
 
