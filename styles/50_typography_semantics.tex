@@ -150,25 +150,24 @@
 % \ZSFlabel verschiedene Dinge bedeuten und eine ZSF den Unterschied ändern
 % können soll, ohne ein einziges Kapitel anzufassen.
 %
-% VERSCHIEDEN vorbelegt, und das ist der Punkt: \ZSFkeyword ist laut
-% rules/25_structure_markers der PRIMÄRE Scan-Anker, \ZSFlabel ausdrücklich
-% keiner. Rendern beide fett, ist der wichtigste Anker der ZSF von jeder
-% beliebigen Beschriftung nicht zu unterscheiden — und Auffindbarkeit unter
-% Zeitdruck ist das oberste Ziel (rules/00_meta).
+% BEIDE schlicht fett, ohne Farbe. \ZSFkeyword stand bis hierher fett in der
+% KAPITELFARBE, mit dem Argument, der primäre Scan-Anker müsse sich von jeder
+% anderen Fettung abheben. Das Argument ist am Satz gescheitert: In laufendem
+% Text bringt eine eingefärbte Vokabel Unruhe in den Absatz, ohne dass die
+% Farbe etwas sagt — sie wiederholt nur, in welchem Kapitel man ohnehin gerade
+% ist. Wer den Absatz liest, wird gestört; wer ihn überfliegt, findet die
+% Fettung auch ohne Farbe.
 %
-% Warum ausgerechnet die Kapitelfarbe: Die anderen billigen Signale sind
-% vergeben — fett+unterstrichen ist \ZSFhl, die rote Pille \ZSFdanger, der
-% Pfeil \ZSFconclusion. Die Farbe ist frei und trägt im System bereits die
-% Bedeutung »dieses Kapitel« (Balken, Akzente, Verweis-Locator); der Anker
-% fügt damit keine neue Farbdimension hinzu, sondern nutzt die vorhandene.
+% Farbe bleibt damit im System das, was sie vorher schon war und wofür sie
+% trägt: Kapitel-Identität auf Flächen (Balken, Akzente), Wegweiser zum ZIEL
+% eines Verweises (\ZSFref) und semantische Zuordnung in Formeln (\ZSFmhl*).
+% Als blosse Betonung im Fliesstext ist sie ausdrücklich nicht vorgesehen.
 %
-% \chaptercolor statt eines eigenen Tokens, damit der Anker der Kapitelrotation
-% folgt wie jedes andere farbtragende Element. Umstellen pro ZSF in
-% preamble.tex per \renewcommand, nie im Kapitel.
-% Die Farbe läuft über \ZSFInk: In einem Titelbalken oder einer Tabellenkopfzelle
-% besitzt die Fläche die Farbe bereits, und der Anker erbt dort deren
-% Kontrastfarbe, statt in ihr zu verschwinden (40_colors_structure → Ink-Vertrag).
-\newcommand{\ZSFkeywordStyle}[1]{\textbf{\ZSFInk{\chaptercolor}{#1}}}
+% Die Unterscheidung der beiden Marker liegt jetzt allein in der Bedeutung —
+% \ZSFkeyword ist ein Fachbegriff und landet im Register, \ZSFlabel ist eine
+% neutrale Beschriftung und tut das nicht. Das ist der Unterschied, der beim
+% Schreiben zählt; er war nie der Farbe zu entnehmen.
+\newcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
 \newcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
 \newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\ZSFfontBoxBinding (S.#1)}}

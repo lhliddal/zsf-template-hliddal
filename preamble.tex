@@ -98,11 +98,12 @@
 \input{styles/40_colors_structure}
 \input{styles/50_typography_semantics}
 
-% ── Marker-Darstellung: der primäre Scan-Anker ───────────────────────
-% Default: \ZSFkeyword fett in der Kapitelfarbe, \ZSFlabel schlicht fett.
-% Der Unterschied ist gewollt — der primäre Anker soll beim Überfliegen vor
-% jeder anderen Fettung auffallen. Umstellen heisst GENAU diese eine Zeile,
-% nie ein Kapitel. Fassung ohne Farbe (z.B. für reinen S/W-Druck):
+% ── Marker-Darstellung ───────────────────────────────────────────────
+% Default: \ZSFkeyword und \ZSFlabel beide schlicht fett, ohne Farbe.
+% Inline-Betonung im Fliesstext trägt bewusst KEINE Kapitelfarbe — sie brächte
+% Unruhe in den Absatz und sagte nichts, was die Seite nicht ohnehin zeigt.
+% Farbe bleibt den Flächen, den Verweisen und den Formel-Markern vorbehalten.
+% Umstellen heisst GENAU diese eine Zeile, nie ein Kapitel:
 % \renewcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
 % \renewcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 % Dritter Marker derselben Familie: die Hervorhebung der Kernaussage.

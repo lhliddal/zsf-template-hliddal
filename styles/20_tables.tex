@@ -299,6 +299,10 @@
 }
 \NewDocumentEnvironment{ZSFtable}{O{} m}{%
   \begingroup
+  % Zellinhalt: ein \ZSFimage hier bekommt Zellen-, nicht Abbildungshoehe.
+  % Explizit und nicht als Default verlassen, damit eine Tabelle IN einer
+  % figbox nicht deren Abbildungsbudget erbt (siehe \ZSF@imgBudget, 60_boxes).
+  \renewcommand{\ZSF@imgBudget}{\ZSFimageMaxHeight}%
   \pgfkeys{/zsf/table, ZSF@tblDefaults, #1}%
   \setlength{\tabcolsep}{\ZSF@tblColSep}%
   \renewcommand{\arraystretch}{\ZSF@tblStretch}%

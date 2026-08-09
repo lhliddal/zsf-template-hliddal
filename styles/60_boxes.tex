@@ -864,8 +864,17 @@
 
 \NewDocumentEnvironment{tablebox}{O{} O{}}
   {\begin{ZSF@box}{preset/table}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+% figbox und splitbox tragen einen Block — dort gilt fuer ein \ZSFimage das
+% Budget einer Abbildung, nicht das der Tabellenzelle (siehe \ZSF@imgBudget).
+% \makeatletter ist noetig, weil \ZSF@imgBudget ein Kontrollwort mit @ ist;
+% \begin{ZSF@box} daneben braucht es nicht — ein Umgebungsname ist Text.
+\makeatletter
 \NewDocumentEnvironment{figbox}{O{} O{}}
-  {\begin{ZSF@box}{preset/fig}{#1}{#2}}{\end{ZSF@box}} % chktex 9
+  {\begingroup
+   \renewcommand{\ZSF@imgBudget}{\ZSFfigMaxHeight}%
+   \begin{ZSF@box}{preset/fig}{#1}{#2}}
+  {\end{ZSF@box}\endgroup} % chktex 9
+\makeatother
 % Warn-Box — dieselbe Titelbox im Warn-Ton, mit vorbelegtem Titel »Achtung«.
 %
 % BEWUSSTE AUSNAHME zur Katalog-Ökonomie und die einzige im Katalog: Nach
@@ -1124,11 +1133,27 @@
 % einer Tabellenzelle unbrauchbar — dem Fall, für den es existiert.
 \newcommand{\ZSF@imgWidthFrac}{1}
 \newlength{\ZSF@imgHeightLimit}
+% Das Hoehenbudget gehoert dem CONTAINER, nicht dem Bild.
+%
+% Dasselbe \ZSFimage bedeutet an zwei Orten zwei Groessenordnungen: In einer
+% Tabellenzelle muss es in eine Zeile passen (\ZSFimageMaxHeight), als
+% Abbildung fuellt es einen Block (\ZSFfigMaxHeight). Das Bild selbst kann das
+% nicht wissen — es sieht seinen Container nicht.
+%
+% Stuende hier ein fester Default, waere genau eine der beiden Lagen still
+% falsch: Ein \ZSFimage in einer figbox wuerde ohne Fehler und ohne Warnung auf
+% Zellenhoehe gestaucht, und die Hoehe muesste an jedem Aufruf wiederholt
+% werden — also genau die Wiederholung, die ein zentraler Default vermeidet.
+% Deshalb ist der Default eine INDIREKTION: Jeder Baustein, der Bilder tragen
+% kann, bindet sie auf sein eigenes Mass um (figbox/splitbox auf Abbildungs-,
+% ZSFtable/valuegrid auf Zellenhoehe). Wer nichts bindet, bekommt die Zelle —
+% der Fall, fuer den \ZSFimage existiert.
+\newcommand{\ZSF@imgBudget}{\ZSFimageMaxHeight}
 \pgfkeys{
   /zsf/image/.is family, /zsf/image,
   width/.store in=\ZSF@imgWidthFrac,
   height/.code={\setlength{\ZSF@imgHeightLimit}{#1}},
-  ZSF@imgDefaults/.style={width=1, height=\ZSFimageMaxHeight},
+  ZSF@imgDefaults/.style={width=1, height=\ZSF@imgBudget},
 }
 %
 % Die senkrechte Luft in einer Tabellenzelle bringt das Bild NICHT selbst mit.
@@ -1271,8 +1296,13 @@
   ZSF@surface=quiet,
   split=0.3,
 }}
+\makeatletter
 \NewDocumentEnvironment{splitbox}{O{}}
-  {\begin{ZSF@box}{preset/split}{}{#1}}{\end{ZSF@box}} % chktex 9
+  {\begingroup
+   \renewcommand{\ZSF@imgBudget}{\ZSFfigMaxHeight}%
+   \begin{ZSF@box}{preset/split}{}{#1}}
+  {\end{ZSF@box}\endgroup} % chktex 9
+\makeatother
 
 % ------------------------------------------------------------
 % Aussagen / Verfahren / Listen
@@ -1362,14 +1392,33 @@
 \makeatother
 % Ein Item-Makro statt zweier. Marke und Text sind in beiden Listenarten
 % dieselben zwei Rollen; nur ihre Anordnung folgt der Nummerierung.
+%
+% Die Marke ist OPTIONAL, weil sie es im Inhalt auch ist: Eine Faktenliste
+% mischt benannte Eigenschaften (»Linearität: …«) mit blossen Aussagen
+% (»Die Inverse ist eindeutig.«). Eine Pflicht-Marke zwingt an der zweiten
+% Sorte dazu, eine zu erfinden — also Inhalt zu schreiben, um eine Form zu
+% bedienen (rules/00_meta). Gemessen an der ersten grossen Fach-ZSF: 203 von
+% 266 Einträgen haben keine natürliche Marke. Drei Schreibweisen, ein Makro:
+%   \ZSFItem{Marke}{Text}   — benannter Eintrag
+%   \ZSFItem{}{Text}        — dieselbe Form, Marke leer
+%   \ZSFItem{Text}          — blosse Aussage
+% Der Trenner gehört zur Marke: keine Marke, kein Trenner. Vorher blieb bei
+% leerer Marke ein »— « stehen, das ins Leere zeigte.
 \makeatletter
-\newcommand{\ZSFItem}[2]{%
+% +m/+g: beide Argumente sind lang. Ein Schritt darf mehrere Absätze tragen
+% (Erklärung, Displayformel, Schlusssatz) — xparse-Argumente wären sonst kurz,
+% wo das frühere \newcommand lang war.
+\NewDocumentCommand{\ZSFItem}{+m +g}{%
   \item
-  \ifZSF@listOrdered
-    {\ZSFfontBlockLabel #1}\\[\ZSFlistMarkGap]#2%
-  \else
-    {\ZSFfontBlockLabel #1}\,---\,#2%
-  \fi
+  \IfNoValueTF{#2}%
+    {#1}%
+    {\IfBlankTF{#1}%
+       {#2}%
+       {\ifZSF@listOrdered
+          {\ZSFfontBlockLabel #1}\\[\ZSFlistMarkGap]#2%
+        \else
+          {\ZSFfontBlockLabel #1}\,---\,#2%
+        \fi}}%
 }
 \makeatother
 
@@ -1558,11 +1607,13 @@
 \newcommand{\ZSF@vgOpts}{}
 \newcommand{\ZSF@vgOpen}[1]{\begin{tblr}{#1}} % chktex 9
 \NewDocumentEnvironment{valuegrid}{O{} O{} m}
-  {\renewcommand{\ZSF@boxOwnKnobs}{,grid,rows,colsep,}%
+  {\begingroup
+   \renewcommand{\ZSF@boxOwnKnobs}{,grid,rows,colsep,}%
+   \renewcommand{\ZSF@imgBudget}{\ZSFimageMaxHeight}%
    \begin{ZSF@box}{preset/valuegrid}{#1}{#2}%
    \edef\ZSF@vgOpts{colspec={X[l] *{#3}{X[c]}},\ZSFvaluegridCommon}%
    \expandafter\ZSF@vgOpen\expandafter{\ZSF@vgOpts}}
-  {\end{tblr}\end{ZSF@box}} % chktex 9
+  {\end{tblr}\end{ZSF@box}\endgroup} % chktex 9
 \makeatother
 
 % ------------------------------------------------------------

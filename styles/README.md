@@ -302,9 +302,42 @@ in `20_tables`) einen hohen Zellinhalt um `\ZSFtableCellPadY` höher und tiefer,
 ohne ihn zu verschieben. Kurzer Text läuft weiter über die
 Grundlinien-Ausrichtung und ist unberührt.
 
-Das ist zugleich der Grund, warum es **kein** eigenes Bild-Register gibt: „Ein
-Bild hält Abstand zur Zeilenkante" und „ein Bruch hält Abstand zur Zeilenkante"
-sind derselbe Satz (Vereinigungstest). Der Regler `rows` entscheidet ihn.
+Das ist zugleich der Grund, warum es **kein** eigenes Bild-Register für den
+*Abstand* gibt: „Ein Bild hält Abstand zur Zeilenkante" und „ein Bruch hält
+Abstand zur Zeilenkante" sind derselbe Satz (Vereinigungstest). Der Regler
+`rows` entscheidet ihn.
+
+#### Die Bild-HÖHE gehört dem Container
+
+Anders als der Abstand ist die maximale Bildhöhe **nicht** eine Frage, sondern
+zwei — und welche gilt, weiss nur der Baustein, in dem das Bild steht:
+
+| Container | Budget |
+|---|---|
+| `ZSFtable`, `valuegrid` | `\ZSFimageMaxHeight` (1.1 cm) — muss in eine Zeile passen |
+| `figbox`, `splitbox` | `\ZSFfigMaxHeight` (2.6 cm) — füllt einen Block |
+
+Technisch läuft das über die Indirektion `\ZSF@imgBudget`, die der Default von
+`\ZSFimage` liest und die jeder dieser Bausteine auf sein Mass umbindet. Ein
+fester Default wäre an einem der beiden Orte **still** falsch: Ein `\ZSFimage`
+in einer `figbox` wurde vorher auf Zellenhöhe gestaucht — ohne Fehler, ohne
+Warnung, ohne Linter-Treffer. Ein zu klein gesetztes Bild sieht nicht nach
+einem Defekt aus, sondern nach einer Absicht.
+
+Die Umbindung ist auf die jeweilige Umgebung begrenzt. Nach ihrem Ende gilt
+wieder das Budget des umgebenden Containers; kein Bild-Baustein darf seine
+Höhenentscheidung in einen folgenden Block mitnehmen.
+
+Aufgefallen ist das erst im ersten grossen Fach-Fork, und der Grund ist
+lehrreich: Die Living Showcase führte `\ZSFimage` nur in einer `tablebox` vor —
+in *seinem* Kontext. Die Kreuzprobe (Baustein A im Container B) fehlte. Seither
+steht sie in `ch05_palette_slot.tex`.
+
+> **Vorsicht bei `@` ausserhalb `\makeatletter`:** `figbox` und `splitbox` sind
+> ausserhalb der `\makeatletter`-Klammer definiert. `\begin{ZSF@box}` geht dort,
+> weil ein Umgebungsname reiner Text ist — `\ZSF@imgBudget` geht **nicht** und
+> zerfällt still in `\ZSF` und `@imgBudget`. Beide Definitionen sind deshalb
+> eigens geklammert.
 
 **Der Abstand VOR einem Block** gehört `\ZSFBoxBeforeSkip`, gesetzt in
 `\ZSF@blockBefore` (`60_boxes`) — und zwar für jede Box *und* für `runintext`.
@@ -359,8 +392,19 @@ und Ton bekommt. Der Ink-Vertrag beantwortet die Gegenfrage: Was passiert mit
 Farbtragende Inline-Makros (`\ZSFkeyword`, `\ZSFref`, `\ZSFsectionref`,
 `\ZSFmhl*`, die Grössenfarben) setzen `\color` nicht selbst, sondern gehen
 durch **`\ZSFInk{<Farbe>}{<Inhalt>}`** (`40_colors_structure`). Ist die Fläche
-ink-besitzend, gibt `\ZSFInk` den Inhalt ungefärbt aus — er erbt damit die
-Kontrastfarbe der Fläche und bleibt lesbar.
+ink-besitzend, setzt `\ZSFInk` die Farbe der Fläche erneut — der Marker trägt
+damit genau deren Kontrastfarbe und bleibt lesbar.
+
+**Erneut setzen, nicht bloss weglassen.** Der Unterschied ist kein Detail:
+Nichts zu setzen erbt die Flächenfarbe nur, solange zwischen Fläche und Marker
+niemand sonst färbt. `\hyperref` tut aber genau das — es legt in jedem Link
+seine `linkcolor` an. Ein `\ZSFref` im Titel eines Kapitelbalkens stand deshalb
+**blau auf gesättigtem Grund**, also genau die Unlesbarkeit, gegen die der
+Vertrag geschrieben wurde, und ohne Fehler oder Warnung. `\ZSFInkOwned` hält
+den Farbwert (`\current@color`) fest, weil die Flächen ihre Kontrastfarbe über
+verschiedene Wege setzen (`\textcolor`, `\color`, tcolorbox' `coltitle`) und
+nur der Wert an allen dreien derselbe ist — deshalb braucht keine Aufrufstelle
+ein Argument.
 
 Das Kriterium ist bewusst **eines** und aus dem Code ablesbar:
 
@@ -544,3 +588,28 @@ Punktuelle Steuerung:
 - `\ZSFbreak` — weicher bevorzugter Umbruch
 - `\ZSFnobreak` — gebundenes Leerzeichen (`5\ZSFnobreak kg`)
 - `\ZSFallowbreak` — erlaubt Umbruch an sonst fester Stelle
+
+### Der Lua-Filter: erkennen und gestalten sind getrennt
+
+`styles/zsf_filter.lua` läuft über `chapters/` und `main.tex` und bindet drei
+Stellen automatisch: kurze Inline-Formeln, die Zahl-Einheit-Fuge und den
+Doppelpunkt einer Variablenbeschreibung. **Der Filter erkennt nur die Stelle;
+wie stark dort gebunden wird, steht in `55_readability.tex`** — sonst stünde
+eine typografische Entscheidung in einer `.lua`-Datei und damit ausserhalb von
+`styles/` (`rules/02_ai_mandate`).
+
+| Marke | Bindung | wofür |
+|---|---|---|
+| `\ZSFunitbind` | hart (`\penalty10000`) | Zahl und Einheit sind ein Wort — `10 m/s` |
+| `\ZSFcolonbind` | weich (`\ZSFcolonBindPenalty`, 9000) | nach dem Doppelpunkt einer Variablenbeschreibung |
+
+Der Unterschied ist nicht kosmetisch. Eine **harte** Bindung nach dem
+Doppelpunkt erzwingt in den ~50 mm schmalen Spalten eine Overfull-Zeile, sobald
+dahinter eine lange Formel steht — die Zeile läuft sichtbar in den
+Spaltensteg. Die hohe Penalty ergibt dasselbe Satzbild, lässt den Bruch aber
+zu, wenn die Alternative schlechter ist.
+
+Dazu die **Längengrenze** im Filter (`COLON_MAX_IDENT`, 4 Zeichen): Gebunden
+wird nur nach einem kurzen Bezeichner (`m:`, `$r$:`), nicht nach jedem
+Satzdoppelpunkt. Regel 4 des Filters hatte diese Grenze von Anfang an, Regel 5
+nicht — und ohne sie klebte die Regel ganze Sätze an ihre Folgeformel.

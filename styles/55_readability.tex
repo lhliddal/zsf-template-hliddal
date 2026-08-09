@@ -102,6 +102,43 @@
 \newcommand{\ZSFallowbreak}{\penalty0\relax}
 
 % ------------------------------------------------------------
+% Die Bindungen, die der LuaLaTeX-Filter setzt
+% ------------------------------------------------------------
+% Arbeitsteilung: Der Filter (styles/zsf_filter.lua) ERKENNT die Stellen — wie
+% stark dort gebunden wird, steht hier. Vorher stand beides in der .lua-Datei,
+% also eine typografische Entscheidung ausserhalb von styles/ und damit ausser
+% Reichweite jeder Umstellung und jeder Prüfung (rules/02_ai_mandate).
+%
+% Zwei Stärken, weil es zwei verschiedene Aussagen sind:
+%
+%   \ZSFunitbind   »Zahl und Einheit sind ein Wort« — harte Bindung. Zwischen
+%                  5 und kg gibt es keinen sinnvollen Umbruch, nie.
+%
+%   \ZSFcolonbind  »Nach dem Doppelpunkt bitte nicht brechen« — aber ein Bruch
+%                  ist besser als eine überlaufende Zeile. Ein hartes ~ erzwingt
+%                  in den ~50 mm schmalen Spalten eine Overfull-Zeile, sobald
+%                  hinter dem Doppelpunkt eine lange Formel steht: Die Zeile
+%                  läuft dann sichtbar in den Spaltensteg. Eine hohe Penalty
+%                  ergibt dasselbe Satzbild, lässt den Bruch aber zu, wenn die
+%                  Alternative schlechter ist.
+%
+% Beide bringen ihren Zwischenraum selbst mit (\hskip statt ~), weil TeX das
+% Leerzeichen nach einem Kontrollwort schluckt — dieselbe Falle wie bei
+% \ZSFbreak, und derselbe Ausweg. Im Mathe-Modus bleibt es bei ~: Dort setzt
+% TeX die Abstände selbst, und \fontdimen2 einer Mathe-Schrift ist 0.
+\newcommand{\ZSFcolonBindPenalty}{9000}
+\makeatletter
+\newcommand{\ZSF@bind}[1]{%
+  \ifmmode~\else\unskip\penalty#1\hskip\fontdimen2\font\relax\fi
+}
+% Die beiden oeffentlichen Marken MUESSEN in derselben \makeatletter-Klammer
+% stehen: \ZSF@bind ist ein Kontrollwort mit @, und nach \makeatother zerfiele
+% es beim Tokenisieren in \ZSF und @bind.
+\newcommand{\ZSFcolonbind}{\ZSF@bind{\ZSFcolonBindPenalty}}
+\newcommand{\ZSFunitbind}{\ZSF@bind{10000}}
+\makeatother
+
+% ------------------------------------------------------------
 % Automatischer LuaLaTeX-Filter für intelligente Zeilenumbrüche
 % ------------------------------------------------------------
 % Lädt den Lua-Filter zur Vermeidung von Trennungen bei Doppelpunkten,

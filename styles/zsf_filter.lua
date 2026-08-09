@@ -64,12 +64,32 @@ local function zsf_filter(line)
     end
   end)
 
-  -- 5. Keine Umbrüche nach Doppelpunkt (x: Erklärung)
-  line = line:gsub(":%s+", ":~")
+  -- 5. Bindung nach Doppelpunkt — NUR bei kurzen Bezeichnern.
+  --
+  -- Gemeint ist die Variablenbeschreibung ("m: Zeilen", "$r$: Rang"), nicht
+  -- jeder Satzdoppelpunkt. Ohne Längengrenze klebte die Regel auch
+  -- "Spaltenrang ist gleich Zeilenrang: $\dim(\Im(A)) = \rang(A)$"
+  -- zusammen — ein 10-Zeichen-Wort an eine 40 pt breite Formel, was in einer
+  -- ~50 mm schmalen Spalte zwingend eine Overfull-Zeile ergibt.
+  -- Gleiche Bauart wie die Längengrenze in Regel 4; dass sie hier fehlte, war
+  -- die Ausnahme und nicht die Regel.
+  --
+  -- Emittiert wird eine benannte Marke, kein rohes ~: Die Bindungsstärke ist
+  -- eine typografische Entscheidung und gehört nach styles/ (\ZSFcolonbind in
+  -- styles/55_readability.tex), nicht in diese Datei.
+  local COLON_MAX_IDENT = 4
+  line = line:gsub("(%S*):(%s+)", function(pre, sp)
+    if #pre <= COLON_MAX_IDENT then
+      return pre .. ":\\ZSFcolonbind "
+    end
+    return pre .. ":" .. sp
+  end)
 
   -- 6. Keine Umbrüche zwischen Zahlen und Einheiten (10 m/s, 95 %, 20 °C)
-  -- Findet Ziffern gefolgt von Leerzeichen und einem Einheiten-Anfang
-  line = line:gsub("(%d+)%s+([a-zA-Z°%%][a-zA-Z0-9%%%-/%%^%%*]*)", "%1~%2")
+  -- Findet Ziffern gefolgt von Leerzeichen und einem Einheiten-Anfang.
+  -- Auch hier die benannte Marke statt ~ — die Bindung ist hart, aber das
+  -- steht in styles/ und nicht hier.
+  line = line:gsub("(%d+)%s+([a-zA-Z°%%][a-zA-Z0-9%%%-/%%^%%*]*)", "%1\\ZSFunitbind %2")
 
   -- Platzhalter wiederherstellen
   line = line:gsub(placeholder_double_dollar, "$$")

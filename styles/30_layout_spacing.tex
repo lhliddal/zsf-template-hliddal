@@ -249,15 +249,22 @@
 % Maximale Höhe für Bilder in figboxen (verhindert überhohe Aspect-Ratios).
 \newlength{\ZSFfigMaxHeight}\setlength{\ZSFfigMaxHeight}{2.6cm}
 
-% Vorbelegte Höhe eines Bildes OHNE Box (\ZSFimage) — der Fall ist die
-% Tabellenzelle. Eigener Wert und nicht \ZSFfigMaxHeight, weil die beiden
-% verschiedene Grössenordnungen sind: eine Abbildung füllt einen Block, ein
-% Zellenbild muss in eine Tabellenzeile passen.
+% Höhe eines Bildes OHNE Box (\ZSFimage) in einer TABELLENZELLE. Eigener Wert
+% und nicht \ZSFfigMaxHeight, weil die beiden verschiedene Grössenordnungen
+% sind: eine Abbildung füllt einen Block, ein Zellenbild muss in eine
+% Tabellenzeile passen.
 %
 % Der eigentliche Zweck ist die Gleichmässigkeit: Eine Spalte aus
 % \ZSFimage{pfad}-Aufrufen ohne Höhenangabe ist damit von selbst einheitlich
 % hoch. Stünde die Höhe stattdessen an jedem Aufruf, wäre dieselbe Entscheidung
 % fünfmal geschrieben — und beim sechsten Bild einmal anders.
+%
+% Welcher der beiden Werte gilt, entscheidet NICHT das Bild, sondern der
+% Baustein, in dem es steht: ZSFtable und valuegrid binden auf diesen Wert,
+% figbox und splitbox auf \ZSFfigMaxHeight (Mechanik: \ZSF@imgBudget in
+% styles/60_boxes.tex). Ein fester Default hier wäre an einem der beiden Orte
+% still falsch — und still ist das Wort, das zählt: Ein zu klein gesetztes Bild
+% bricht keinen Build und löst keine Warnung aus.
 \newlength{\ZSFimageMaxHeight}\setlength{\ZSFimageMaxHeight}{1.1cm}
 
 % Es gab hier ein \ZSFimagePadY — die senkrechte Luft, die ein Bild in einer

@@ -155,9 +155,23 @@
 %
 % Wo das gilt, steht \ZSFInkOwned direkt neben dem \color/\textcolor, das den
 % Kontrast setzt — nicht an einer entfernten Stelle, wo es beim naechsten
-% Eingriff vergessen wird. Ist die Farbe besetzt, gibt \ZSFInk den Inhalt
-% ungefaerbt aus; er erbt damit genau die Kontrastfarbe der Flaeche und bleibt
-% lesbar, statt zu verschwinden.
+% Eingriff vergessen wird.
+%
+% Und weil es dort steht, kann es die Farbe FESTHALTEN statt sie nur zu
+% beanspruchen: \ZSFInk setzt sie im Inneren erneut. Das ist der Unterschied
+% zwischen "erbt die Kontrastfarbe" und "setzt keine eigene Farbe" — und
+% zwischen den beiden liegt ein realer Fehler:
+%
+%   Nichts zu setzen erbt nur dann die Flaechenfarbe, wenn zwischen Flaeche und
+%   Marker niemand sonst faerbt. \hyperref tut aber genau das: Es legt in jedem
+%   Link seine linkcolor an. Ein \ZSFref im Titel eines Kapitelbalkens stand
+%   deshalb BLAU auf gesaettigtem Grund — also genau die Unlesbarkeit, gegen
+%   die der Vertrag geschrieben wurde, und ohne Fehler oder Warnung.
+%
+% Festgehalten wird der Farbwert selbst (\current@color), nicht ein Farbname:
+% Die Flaechen setzen ihre Kontrastfarbe ueber verschiedene Wege (\textcolor,
+% \color, tcolorbox' coltitle), und nur der Wert ist an allen dreien derselbe.
+% Deshalb braucht keine einzige Aufrufstelle ein Argument.
 %
 % Gruppenlokal: Balken und Titel sind tcolorbox-Gruppen, der Schalter faellt
 % mit ihnen zurueck. Ein manueller Reset, den man vergessen kann, existiert
@@ -167,8 +181,18 @@
 \makeatletter
 \newif\ifZSF@inkOwned
 \ZSF@inkOwnedfalse
-\newcommand{\ZSFInkOwned}{\ZSF@inkOwnedtrue}
-\newcommand{\ZSFInk}[2]{{\ifZSF@inkOwned\else\color{#1}\fi#2}}
+\let\ZSF@inkOwnedColor\current@color
+\newcommand{\ZSFInkOwned}{%
+  \ZSF@inkOwnedtrue
+  \let\ZSF@inkOwnedColor\current@color
+}
+\newcommand{\ZSFInk}[2]{{%
+  \ifZSF@inkOwned
+    \let\current@color\ZSF@inkOwnedColor\set@color
+  \else
+    \color{#1}%
+  \fi
+  #2}}
 \makeatother
 
 % ------------------------------------------------------------

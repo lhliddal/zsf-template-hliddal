@@ -47,6 +47,17 @@
     lässt sich die Stufe einmal als font-Option der tikzpicture setzen.}
 \end{figbox}
 
+% Kreuzprobe: \ZSFimage ist auf die Tabellenzelle vorbelegt (ch04 führt das
+% vor). Hier steht dasselbe Makro in einer figbox und muss das Budget einer
+% Abbildung bekommen. Ohne diese Stelle prüft die Showcase jeden Baustein nur
+% in SEINEM Kontext — und ein zu klein gesetztes Bild bricht keinen Build.
+\begin{figbox}[Dasselbe Bild-Makro, anderer Container\ZSFTitleTag{ZSFimage in figbox}][align=center]
+  \ZSFimage[width=0.55]{example-image-b}
+  \ZSFfigcaption{In einer Tabellenzelle passt \textbackslash ZSFimage in eine
+    Zeile, hier füllt es einen Block. Das Höhenbudget gehört dem Container,
+    nicht dem Bild.}
+\end{figbox}
+
 \begin{defbox}[Derselbe Regler, mit Kopfzeile\ZSFTitleTag{split}][split=0.34]
   \centering Formel
   \tcblower
