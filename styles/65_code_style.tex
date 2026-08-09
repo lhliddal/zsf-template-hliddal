@@ -144,7 +144,7 @@
   ZSF@partBase/first/.style={
     zsf@codebox@split@base,
     toprule=\ZSFboxRuleWidth,
-    arc=\ZSFboxArc, outer arc=\ZSFboxArc,
+    arc=\ZSFboxInnerArc, outer arc=\ZSFboxArc,
     sharp corners=south,
     % KEIN `before skip` hier. Es ist in tcolorbox ein Stil, der `before`
     % schreibt, und ueberschriebe damit den Eintritts-Hook aus zsfbox
@@ -156,7 +156,7 @@
   ZSF@partBase/last/.style={
     zsf@codebox@split@base,
     bottomrule=\ZSFboxRuleWidth,
-    arc=\ZSFboxArc, outer arc=\ZSFboxArc,
+    arc=\ZSFboxInnerArc, outer arc=\ZSFboxArc,
     sharp corners=north,
     after skip=\ZSFspaceS,
   },

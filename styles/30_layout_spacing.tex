@@ -217,10 +217,18 @@
 \providecommand{\ZSFBarGapFactor}{1}
 \newlength{\ZSFbarAfterGap}\ZSFderive{\ZSFbarAfterGap}{\ZSFBarGapFactor\dimexpr
   \ZSFDensityStructure\dimexpr\ZSFDensityFactor\dimexpr 3pt\relax\relax\relax}
-\newlength{\ZSFboxArc}\ZSFderive{\ZSFboxArc}{\ZSFspaceXS}
+% Der sichtbare Aussenradius ist Form, nicht Leerraum: Auch bei dichterem Satz
+% bleiben die Kanten bewusst gleich weich. Der Innenradius wird aus der
+% jeweiligen Rahmenbreite abgeleitet, damit die Kontur in der Kurve nicht
+% dicker wird als auf den geraden Kanten.
+\newlength{\ZSFboxArc}\setlength{\ZSFboxArc}{3pt}
 \newlength{\ZSFboxRuleWidth}\setlength{\ZSFboxRuleWidth}{0.5pt}
+\newlength{\ZSFboxInnerArc}\ZSFderive{\ZSFboxInnerArc}{\dimexpr
+  \ZSFboxArc-\ZSFboxRuleWidth\relax}
 \newlength{\ZSFgoalConditionRuleWidth}\setlength{\ZSFgoalConditionRuleWidth}{1.5pt}
 \newlength{\ZSFgoalConditionBorderlineWidth}\setlength{\ZSFgoalConditionBorderlineWidth}{0.2pt}
+\newlength{\ZSFgoalConditionInnerArc}\ZSFderive{\ZSFgoalConditionInnerArc}{\dimexpr
+  \ZSFboxArc-\ZSFgoalConditionRuleWidth\relax}
 % Abstand zwischen zwei Gliedern einer Zielkette (Bedingung, Schritt, Ziel).
 % Ein eigenes Register, weil der Abstand in der goalbox eine ENTSCHEIDUNG ist
 % und nicht das Nebenprodukt der Zeilenschaltung: Die Glieder sind verschieden
