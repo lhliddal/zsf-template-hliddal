@@ -1,0 +1,69 @@
+% Katalog A: Struktur und Navigation (Palette Slot 1).
+\ZSFNewColumn
+\StartChapter[kat:struktur]{A · Struktur}
+
+\begin{runintext}
+  Struktur-Makros haben keinen Inhalt — ihr Katalogeintrag ist der Balken
+  selbst. Die Kapitelzeile über diesem Absatz ist A-02, jeder Abschnittsbalken
+  unten sein eigener Eintrag.
+\end{runintext}
+
+\begin{defbox}[A-01 · ZSFTitleHeader][weight=quiet]
+  \ZSFindex{ZSFTitleHeader}
+  Steht genau einmal ganz oben im Dokument — in dieser Ausgabe über der
+  Lesehilfe. Nicht wiederholbar, deshalb hier nur benannt.
+\end{defbox}
+\Zweck{Dokumentkopf mit Titel und Autor.}
+
+\begin{defbox}[A-02 · StartChapter][weight=quiet]
+  \ZSFindex{StartChapter}
+  Der breite Balken am Kopf dieser Sektion. Nummeriert automatisch und
+  vergibt die Kapitelfarbe an alles, was folgt.
+\end{defbox}
+\Zweck{Hauptkapitel mit Auto-Nummer und eigener Palette-Farbe.}
+
+\begin{defbox}[A-03 · StartFrontChapter][weight=quiet]
+  \ZSFindex{StartFrontChapter}
+  Unnummeriert und in ETH-Blau — der Balken über der Lesehilfe. Das
+  Kurzlabel im optionalen Argument dient dem Register als Wegweiser.
+\end{defbox}
+\Zweck{Front- und Back-Matter ohne Kapitelnummer.}
+
+\SubsectionBar[kat:bar]{A-04 · SubsectionBar}
+\ZSFindex{SubsectionBar}
+
+\begin{defbox}[][weight=quiet]
+  \Muster
+\end{defbox}
+\Zweck{Nummerierter Abschnitt; liefert Label für Verweise und Index-Locator.}
+
+\SubsectionBar*{A-05 · SubsectionBar*}
+
+\begin{defbox}[][weight=quiet]
+  \Muster
+\end{defbox}
+\Zweck{Gliederung ohne neue Nummer — rein visuell, kein Verweisziel.}
+
+\SubsubsectionBar[kat:subsub]{A-06 · SubsubsectionBar}
+\ZSFindex{SubsubsectionBar}
+
+\begin{defbox}[][weight=quiet]
+  \Muster
+\end{defbox}
+\Zweck{Dritte Lookup-Ebene, sichtbar kleiner und heller.}
+
+\SubsubsectionBar*{A-07 · SubsubsectionBar*}
+
+\begin{defbox}[][weight=quiet]
+  \Muster
+\end{defbox}
+\Zweck{Dritte Ebene ohne Nummer.}
+
+\SubsectionBar*{A-08 · ZSFNewColumn}
+
+\begin{defbox}[][weight=quiet]
+  \ZSFindex{ZSFNewColumn}
+  Unsichtbar: erzwingt den Spaltenwechsel vor einem Strukturmakro. Steht in
+  diesem Katalog vor jedem Sektionskopf, damit jede Sektion oben beginnt.
+\end{defbox}
+\Zweck{Bewusster Spaltenumbruch statt rohem columnbreak.}

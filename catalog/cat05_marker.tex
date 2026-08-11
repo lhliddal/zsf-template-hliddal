@@ -1,0 +1,131 @@
+% Katalog E: Inline-Semantik und Verweise (Palette Slot 5).
+\ZSFNewColumn
+\StartChapter[kat:marker]{E · Marker}
+
+\begin{runintext}
+  Auszeichnungen im laufenden Text. Jeder Eintrag trägt denselben
+  Trägersatz, damit sich die Marker direkt vergleichen lassen — vier von
+  ihnen sehen absichtlich gleich aus und unterscheiden sich nur in der
+  Bedeutung.
+\end{runintext}
+
+\SubsectionBar[kat:marker-betonung]{Betonung}
+\ZSFindex{ZSFkeyword}
+\ZSFindex{ZSFlabel}
+
+\begin{defbox}[E-01 · ZSFkeyword][weight=quiet]
+  Mustertext mit \ZSFkeyword{Fachbegriff} zum Formvergleich.
+\end{defbox}
+\Zweck{Zentraler Fachbegriff als Scan-Anker; erzeugt automatisch einen
+Registereintrag. Richtwert 1--3 pro Block.}
+
+\begin{defbox}[E-02 · ZSFkeyword*][weight=quiet]
+  Mustertext mit \ZSFkeyword*{Fachbegriff} zum Formvergleich.
+\end{defbox}
+\Zweck{Dasselbe ohne Registereintrag — für Begriffe, die nur hier stehen.}
+
+\begin{defbox}[E-03 · ZSFlabel][weight=quiet]
+  Mustertext mit \ZSFlabel{Beschriftung} zum Formvergleich.
+\end{defbox}
+\Zweck{Neutrale fette Beschriftung ohne Fachbegriff-Semantik: Listenkopf,
+Zeilenmarke. Sieht aus wie E-01 und ist es nicht.}
+
+\begin{defbox}[E-04 · ZSFhl][weight=quiet]
+  Mustertext mit \ZSFhl{hervorgehobener Kernaussage} zum Formvergleich.
+\end{defbox}
+\Zweck{Die prüfungskritischste Aussage einer Box. Sparsam, sonst flacht das
+Signal ab.}
+
+\begin{defbox}[E-05 · ZSFdanger][weight=quiet]
+  Mustertext mit \ZSFdanger{Stolperfalle} zum Formvergleich.
+\end{defbox}
+\Zweck{Inline-Pille für eine kurze Warnung innerhalb einer anderen Box —
+nicht zusätzlich zur warnbox für dieselbe Aussage.}
+
+\begin{defbox}[E-06 · ZSFconclusion][weight=quiet]
+  Mustertext zum Formvergleich. \ZSFconclusion{Daraus folgt die Aussage.}
+\end{defbox}
+\Zweck{Leitet eine Folgerung ein, gesetzt als Implikationspfeil.}
+
+\SubsectionBar[kat:marker-verweis]{Verweise}
+\ZSFindex{ZSFref}
+\ZSFindex{ZSFsectionref}
+
+\begin{defbox}[E-07 · ZSFref][weight=quiet]
+  Mustertext mit Verweis \ZSFref{kat:boxen} zum Formvergleich.
+\end{defbox}
+\Zweck{Querverweis mit Pfeil, in der Farbe des Zielkapitels — der einzige
+farbtragende Marker im Fliesstext.}
+
+\begin{defbox}[E-08 · ZSFsectionref][weight=quiet]
+  Mustertext mit Zielnummer \ZSFsectionref{kat:tabellen} zum Formvergleich.
+\end{defbox}
+\Zweck{Kompakte klickbare Zielnummer ohne Pfeil — für lokale
+Inhaltsübersichten und Referenztabellen.}
+
+\begin{defbox}[E-09 · ZSFScriptRef][weight=quiet]
+  Mustertext zum Formvergleich.
+  \ZSFScriptRef{42}
+\end{defbox}
+\Zweck{Rechtsbündiger Verweis auf die Skript-Seite; nur wo das Skript in der
+Prüfung erlaubt ist.}
+
+\begin{defbox}[E-10 · ZSFTitleTag\ZSFTitleTag{hier}][weight=quiet]
+  Mustertext zum Formvergleich — das Tag steht rechts im Titel oben.
+\end{defbox}
+\Zweck{Rechtsbündiges Meta-Tag im Titel jeder Box mit Titel, auch in der
+leisen Fassung.}
+
+\begin{defbox}[E-11 · Ink-Vertrag: \ZSFref{kat:formeln} im Titel]
+  Derselbe Verweis im Inhalt: \ZSFref{kat:formeln} — hier mit seiner Farbe.
+\end{defbox}
+\Zweck{Auf einer Fläche mit eigener Kontrastfarbe geben farbtragende Marker
+ihre Farbe ab. Kein Regler, sondern automatisch.}
+
+\SubsectionBar[kat:marker-block]{Blockgliederung}
+\ZSFindex{ZSFsep}
+\ZSFindex{ZSFItem}
+
+\begin{defbox}[E-12 · ZSFsep][weight=quiet]
+  Mustertext zum Formvergleich.
+  \ZSFsep
+  Zweiter Block nach dem Trenner.
+  \ZSFsep[E-13 · ZSFsep mit Beschriftung]
+  Dritter Block, mit benanntem Trenner darüber.
+\end{defbox}
+\Zweck{Trennt Blöcke innerhalb jeder Box — nicht nur in der formulabox. Wer
+stattdessen eine zweite Box daneben stellt, hat den Trenner nicht gefunden.}
+
+\begin{ZSFlist}[E-14 · ZSFItem]
+  \ZSFItem{Mit Marke}{Mustertext zum Formvergleich.}
+  \ZSFItem{Mustertext ohne Marke — keine Marke, kein Trenner.}
+\end{ZSFlist}
+\Zweck{Listeneintrag mit optionaler Marke; eine Marke zu erfinden, damit die
+Form aufgeht, wäre eine Inhaltsänderung.}
+
+\textVorBox{E-15 · textVorBox — dieser Satz gehört zur Box darunter.}
+\begin{defbox}[][weight=quiet]
+  Mustertext zum Formvergleich.
+\end{defbox}
+\Zweck{Bindet einen Satz an die folgende Box; textNachBox an die
+vorhergehende — jede Zweckzeile dieses Katalogs ist eine.}
+
+\SubsectionBar[kat:marker-farbe]{Farbe als Bedeutung}
+\ZSFindex{Grössenfarbe}
+\ZSFindex{ZSFfontDiagramLabel}
+
+\begin{formulabox}[E-16 · Grössenfarben]
+  \[
+    \ZSFqMoment{M} = \ZSFqKraft{F} \cdot \ZSFqWeg{r}
+  \]
+  \formulanote{Mustertext zum Formvergleich.}
+\end{formulabox}
+\Zweck{Eine Farbe gehört im ganzen Dokument einer Grösse. Zwölf Slots,
+vergeben in preamble.tex, nie im Kapitel.}
+
+\begin{figbox}[E-17 · ZSFfontDiagramLabel]
+  {\ZSFfontDiagramLabel Mustertext in der Beschriftungsgrösse.}\\
+  {\ZSFfontDiagramLabelSmall Zweite Stufe für gedrängte Zusatzangaben.}
+\end{figbox}
+\Zweck{Die zwei Schriftstufen für Diagramm-Beschriftung statt lokalem tiny;
+beide zusammen skalierbar über ZSFDiagramLabelScale.}

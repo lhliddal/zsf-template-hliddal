@@ -1,0 +1,100 @@
+% Katalog G: Formelsatz und Zielketten (Palette Slot 7).
+\ZSFNewColumn
+\StartChapter[kat:formeln]{G · Formeln}
+
+\begin{runintext}
+  Die Formel-API ist immer aktiv; die erweiterten Operatoren stehen in
+  \ZSFref{kat:module}. Jeder Eintrag zeigt die Makros in ihrer gesetzten
+  Form, nicht ihren Aufruf.
+\end{runintext}
+
+\SubsectionBar[kat:formel-basis]{Basis-Makros}
+\ZSFindex{Zahlmenge}
+\ZSFindex{Begrenzer}
+
+\begin{formulabox}[G-01 · Zahlmengen]
+  \[
+    x\in\R,\quad z\in\C,\quad n\in\N,\quad k\in\Z,\quad q\in\Q
+  \]
+\end{formulabox}
+\Zweck{R, C, N, Z, Q statt rohem mathbb.}
+
+\begin{formulabox}[G-02 · Operatoren und Begrenzer]
+  \[
+    \dd x,\quad \abs{x},\quad \norm{\vect v},\quad \sgn(x)
+  \]
+  \ZSFsep
+  \[
+    \grad f,\quad \divg \vect F,\quad \rot \vect F
+  \]
+\end{formulabox}
+\Zweck{Aufrechtes Differential, gepaarte Begrenzer, Vektorsatz und die drei
+Feldoperatoren.}
+
+\begin{formulabox}[G-03 · Summe und Limes]
+  \[
+    \ZSFsumAuto{i=1}{n} i,\quad \ZSFlimAuto{x\to0}\frac{\sin x}{x}
+  \]
+\end{formulabox}
+\Zweck{Der Grenzen-Modus (side, stack, auto) wird zentral umgeschaltet, nicht
+pro Formel.}
+
+\SubsectionBar[kat:formel-anno]{Anmerkung und Benennung}
+\ZSFindex{formulanote}
+\ZSFindex{ZSFbraceunder}
+
+\begin{formulabox}[G-04 · Klammern]
+  \[
+    \ZSFbraceunder{x^2+2x+1}{Ausgangsform}
+    = \ZSFbraceover{(x+1)^2}{faktorisiert}
+  \]
+\end{formulabox}
+\Zweck{Der Name steht am Teil statt daneben — für einen zusammenhängenden
+Term der Normalfall.}
+
+\begin{formulabox}[G-05 · Anmerkungen]
+  \ZSFformulaline{a^2+b^2=c^2}{G-06 · ZSFformulaline}
+  \ZSFsep
+  \[
+    E = mc^2
+  \]
+  \formulanote{G-07 · formulanote als eigene Zeile darunter.}
+\end{formulabox}
+\Zweck{Drei Rollen, ein Stil: rechtsbündig auf der Zeile, als eigene Zeile
+darunter, oder als ganzer Satz über textNachBox.}
+
+\SubsectionBar[kat:formel-farbe]{Terme verfolgen}
+\ZSFindex{ZSFmhlA}
+
+\begin{formulabox}[G-08 · ZSFmhlA bis D]
+  \[
+    \ZSFmhlA{a}x^2 + \ZSFmhlB{b}x + \ZSFmhlD{c} = 0
+  \]
+  \ZSFsep
+  \[
+    \ZSFmhlC{x_{1,2}} = \frac{-\ZSFmhlB{b} \pm
+      \sqrt{\ZSFmhlB{b}^2 - 4\,\ZSFmhlA{a}\,\ZSFmhlD{c}}}{2\,\ZSFmhlA{a}}
+  \]
+\end{formulabox}
+\Zweck{Positional: A, B und D sind die Stränge, C ist immer das Ziel. Gilt
+innerhalb einer Herleitung — das Gegenstück sind die Grössenfarben (E-16).}
+
+\SubsectionBar[kat:formel-goal]{Zielketten}
+\ZSFindex{goalbox}
+\ZSFindex{GoalCondition}
+
+\begin{goalbox}[G-09 · Primitive]
+  \GoalCondition{Bedingung}
+  \GoalStep{\text{Zwischenschritt}}
+  \GoalStep{\text{beliebig oft wiederholbar}}
+  \GoalTarget{\text{Ziel}}
+\end{goalbox}
+\Zweck{Frei gebaute Kette: eine Bedingung, beliebig viele Schritte, ein Ziel.}
+
+\begin{goalbox}[G-10 · ZSFDerivationCase]
+  \ZSFDerivationCase*{Sternform, einzeilig}{\sqrt{x^2}}{x}
+  \ZSFsep
+  \ZSFDerivationCase{Grundform}{\sqrt{x^2}}{-x}
+\end{goalbox}
+\Zweck{Der fertige Dreisatz Bedingung, Ausdruck, Resultat für die
+Fallunterscheidung.}

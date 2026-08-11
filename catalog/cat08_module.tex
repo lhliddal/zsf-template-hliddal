@@ -1,0 +1,118 @@
+% Katalog H: Opt-in-Module (Palette Slot 8).
+\ZSFNewColumn
+\StartChapter[kat:module]{H · Module}
+
+\begin{runintext}
+  Fünf Module, die eine ZSF einzeln in \ZSFlabel{preamble.tex} zuschaltet.
+  Dieser Katalog lädt alle, damit sie beurteilbar sind — ein Fach-Fork
+  startet ohne sie.
+\end{runintext}
+
+\SubsectionBar[kat:mod-math]{11\_math\_advanced}
+\ZSFindex{Operator}
+
+\begin{formulabox}[H-01 · Erweiterte Operatoren]
+  \[
+    \begin{aligned}
+      &\Ker A,\quad \rang A,\quad \Spur A,\quad \diag(A),\\
+      &\spanop(v_1,v_2),\quad \eig(A),\quad \proj_U(v),\\
+      &\sig(A),\quad \Adj(A),\quad \Re z,\quad \Im z,\quad
+        \asterisk,\quad \oasterisk
+    \end{aligned}
+  \]
+\end{formulabox}
+\Zweck{Für LinAlg und Analysis. Ohne das Modul sind diese Namen nicht
+definiert.}
+
+\begin{formulabox}[H-02 · Klammer über Zellgrenzen]
+  \[
+    A=\begin{pmatrix}
+      1 & 0 & 4 \\
+      \tikzmark[xshift=-\ZSFspaceS]{kat-brace-left}0 &
+      1\tikzmark[xshift=\ZSFspaceS]{kat-brace-right} & 5
+    \end{pmatrix}
+  \]
+  \drawbrace[brace mirrored]{kat-brace-left}{kat-brace-right}
+  \annote[yshift=-\ZSFspaceM]{brace-\thebrace}{\ZSFfontDiagramLabel Mustertext}
+  \ZSFbraceRoom
+\end{formulabox}
+\Zweck{Der Fall, den ZSFbraceunder nicht kann. Zeichnet als Overlay ohne
+eigene Höhe — den Platz stellt ZSFbraceRoom.}
+
+\SubsectionBar[kat:mod-plots]{12\_plots}
+\ZSFindex{Plot}
+
+\begin{defbox}[H-03 · pgfplots][weight=quiet]
+  Lädt pgfplots für die \ZSFlabel{axis}-Umgebung. Vorgeführt in
+  \ZSFref{kat:bilder}, weil ein Plot dort in seinem Container steht.
+\end{defbox}
+\Zweck{Nur für Dokumente mit echten Plot-Inhalten; tikzpicture allein
+braucht das Modul nicht.}
+
+\SubsectionBar[kat:mod-code]{65\_code\_style}
+\ZSFindex{codebox}
+\ZSFindex{part}
+
+\begin{codebox}[H-04 · codebox]
+\begin{lstlisting}[style=CodeExpert]
+# Mustertext zum Formvergleich
+def beispiel(text="Zeichenkette", zahl=42):
+    if zahl > 0:
+        return text
+    return None
+\end{lstlisting}
+\end{codebox}
+\Zweck{Code-Container mit CodeExpert-Stil; Kommentare sind nativ, nicht über
+CodeLine.}
+
+\begin{codebox}[H-05 · part=first][part=first]
+\begin{lstlisting}[style=CodeExpert]
+# Rahmen oben, unten offen
+werte = [1, 2, 3]
+\end{lstlisting}
+\end{codebox}
+\begin{codebox}[][part=mid]
+\begin{lstlisting}[style=CodeExpert]
+# part=mid: beide Kanten offen
+summe = sum(werte)
+\end{lstlisting}
+\end{codebox}
+\begin{codebox}[][part=last]
+\begin{lstlisting}[style=CodeExpert]
+# part=last: Rahmen unten
+print(summe)
+\end{lstlisting}
+\end{codebox}
+\Zweck{Mehrteilige Gruppe mit offenen Kanten. Vorbelegung: whole.}
+
+\SubsectionBar[kat:mod-comments]{67\_code\_comments}
+\ZSFindex{CodeLine}
+
+\begin{defbox}[H-06 · CodeLine][weight=quiet]
+  \ttfamily
+  \CodeLine{kurz = 1}[passt rechts daneben]\\
+  \CodeLine{sehr_langer_variablenname = 1}[zu breit, deshalb darüber]\\
+  \CodeLine{limit = 10}\InlineComment{H-07 · InlineComment}\\
+  \OverlineComment{H-08 · OverlineComment}
+  \CodeLine{fertig = True}
+\end{defbox}
+\Zweck{Entscheidet nach Breite, wo der Kommentar steht. Wirkt in jeder
+Textbox, aber nicht in lstlisting — unabhängig von 65.}
+
+\SubsectionBar[kat:mod-index]{66\_index}
+\ZSFindex{Stichwortverzeichnis}
+\ZSFindexsee{Register}{Stichwortverzeichnis}
+
+\begin{defbox}[H-09 · ZSFindex][weight=quiet]
+  Unsichtbarer Registereintrag für Begriffe, die nicht als
+  \ZSFkeyword*{ZSFkeyword} im Text stehen. Jeder Eintrag dieses Katalogs
+  setzt einen — das Ergebnis steht am Dokumentende.
+\end{defbox}
+\Zweck{Für Box-Titel, Verfahrensnamen und Tabellen-Themen.}
+
+\begin{defbox}[H-10 · ZSFindexsee][weight=quiet]
+  Verweis von einem Synonym auf den kanonischen Begriff, samt farbcodierter
+  Zielnummer. Im Register steht »Register, siehe Stichwortverzeichnis«.
+\end{defbox}
+\Zweck{Abkürzungen, Eponyme, Einheiten und Symbole auf den Sachbegriff
+führen — der wertvollste Hebel für die Auffindbarkeit.}

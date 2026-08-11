@@ -1,0 +1,216 @@
+% Katalog I: Inventar — jede API-Einheit einmal, mit Codestelle (Slot 9).
+% Der visuelle Teil (A–H) zeigt, WIE etwas aussieht. Diese Sektion zeigt,
+% WAS es ist und WO es lebt — die zwei Fragen, die beim Aussortieren
+% unmittelbar auf die Entscheidung folgen.
+\ZSFNewColumn
+\StartChapter[kat:inventar]{I · Inventar}
+
+\begin{runintext}
+  Jede Einheit der stabilen API genau einmal, nach Quelldatei gruppiert.
+  Ein Strich statt einer ID heisst: hat keine eigene Darstellung, steht
+  deshalb nicht im visuellen Teil.
+\end{runintext}
+
+\SubsectionBar[kat:inv-arten]{Drei Arten von Eingriff}
+\ZSFindex{Inventar}
+
+\begin{ZSFlist}
+  \ZSFItem{Umgebung}{Eigener Name mit \ZSFlabel{begin/end}. Streichen heisst:
+  Name weg, vorhandene Aufrufe auf einen anderen Baustein umstellen.}
+  \ZSFItem{Reglerwert}{Ein Zweig in der Box-Fabrik. Streichen heisst: der
+  Wert entfällt, die Vorbelegung bleibt — kein Aufruf verliert seine Box.}
+  \ZSFItem{Makro}{Ein Befehl. Streichen heisst: Befehl weg, Aufrufe ersetzen.}
+\end{ZSFlist}
+\Zweck{Die Unterscheidung entscheidet, was ein »weg damit« überhaupt kostet.}
+
+\begin{defbox}[Wo das meiste liegt][weight=quiet]
+  \ZSFhl{34 der 104 Namen stehen in 60\_boxes.tex} — mit 78 KB zugleich die
+  grösste Datei. Wer dort etwas entfernt, arbeitet an der Box-Fabrik, die
+  alle Boxen gemeinsam tragen.
+\end{defbox}
+
+\SubsectionBar[kat:inv-boxes]{60\_boxes.tex · 34}
+\ZSFindex{Box-Fabrik}
+
+\begin{tablebox}[Umgebungen]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    defbox & B-02 \\
+    figbox & B-08 \\
+    formulabox & B-06 \\
+    goalbox & B-09 \\
+    runintext & B-01 \\
+    splitbox & B-05 \\
+    tablebox & B-07 \\
+    valuegrid & B-10 \\
+    warnbox & B-03 \\
+    ZSFboxgroup & B-11 \\
+    ZSFinset & B-12 \\
+    ZSFlist & B-04
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[Makros aus derselben Datei]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    GoalCondition & G-09 \\
+    GoalStep & G-09 \\
+    GoalTarget & G-09 \\
+    SubsectionBar & A-04 \\
+    SubsubsectionBar & A-06 \\
+    formulanote & G-07 \\
+    ZSFBoxesBreakableOn & --- \\
+    ZSFBoxesBreakableOff & --- \\
+    ZSFBreakReservesOff & --- \\
+    ZSFDerivationCase & G-10 \\
+    ZSFItem & E-14 \\
+    ZSFNewColumn & A-08 \\
+    ZSFTitleHeader & A-01 \\
+    ZSFTitleTag & E-10 \\
+    ZSFdanger & E-05 \\
+    ZSFfig & F-01 \\
+    ZSFfigcaption & F-05 \\
+    ZSFfigside & F-03 \\
+    ZSFformulaline & G-06 \\
+    ZSFgroupcols & B-11 \\
+    ZSFimage & D-09 \\
+    ZSFsep & E-12
+  \end{ZSFtable}
+\end{tablebox}
+
+\SubsectionBar[kat:inv-knobs]{Reglerwerte · 18 Schlüssel}
+\ZSFindex{Reglerwert}
+
+\begin{tablebox}[Alle in der Box-Fabrik]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.05} Y{1.25} Z{0.55}}
+    \ZSFheaderRow \ZSFhead{Schlüssel} & \ZSFhead{ausser Default}
+                  & \ZSFhead{ID} \\
+    align & center & C-12 \\
+    atomic & Flag & C-15 \\
+    bodyparskip & inherit & C-14 \\
+    colsep & tight & D-07 \\
+    font & dense & C-13 \\
+    frame & strong, hard, none & C-09 \\
+    grid & horizontal, none & C-21 \\
+    header & false & D-02 \\
+    ordered & Flag & C-20 \\
+    padx & bar, none & C-05 \\
+    pady & tight, none & C-07 \\
+    part & first, mid, last & H-05 \\
+    rows & roomy, tight & D-05 \\
+    split & Anteil & C-16 \\
+    splitalign & center, bottom & C-17 \\
+    tone & neutral, warn & C-01 \\
+    weight & quiet & C-03 \\
+    zebra & false & D-03
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Vier gehören genau einer Box: ordered, grid, part und die vier
+Tabellen-Regler. Alle übrigen gelten auf jeder Box.}
+
+\SubsectionBar[kat:inv-rest]{Die übrigen Module}
+\ZSFindex{Modul}
+
+\begin{tablebox}[10\_math.tex · 19]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    R, C, N, Z, Q & G-01 \\
+    dd, vect, abs, norm & G-02 \\
+    ZSFsumAuto, ZSFlimAuto & G-03 \\
+    ZSFbraceunder, -over & G-04 \\
+    ZSFmhlA bis D & G-08 \\
+    SetZSFsumMode & --- \\
+    SetZSFlimMode & ---
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[20\_tables.tex · 12]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    ZSFtable & D-01 \\
+    ZSFheaderRow, ZSFhead & D-01 \\
+    ZSFspan & D-08 \\
+    L, C, R, F & D-11 \\
+    Y, Z, Q & D-12 \\
+    SetZSFzebraBG & ---
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{C, Q, R und Z heissen hier Spaltentyp und in 10\_math Zahlmenge —
+derselbe Buchstabe, zwei Bedeutungen, getrennt durch den Kontext.}
+
+\begin{tablebox}[50\_typography\_semantics.tex · 13]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    ZSFkeyword & E-01 \\
+    ZSFlabel & E-03 \\
+    ZSFhl & E-04 \\
+    ZSFconclusion & E-06 \\
+    ZSFref & E-07 \\
+    ZSFsectionref & E-08 \\
+    ZSFScriptRef & E-09 \\
+    ZSFfontDiagramLabel & E-17 \\
+    ZSFfontDiagramLabelSmall & E-17 \\
+    ZSFkeywordStyle & --- \\
+    ZSFlabelStyle & --- \\
+    ZSFhlStyle & --- \\
+    ZSFDiagramLabelScale & ---
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[30\_layout\_spacing.tex · 14]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    textVorBox, textNachBox & E-15 \\
+    ZSFgap & --- \\
+    ZSFSectionGap & --- \\
+    ZSFDensityFactor & --- \\
+    ZSFDensityBoxes & --- \\
+    ZSFDensityText & --- \\
+    ZSFDensityTables & --- \\
+    ZSFDensityStructure & --- \\
+    ZSFLeadingFactor & --- \\
+    ZSFBarGapFactor & --- \\
+    ZSFBreakReserveFactor & --- \\
+    ZSFChapterDensity & --- \\
+    ZSFChapterDensityReset & ---
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[40\_colors\_structure.tex · 6]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    StartChapter & A-02 \\
+    StartFrontChapter & A-03 \\
+    ZSFDeclareQuantity & E-16 \\
+    ZSFDeclareTone & --- \\
+    ZSFQuantityColorsOn & --- \\
+    ZSFQuantityColorsOff & ---
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[55\_readability.tex · 5]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.5} Z{0.6}}
+    \ZSFheaderRow \ZSFhead{Name} & \ZSFhead{ID} \\
+    ZSFbreak & --- \\
+    ZSFnobreak & --- \\
+    ZSFallowbreak & --- \\
+    ZSFReadableBodyOn & --- \\
+    ZSFReadableBodyOff & ---
+  \end{ZSFtable}
+\end{tablebox}
+
+\begin{tablebox}[Opt-in-Module]
+  \begin{ZSFtable}[font=dense, rows=tight, colsep=tight]{Y{1.05} Y{1.25} Z{0.55}}
+    \ZSFheaderRow \ZSFhead{Modul} & \ZSFhead{Name} & \ZSFhead{ID} \\
+    11 & Operatoren & H-01 \\
+    11 & drawbrace, tikzmark & H-02 \\
+    12 & pgfplots & H-03 \\
+    65 & codebox & H-04 \\
+    67 & CodeLine & H-06 \\
+    67 & InlineComment & H-07 \\
+    67 & OverlineComment & H-08 \\
+    66 & ZSFindex & H-09 \\
+    66 & ZSFindexsee & H-10 \\
+    66 & ZSFIndexShowPageNumber & ---
+  \end{ZSFtable}
+\end{tablebox}

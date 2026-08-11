@@ -1,0 +1,188 @@
+% Katalog C: die Instanz-Regler (Palette Slot 3).
+\ZSFNewColumn
+\StartChapter[kat:regler]{C · Regler}
+
+\begin{runintext}
+  Die Regler sind das eigentliche Gestaltungsangebot. Alle stehen an
+  derselben \ZSFkeyword{defbox} mit demselben Mustertext — was sich
+  unterscheidet, ist allein der Regler. Vorbelegungen sind nicht als eigener
+  Eintrag geführt, sondern in der Zweckzeile genannt; C-00 ist die Referenz.
+\end{runintext}
+
+\begin{defbox}[C-00 · Referenz]
+  \Muster
+\end{defbox}
+\Zweck{Dieselbe Box ohne jede Option. Jeder Eintrag unten weicht in genau
+einem Regler davon ab.}
+
+\SubsectionBar[kat:regler-farbe]{Farbe und Gewicht}
+\ZSFindex{tone}
+\ZSFindex{weight}
+
+\begin{defbox}[C-01 · tone=neutral][tone=neutral]
+  \Muster
+\end{defbox}
+\Zweck{Diese Box gehört nicht zum Kapitelthema — Meta-Hinweis, Konvention,
+Legende. Vorbelegung: chapter.}
+
+\begin{defbox}[C-02 · tone=warn][tone=warn]
+  \Muster
+\end{defbox}
+\Zweck{Warn-Farbwelt an einer beliebigen Box, ohne den Namen warnbox.}
+
+\begin{defbox}[C-03 · weight=quiet][weight=quiet]
+  \Muster
+\end{defbox}
+\Zweck{Titel wandert in die erste Inhaltszeile, Kopfbalken weicht einem
+linken Akzent. Vorbelegung: loud.}
+
+\begin{defbox}[C-04 · weight + tone][weight=quiet, tone=warn]
+  \Muster
+\end{defbox}
+\Zweck{Zwei Regler zusammen — die leise Fassung nimmt den Ton über ihren
+Akzent entgegen, nicht über eine Fläche.}
+
+\SubsectionBar[kat:regler-raum]{Innenabstand}
+\ZSFindex{padx}
+\ZSFindex{pady}
+
+\begin{defbox}[C-05 · padx=bar][padx=bar]
+  \Muster
+\end{defbox}
+\Zweck{Links mehr Rand, damit der Inhalt den Akzentbalken freihält.
+Vorbelegung: normal.}
+
+\begin{defbox}[C-06 · padx=none][padx=none]
+  \Muster
+\end{defbox}
+\Zweck{Die Box polstert waagrecht gar nicht — für Inhalt, der es selbst tut.}
+
+\begin{defbox}[C-07 · pady=tight][pady=tight]
+  \Muster
+\end{defbox}
+\Zweck{Knappe Höhe oben und unten. Vorbelegung: normal.}
+
+\begin{defbox}[C-08 · pady=none][pady=none]
+  \Muster
+\end{defbox}
+\Zweck{Senkrecht ohne jede Polsterung.}
+
+\SubsectionBar[kat:regler-kontur]{Kontur und Ausrichtung}
+\ZSFindex{frame}
+\ZSFindex{align}
+
+\begin{defbox}[C-09 · frame=strong][frame=strong]
+  \Muster
+\end{defbox}
+\Zweck{Kräftigere Kontur; die Farbe kommt weiterhin aus dem Ton.
+Vorbelegung: soft.}
+
+\begin{defbox}[C-10 · frame=hard][frame=hard]
+  \Muster
+\end{defbox}
+\Zweck{Die stärkste Stufe.}
+
+\begin{defbox}[C-11 · frame=none][frame=none]
+  \Muster
+\end{defbox}
+\Zweck{Kein Rahmen, Kopfzeile bleibt — Rahmen und Gewicht sind zwei Fragen.}
+
+\begin{defbox}[C-12 · align=center][align=center]
+  \Muster
+\end{defbox}
+\Zweck{Zentrierter Boxinhalt. Vorbelegung: left, also Flattersatz für
+schmale Spalten.}
+
+\SubsectionBar[kat:regler-satz]{Satz und Umbruch}
+\ZSFindex{font}
+\ZSFindex{bodyparskip}
+\ZSFindex{atomic}
+
+\begin{defbox}[C-13 · font=dense][font=dense]
+  \Muster
+\end{defbox}
+\Zweck{Inhalt eine Stufe kleiner, Titel unverändert. Vorbelegung: normal.}
+
+\begin{defbox}[C-14 · bodyparskip=inherit][bodyparskip=inherit]
+  \Muster
+
+  Sichtbar wird der Unterschied erst am zweiten Absatz.
+\end{defbox}
+\Zweck{Absatzabstand aus dem Dokument statt aus der Box. Vorbelegung: box.}
+
+\begin{defbox}[C-15 · atomic][atomic]
+  \Muster
+\end{defbox}
+\Zweck{Bricht nie über eine Spaltengrenze — auch nicht im Pack-Modus. Flag
+ohne Wert, im Einzeleintrag nicht sichtbar.}
+
+\SubsectionBar[kat:regler-split]{Zweispaltiger Inhalt}
+\ZSFindex{split}
+\ZSFindex{splitalign}
+
+\begin{defbox}[C-16 · split=0.4][split=0.4]
+  \MusterKurz
+  \tcblower
+  Die rechte Hälfte. Ohne tcblower landet alles links.
+\end{defbox}
+\Zweck{Anteil der linken Hälfte; gilt auf jeder Box, nicht nur splitbox.}
+
+\begin{defbox}[C-17 · splitalign=top][split=0.4, splitalign=top]
+  \MusterKurz
+  \tcblower
+  Die rechte Hälfte ist absichtlich länger, damit die Ausrichtung der
+  beiden Hälften zueinander sichtbar wird.
+\end{defbox}
+\Zweck{Hälften an der Oberkante — für Diagramm neben Legende.
+Vorbelegung: top.}
+
+\begin{defbox}[C-18 · splitalign=center][split=0.4, splitalign=center]
+  \MusterKurz
+  \tcblower
+  Die rechte Hälfte ist absichtlich länger, damit die Ausrichtung der
+  beiden Hälften zueinander sichtbar wird.
+\end{defbox}
+\Zweck{Hälften mittig — für Formel neben Erklärung.}
+
+\begin{defbox}[C-19 · splitalign=bottom][split=0.4, splitalign=bottom]
+  \MusterKurz
+  \tcblower
+  Die rechte Hälfte ist absichtlich länger, damit die Ausrichtung der
+  beiden Hälften zueinander sichtbar wird.
+\end{defbox}
+\Zweck{Hälften auf Grundlinie.}
+
+\SubsectionBar[kat:regler-eigen]{Regler mit nur einem Besitzer}
+\ZSFindex{ordered}
+\ZSFindex{grid}
+
+\begin{runintext}
+  Vier Regler gehören genau einer Box und brechen auf jeder anderen mit einer
+  Meldung. Zwei stehen hier, die Tabellen-Regler in \ZSFref{kat:tabellen},
+  \ZSFkeyword*{part} in \ZSFref{kat:module}.
+\end{runintext}
+
+\begin{ZSFlist}[C-20 · ordered][ordered]
+  \ZSFItem{Erster Schritt}{Mustertext zum Formvergleich.}
+  \ZSFItem{Zweiter Schritt}{Die Nummerierung kommt aus dem Regler.}
+\end{ZSFlist}
+\Zweck{ZSFlist nummeriert statt aufgezählt — nur bei stabiler Schrittfolge.}
+
+\begin{valuegrid}[C-21 · grid=horizontal][grid=horizontal]{2}
+  Mustertext & zum & Formvergleich \\
+  Zweite Zeile & nur & Zeilenlinien
+\end{valuegrid}
+\Zweck{valuegrid ohne Senkrechte. Vorbelegung: both.}
+
+\begin{valuegrid}[C-22 · grid=none][grid=none]{2}
+  Mustertext & zum & Formvergleich \\
+  Zweite Zeile & ganz & ohne Gitter
+\end{valuegrid}
+\Zweck{Gar keine Linien — wo die Spalten selbst sprechen.}
+
+\begin{defbox}[C-23 · ZSFlist ohne Titel][tone=neutral, weight=quiet]
+  Ohne Titel entsteht keine Box, also gibt es keinen Träger für die
+  Box-Regler. \ZSFkeyword*{ordered} und \ZSFkeyword*{tone} wirken trotzdem,
+  jeder andere Regler bricht dort mit einer Meldung ab.
+\end{defbox}
+\Zweck{Bekannte Sonderstelle im Reglersystem, kein eigener Baustein.}

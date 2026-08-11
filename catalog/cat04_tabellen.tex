@@ -1,0 +1,160 @@
+% Katalog D: Tabellen und Gitter (Palette Slot 4).
+\ZSFNewColumn
+\StartChapter[kat:tabellen]{D · Tabellen}
+
+\begin{runintext}
+  Eine Tabellen-Umgebung mit fünf Reglern, dazu das kompakte
+  \ZSFkeyword{valuegrid}. Alle Einträge tragen denselben Zellinhalt, damit
+  die Regler und nicht die Daten den Unterschied machen.
+\end{runintext}
+
+\SubsectionBar[kat:tab-basis]{Kopfzeile und Zebra}
+\ZSFindex{ZSFtable}
+\ZSFindex{header}
+\ZSFindex{zebra}
+
+\begin{tablebox}[D-01 · ZSFtable]
+  \begin{ZSFtable}{Y{1.0} Y{1.0}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & zeigt das Zebra \\
+    Dritte Zeile & zeigt den Wechsel
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Vorbelegung: Kopfzeile an, Zebra ab Zeile 2. Kopfzeile braucht immer
+beide Makros — ZSFheaderRow färbt, ZSFhead setzt die Schrift.}
+
+\begin{tablebox}[D-02 · header=false]
+  \begin{ZSFtable}[header=false]{Y{1.0} Y{1.0}}
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & Zebra ab Zeile 1 \\
+    Dritte Zeile & zeigt den Wechsel
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Ohne Kopfzeile beginnt das Zebra bei der ersten Zeile — für reine
+Datenlisten.}
+
+\begin{tablebox}[D-03 · zebra=false]
+  \begin{ZSFtable}[header=false, zebra=false]{Y{1.0} Y{1.0}}
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & ohne Streifen \\
+    Dritte Zeile & zeigt den Wechsel
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Keine Streifen — für sehr kurze Tabellen.}
+
+\SubsectionBar[kat:tab-mass]{Schrift, Zeilenhöhe, Polsterung}
+\ZSFindex{rows}
+\ZSFindex{colsep}
+
+\begin{tablebox}[D-04 · font=dense]
+  \begin{ZSFtable}[font=dense]{Y{1.0} Y{1.0}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & eine Stufe kleiner
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Für lange Register mit knappem Zellinhalt. Derselbe Reglername wie
+an der Box, dieselbe Bedeutung.}
+
+\begin{tablebox}[D-05 · rows=roomy]
+  \begin{ZSFtable}[rows=roomy]{Y{1.0} Z{1.0}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    Mustertext & $\dfrac{\Delta y}{\Delta x}$ \\
+    Zweite Zeile & $\dfrac{a+b}{2}$
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Mehr Luft, wo hoher Zellinhalt sonst an die Zeilenkante stösst.
+Vorbelegung: normal.}
+
+\begin{tablebox}[D-06 · rows=tight]
+  \begin{ZSFtable}[rows=tight, header=false]{Y{1.0} Q{1.0}}
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & knapp \\
+    Dritte Zeile & dicht
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Knappe Zeilen für Register mit einzeiligem Kurzinhalt.}
+
+\begin{tablebox}[D-07 · colsep=tight]
+  \begin{ZSFtable}[font=dense, colsep=tight]{Y{1.4} Z{0.9} Z{0.9} Z{0.8}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{A} & \ZSFhead{B} & \ZSFhead{C} \\
+    Mustertext & 12 & 24 & 36 \\
+    Zweite Zeile & 20 & 40 & 60
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Knappe Zellpolsterung für vielspaltige Tabellen — zugleich zwischen
+den Spalten und an der Boxkante. Vorbelegung: normal.}
+
+\SubsectionBar[kat:tab-struktur]{Zellverbund, Bild, Linien}
+\ZSFindex{ZSFspan}
+\ZSFindex{ZSFimage}
+
+\begin{tablebox}[D-08 · ZSFspan]
+  \begin{ZSFtable}{Y{1.2} Z{0.9} Z{0.9} Z{0.8}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFspan{C}{2}{\ZSFhead{Gruppe}}
+                                  & \ZSFhead{C} \\
+    Mustertext & 12 & 24 & 36 \\
+    \ZSFspan{L}{4}{\ZSFlabel{Abschnittszeile über die volle Breite}} \\
+    Zweite Zeile & 20 & 40 & 60
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Ein Baustein für drei Rollen: gruppierter Kopf, Formel über die
+Breite, Abschnittszeile. Die Ausrichtung ist Pflichtargument, der Inhalt
+bricht nicht um.}
+
+\begin{tablebox}[D-09 · ZSFimage in der Zelle]
+  \begin{ZSFtable}[colsep=tight]{Z{0.8} Y{1.0} Y{1.2}}
+    \ZSFheaderRow \ZSFhead{Bild} & \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    \ZSFimage{example-image-a} & Mustertext & ohne Höhenangabe \\
+    \ZSFimage{example-image-b} & Zweite Zeile & gleich hoch von selbst
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Das Bild ohne eigene Box; die Höhe stellt der Container, nicht der
+Aufruf.}
+
+\begin{tablebox}[D-10 · Linien]
+  \begin{ZSFtable}[header=false, zebra=false]{Y{1.0} | Q{1.0}}
+    Mustertext & zum Formvergleich \\ \hline
+    Zweite Zeile & nach hline \\
+    Dritte Zeile & senkrecht getrennt
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Vorbelegung ist ohne Linien, aber hline und der Pipe in der
+Spaltenangabe bleiben erlaubt — nur ihre Farbe wird nicht lokal gesetzt.}
+
+\SubsectionBar[kat:tab-spalten]{Spaltentypen}
+\ZSFindex{Spaltentyp}
+
+\begin{tablebox}[D-11 · L C R F]
+  \begin{ZSFtable}[header=false, zebra=false]{L C R F{1}}
+    L links & C zentriert & R rechts & F{1}: x^2+1
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Gleichverteilt mit Faktor 1; F ist der neutrale Typ für Mathe-Inhalt.}
+
+\begin{tablebox}[D-12 · Y Z Q mit Gewicht]
+  \begin{ZSFtable}[header=false, zebra=false]{Y{1.4} Z{0.8} Q{0.8}}
+    Y links, Gewicht 1.4 & Z zentriert & Q rechts
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Dieselben drei Ausrichtungen mit frei wählbarem Gewicht; die Summe
+der Faktoren entspricht der Anzahl Spalten.}
+
+\SubsectionBar[kat:tab-grid]{Wertegitter}
+\ZSFindex{valuegrid}
+
+\begin{valuegrid}[D-13 · valuegrid]{3}
+  Mustertext & 12 & 24 & 36 \\
+  Zweite Zeile & 20 & 40 & 60 \\
+  Dritte Zeile & 30 & 60 & 90
+\end{valuegrid}
+\Zweck{Festes Gitter, erste Spalte immer Beschriftung. Nimmt rows, colsep
+und grid unter denselben Namen wie die ZSFtable.}
+
+\begin{valuegrid}[D-14 · valuegrid rows=tight][rows=tight, colsep=tight]{3}
+  Mustertext & 12 & 24 & 36 \\
+  Zweite Zeile & 20 & 40 & 60 \\
+  Dritte Zeile & 30 & 60 & 90
+\end{valuegrid}
+\Zweck{Dieselben Masse-Regler wie an der Tabelle, hier zusammen gesetzt.}

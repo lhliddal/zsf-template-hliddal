@@ -1,0 +1,59 @@
+% ============================================================
+% BAUSTEIN-KATALOG — zweites Dokument neben main.tex
+% ============================================================
+% Zweck: EINE Seite Wahrheit darüber, was das Template an sichtbaren
+% Bausteinen hergibt. Jeder Eintrag zeigt denselben Mustertext, damit
+% Unterschiede rein gestalterisch sind und Redundanz auffällt.
+%
+% Das ist bewusst KEINE zweite Showcase:
+%   main.tex  — führt die Bausteine im Fluss einer ZSF vor (Referenz-
+%               Implementierung, Grundlage von check_showcase_coverage).
+%   catalog   — reiht sie zum Vergleich nebeneinander (Arbeitsinstrument
+%               fürs Aussortieren; prüft nichts und wird von nichts geprüft).
+%
+% Bauen: make catalog   →  catalog.pdf (im Root, versioniert)
+% Läuft aus dem Repo-Root, deshalb sind alle Pfade root-relativ.
+% ============================================================
+\documentclass[8pt]{extarticle}
+
+% Katalog-Modus: lädt ALLE Opt-in-Module, sonst fehlten codebox, Index,
+% math_advanced und pgfplots — also genau die Bausteine, über die man beim
+% Aussortieren entscheiden will. Derselbe Marker wie in main.tex.
+\newcommand{\ZSFShowcaseMode}{}
+\input{preamble}
+
+% ── Katalog-Werkzeug ────────────────────────────────────────────────
+% Diese drei Makros gehören dem KATALOG, nicht dem Template. Sie stehen
+% hier auf Dokument-Ebene und nicht in einer Kapiteldatei — ein Kapitel
+% definiert keine Makros (rules/02_ai_mandate).
+%
+% \Muster ist in jedem Eintrag identisch. Das ist der ganze Trick des
+% Katalogs: Was sich zwischen zwei Einträgen unterscheidet, ist dann der
+% Baustein und nie der Inhalt.
+\newcommand{\Muster}{Mustertext zum Formvergleich. Die zweite Zeile zeigt,
+wie der Container umbricht und wie eng er seinen Inhalt fasst.}
+\newcommand{\MusterKurz}{Mustertext zum Formvergleich.}
+
+% Die Zweckzeile: wofür der Eintrag da ist, in einem Satz. Als \textNachBox,
+% damit sie optisch am Eintrag klebt und nicht als eigener Block liest.
+\newcommand{\Zweck}[1]{\textNachBox{#1}}
+
+\begin{document}
+\setcounter{section}{0}
+\begin{multicols*}{4}
+\ZSFReadableAuto
+
+\input{catalog/cat00_lesehilfe}
+\input{catalog/cat01_struktur}
+\input{catalog/cat02_boxen}
+\input{catalog/cat03_regler}
+\input{catalog/cat04_tabellen}
+\input{catalog/cat05_marker}
+\input{catalog/cat06_bilder}
+\input{catalog/cat07_formeln}
+\input{catalog/cat08_module}
+\input{catalog/cat09_inventar}
+\input{catalog/cat10_register}
+
+\end{multicols*}
+\end{document}

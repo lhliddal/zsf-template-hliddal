@@ -34,7 +34,7 @@ IDENTITY_FORCE := $(shell if [ ! -f "$(IDENTITY_STAMP)" ] || [ "$$(cat "$(IDENTI
 # Optional local-only automation; Makefile.local is gitignored.
 -include Makefile.local
 
-.PHONY: build rebuild check check-deep check-all clean all \
+.PHONY: build rebuild catalog catalog-rebuild catalog-status check check-deep check-all clean all \
         check-main-full check-chapters check-tables check-refs check-index check-styles check-optional-modules check-init-project \
         check-root-clean check-pdf-identity check-guardrails check-showcase-coverage check-box-options \
         check-global-knobs check-ink-contract check-spacing-registers check-scopes lint \
@@ -59,6 +59,43 @@ build:
 rebuild: LATEXMK_FORCE := -g
 rebuild: build
 
+# --- Baustein-Katalog ---------------------------------------------------
+# Zweites Dokument neben main.tex: reiht jeden sichtbaren Baustein mit
+# identischem Mustertext nebeneinander, damit Redundanz auffaellt. Nutzt
+# dieselbe preamble.tex und dieselben styles/ wie die ZSF — sonst beurteilte
+# man etwas anderes als das, was im Satz tatsaechlich passiert.
+#
+# Eigener outdir, damit die Aux-Dateien nicht mit denen von main.tex
+# kollidieren. Laeuft aus dem Repo-Root, weil catalog.tex root-relativ
+# inputtet. Kein Teil von 'make check': der Katalog ist ein
+# Arbeitsinstrument, kein Prueffgegenstand (catalog/catalog.tex, Kopf).
+catalog:
+	@mkdir -p $(BUILD_DIR)/catalog
+	INDEXSTYLE="$(CURDIR)/styles:" \
+	latexmk $(LATEXMK_FORCE) $(LATEXMK_FLAGS) -outdir=$(BUILD_DIR)/catalog -auxdir=$(BUILD_DIR)/catalog \
+		-e '$$makeindex = q{upmendex -r -s zsfindex.ist %O -o %D %S || { test ! -s %S && touch %D; }};' \
+		-pdflualatex="lualatex %O '$(LATEX_DEFS)\input{%S}'" catalog/catalog.tex
+	@cp $(BUILD_DIR)/catalog/catalog.pdf catalog.pdf
+	@echo "Katalog gebaut: catalog.pdf"
+
+catalog-rebuild: LATEXMK_FORCE := -g
+catalog-rebuild: catalog
+
+# Frische-Hinweis, kein Gate. catalog.pdf ist versioniert und bildet damit
+# einen Systemstand ab — ein veraltetes PDF im Repo behauptet etwas Falsches.
+# Bewusst nur eine Meldung: Wer an der ZSF arbeitet, muss den Katalog nicht
+# mitziehen, und ein Build im Alltags-Gate spraengte dessen Zeitbudget.
+# Vergleicht mtime und ist damit groeber als latexmk (das Inhalte vergleicht) —
+# ein Fehlalarm kostet nur ein 'make catalog', das dann nichts zu tun findet.
+catalog-status:
+	@if [ ! -f catalog.pdf ]; then \
+	  echo "Katalog: catalog.pdf fehlt — 'make catalog'."; \
+	elif [ -n "$$(find catalog preamble.tex styles -name '*.tex' -newer catalog.pdf -print -quit 2>/dev/null)" ]; then \
+	  echo "Katalog: catalog.pdf ist VERALTET — 'make catalog' vor dem Commit."; \
+	else \
+	  echo "Katalog: catalog.pdf aktuell."; \
+	fi
+
 # --- Verifier: drei Stufen ---------------------------------------------
 # 'make check'      — Alltags-Gate (<30 s): Build + alle Schnellprüfungen
 #                     (Struktur, Tabellen, Refs, Index, Style-Tokens, Root,
@@ -82,6 +119,7 @@ check: build check-main-full check-chapters check-tables check-refs check-index 
        check-root-clean check-pdf-identity check-guardrails check-showcase-coverage \
        check-scopes lint check-rule-authorship check-rules
 	@bash tests/run_deep_checks.sh status
+	@$(MAKE) --no-print-directory catalog-status
 	@echo "make check: alle Schnellprüfungen bestanden."
 
 check-deep:

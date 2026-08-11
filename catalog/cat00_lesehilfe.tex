@@ -1,0 +1,58 @@
+% Katalog: Einstieg, ID-System, Sektionsübersicht (Palette Slot 0).
+\ZSFTitleHeader{Baustein-Katalog}{\ZSFOwnerDisplayName}
+\StartFrontChapter[Kat]{Lesehilfe}
+
+\begin{runintext}
+  Jeder sichtbare Baustein des Templates einmal, mit identischem Mustertext.
+  Was sich zwischen zwei Einträgen unterscheidet, ist deshalb der Baustein
+  und nie der Inhalt.
+\end{runintext}
+
+\SubsectionBar*{Aufbau eines Eintrags}
+\ZSFindex{Eintrag}
+
+\begin{defbox}[B-00 · Aufbau]
+  \Muster
+\end{defbox}
+\Zweck{Titel trägt ID und Bausteinnamen, der Inhalt ist überall derselbe,
+diese Zeile nennt den Zweck.}
+
+\begin{defbox}[Die drei Teile][weight=quiet]
+  \ZSFlabel{ID:} adressierbar — »C-11 raus« genügt als Auftrag.
+  \ZSFlabel{Name:} der Baustein oder der Regler samt Wert.
+  \ZSFlabel{Zweckzeile:} wofür er gedacht war, in einem Satz.
+\end{defbox}
+
+\SubsectionBar*{Sektionen}
+\ZSFindex{Sektionen}
+
+\begin{tablebox}[Wo was steht]
+  \begin{ZSFtable}{Z{0.34} Y{1.10} Y{1.56}}
+    \ZSFheaderRow \ZSFhead{ID} & \ZSFhead{Kap.} & \ZSFhead{Inhalt} \\
+    A & \ZSFsectionref{kat:struktur} & Kapitel, Balken, Umbruch \\
+    B & \ZSFsectionref{kat:boxen} & die Box-Umgebungen \\
+    C & \ZSFsectionref{kat:regler} & jeder Regler, jeder Wert \\
+    D & \ZSFsectionref{kat:tabellen} & ZSFtable, valuegrid, Gruppe \\
+    E & \ZSFsectionref{kat:marker} & Inline-Semantik, Verweise \\
+    F & \ZSFsectionref{kat:bilder} & Abbildungen \\
+    G & \ZSFsectionref{kat:formeln} & Formelsatz, Zielketten \\
+    H & \ZSFsectionref{kat:module} & Opt-in-Module \\
+    I & \ZSFsectionref{kat:inventar} & Liste: Art, ID, Codestelle
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{A bis H zeigen, wie ein Baustein aussieht. I sagt, was er ist und in
+welcher Datei er lebt — die beiden Fragen nach der Entscheidung.}
+
+\begin{defbox}[Vollständigkeit][tone=neutral, weight=quiet]
+  102 gezeigte Einträge in A--H, alle 104 Namen der stabilen API in I.
+  Die 32 Namen ohne eigene Darstellung — Preambel- und Kapitel-Schalter,
+  Spacing- und Umbruch-Makros — stehen dort mit einem Strich statt einer ID.
+\end{defbox}
+\Zweck{Nichts aus der stabilen API fehlt; was man nicht sehen kann, ist als
+solches gekennzeichnet.}
+
+\begin{warnbox}[Kein Prüfgegenstand]
+  Dieses Dokument prüft nichts und wird von nichts geprüft. Die
+  Vorführ-Pflicht der stabilen API hängt weiterhin an \ZSFlabel{main.tex};
+  ein hier gestrichener Eintrag verschwindet nicht aus dem System.
+\end{warnbox}

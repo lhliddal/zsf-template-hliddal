@@ -1,0 +1,64 @@
+% Katalog F: Abbildungen (Palette Slot 6).
+\ZSFNewColumn
+\StartChapter[kat:bilder]{F · Bilder}
+
+\begin{runintext}
+  Drei Makros für drei Fälle: die eigenständige Abbildung, Bild neben Text
+  und das Bild ohne Box. Alle nehmen \ZSFkeyword*{width} und
+  \ZSFkeyword*{height} selbst entgegen; jeder andere Schlüssel geht an die
+  umgebende \ZSFkeyword{figbox}.
+\end{runintext}
+
+\SubsectionBar[kat:bild-fig]{Eigenständige Abbildung}
+\ZSFindex{ZSFfig}
+\ZSFindex{ZSFfigside}
+
+\ZSFfig[width=0.5]{example-image-a}{F-01 · ZSFfig}%
+  {Mustertext zum Formvergleich. Ohne width und height greifen die zentralen
+   Vorbelegungen.}
+
+\ZSFfig{example-image-a,example-image-b,example-image-c}%
+  {F-02 · ZSFfig mit Pfadliste}%
+  {Dasselbe Makro, mehrere Pfade: eine Reihe gleich breiter Bilder, die
+   Breite folgt der Anzahl.}
+
+\ZSFfigside[width=0.3]{example-image-a}{F-03 · ZSFfigside}{%
+  Mustertext zum Formvergleich. Der erste Wert bestimmt den Bildanteil, der
+  Rest gehört dem Text.}
+
+\SubsectionBar[kat:bild-image]{Bild ohne eigene Box}
+\ZSFindex{ZSFimage}
+
+\begin{figbox}[F-04 · ZSFimage in der figbox][align=center]
+  \ZSFimage[width=0.55]{example-image-b}
+  \ZSFfigcaption{F-05 · ZSFfigcaption — nur wenn eine figbox direkt befüllt
+  wird; die Bild-Makros setzen ihre Beschriftung selbst.}
+\end{figbox}
+\Zweck{Dasselbe Makro wie in der Tabellenzelle (D-09), hier mit dem
+Höhenbudget einer Abbildung. Die Höhe stellt der Container.}
+
+\SubsectionBar[kat:bild-tikz]{Selbstgezeichnetes Diagramm}
+\ZSFindex{figbox}
+
+\begin{figbox}[F-06 · figbox mit tikzpicture]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=\linewidth,
+      height=\ZSFfigMaxHeight,
+      axis lines=middle,
+      xmin=-2.2, xmax=2.2,
+      ymin=-0.3, ymax=4.5,
+      samples=40,
+      ticks=none
+    ]
+      \addplot[color=\chaptercolor, very thick, domain=-2:2]{x^2};
+      \node[\chaptercolor, font=\ZSFfontDiagramLabel, anchor=center]
+        at (rel axis cs:0.72,0.78) {Mustertext};
+    \end{axis}
+  \end{tikzpicture}
+  \ZSFfigcaption{Der Fall, für den die figbox gedacht ist: kein Bild aus
+  einer Datei, sondern eine Zeichnung im Dokument.}
+\end{figbox}
+\Zweck{Braucht das Opt-in-Modul 12\_plots für die axis-Umgebung; tikzpicture
+allein genügt ohne es.}

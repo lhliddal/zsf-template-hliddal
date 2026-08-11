@@ -1,0 +1,126 @@
+% Katalog B: die Box-Umgebungen (Palette Slot 2).
+\ZSFNewColumn
+\StartChapter[kat:boxen]{B · Boxen}
+
+\begin{runintext}
+  Zwölf Umgebungen, alle mit demselben Mustertext. Vier davon sind
+  technisch ein \ZSFkeyword{defbox}-Preset und tragen ihre Äquivalenz in
+  der Zweckzeile — dort sitzt die Frage, ob ein eigener Name nötig ist.
+\end{runintext}
+
+\SubsectionBar[kat:box-text]{Textbausteine}
+\ZSFindex{Textbaustein}
+
+\textVorBox{B-01 · runintext}
+\begin{runintext}
+  \Muster
+\end{runintext}
+\Zweck{Ruhiger Fliesstext zwischen strukturierten Blöcken, ohne jede Fläche.
+Titellos, deshalb steht die ID davor.}
+
+\begin{defbox}[B-02 · defbox]
+  \Muster
+\end{defbox}
+\Zweck{Die allgemeine Inhaltsbox: Definition, Satz, gewichtige Aussage.}
+
+\begin{warnbox}[B-03 · warnbox\ZSFTitleTag{Preset}]
+  \Muster
+\end{warnbox}
+\Zweck{Stolperfalle mit Raum. Technisch defbox[tone=warn] plus vorbelegter
+Titel »Achtung«.}
+
+\begin{ZSFlist}[B-04 · ZSFlist]
+  \ZSFItem{Mit Marke}{Mustertext zum Formvergleich.}
+  \ZSFItem{Zweiter Eintrag}{Die zweite Zeile zeigt, wie der Container fasst.}
+  \ZSFItem{Ohne Marke steht der Eintrag als blosse Aussage da.}
+\end{ZSFlist}
+\Zweck{Aufzählung von Fakten; die Marke jedes Eintrags ist optional.}
+
+\textVorBox{B-05 · splitbox}
+\begin{splitbox}[split=0.42]
+  \MusterKurz
+  \tcblower
+  Die zweite Hälfte, getrennt durch tcblower.
+\end{splitbox}
+\Zweck{Zwei Blöcke nebeneinander, rahmenlos und titellos. Technisch defbox
+mit fünf Reglern plus ruhiger Fläche.}
+
+\SubsectionBar[kat:box-special]{Container mit eigenem Inhaltstyp}
+\ZSFindex{Container}
+
+\begin{runintext}
+  Die folgenden vier tragen keinen freien Text, sondern einen bestimmten
+  Inhaltstyp. Der Mustertext weicht deshalb ab — sie zeigen sonst nichts.
+\end{runintext}
+
+\begin{formulabox}[B-06 · formulabox]
+  \[
+    a^2 + b^2 = c^2
+  \]
+  \formulanote{Mustertext zum Formvergleich.}
+\end{formulabox}
+\Zweck{Formeln mit Kontext; betont geflächt in jedem Ton.}
+
+\begin{tablebox}[B-07 · tablebox]
+  \begin{ZSFtable}{Y{1.0} Y{1.0}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    Mustertext & zum Formvergleich \\
+    Die zweite Zeile & zeigt das Zebra
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Container für ZSFtable; läuft absichtlich bis an die Kante, damit das
+Zebra nicht davor endet.}
+
+\begin{figbox}[B-08 · figbox\ZSFTitleTag{Preset}]
+  \Muster
+\end{figbox}
+\Zweck{Container für selbstgezeichnete Diagramme. Technisch
+defbox[atomic]; hier ohne Bild, um den Container pur zu zeigen.}
+
+\begin{goalbox}[B-09 · goalbox\ZSFTitleTag{Preset}]
+  \GoalCondition{Mustertext zum Formvergleich}
+  \GoalStep{\text{Zwischenschritt}}
+  \GoalTarget{\text{Ziel}}
+\end{goalbox}
+\Zweck{Herleitung und Fallunterscheidung. Technisch defbox mit vier Reglern
+plus ungetönter Fläche.}
+
+\begin{valuegrid}[B-10 · valuegrid]{2}
+  Mustertext & zum & Formvergleich \\
+  Zweite Zeile & fixes & Gitter \\
+  Erste Spalte & immer & Beschriftung
+\end{valuegrid}
+\Zweck{Kompakte Wertetabelle mit festem Gitter; das Argument ist die Anzahl
+Datenspalten.}
+
+\SubsectionBar[kat:box-nesting]{Boxen gruppieren und gliedern}
+\ZSFindex{ZSFboxgroup}
+\ZSFindex{ZSFinset}
+
+\begin{ZSFboxgroup}[cols={Y{1.0} Q{1.0}},
+                    head={\ZSFhead{Mustertext} & \ZSFhead{Formvergleich}}]
+  \begin{tablebox}[B-11 · ZSFboxgroup]
+    \begin{ZSFtable}[header=false]{\ZSFgroupcols}
+      Erster Block & 1
+    \end{ZSFtable}
+  \end{tablebox}
+  \begin{tablebox}[Zweites Mitglied]
+    \begin{ZSFtable}[header=false]{\ZSFgroupcols}
+      Zweiter Block & 2
+    \end{ZSFtable}
+  \end{tablebox}
+\end{ZSFboxgroup}
+\Zweck{Mehrere Boxen als ein Block: gemeinsame Kopfzeile, geschlossene
+Zwischenräume, Spaltenaufteilung nur einmal gesetzt.}
+
+\begin{tablebox}[B-12 · ZSFinset]
+  \begin{ZSFtable}[header=false]{Y{1.0} Q{1.0}}
+    Tabelle bis an die Kante & 1 \\
+    damit das Zebra & 2
+  \end{ZSFtable}
+  \begin{ZSFinset}
+    \Muster
+  \end{ZSFinset}
+\end{tablebox}
+\Zweck{Rückt EINEN Block auf den normalen Innenabstand ein, wo die Box
+absichtlich randlos ist.}
