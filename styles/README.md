@@ -8,7 +8,7 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | `10_math.tex` | Math-Macros: `\R \C \N \Z \Q`, `\dd`, `\norm \abs`, `\sgn \grad \divg \rot`, `\vect`, ZSFsumMode/ZSFlimMode |
 | `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, Klammern über Zellgrenzen (`\tikzmark`/`\drawbrace`/`\annote` + `\ZSFbraceRoom`) |
 | `12_plots.tex` | **OPT-IN**: lädt `pgfplots` und setzt die zentrale Kompatibilitätsversion |
-| `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`/`rows`/`colsep`, `\ZSFheaderRow`, `\ZSFhead`, Zellverbund `\ZSFspan` |
+| `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`/`rows`/`colsep`/`grid`, `\ZSFheaderRow`, `\ZSFhead`, Zellverbund `\ZSFspan` |
 | `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Kollaps-Merker an Balkengrenzen (`\ZSFBoxBeforeSkip`, `\ZSFbarAfterGap`), Formel-Innenmasse (`\ZSFmathRowSep`/`\ZSFmathColSep`), Spaltenkopf (`\ZSFcolumnTopSkip`), samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`, Ink-Vertrag (`\ZSFInk`/`\ZSFInkOwned`), Grössenfarben-Palette + `\ZSFDeclareQuantity` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
@@ -510,7 +510,7 @@ deshalb nicht in der Token-Liste oben:
 | `split` | alle Boxen | Anteil der linken Hälfte |
 | `splitalign` | alle Boxen | `top`, `center`, `bottom` |
 | `ordered` | `ZSFlist` | Flag |
-| `grid` | `valuegrid` | `both`, `horizontal`, `none` |
+| `grid` | `ZSFtable`, `valuegrid` | `both`, `horizontal`, `none` |
 | `bodyparskip` | alle Boxen | `box` (eigener Absatzabstand), `inherit` (Dokumentwert) |
 | `part` | `codebox` | `whole`, `first`, `mid`, `last` |
 | `header` | `ZSFtable` | `true`, `false` |
@@ -544,7 +544,8 @@ Darüber hinaus sind tcolorbox' eigene Schlüssel erlaubt (`breakable`, …) —
 zweite optionale Argument geht an tcolorbox weiter.
 
 **Box-spezifische Regler gelten nur auf ihrer Box.** `ordered` (`ZSFlist`),
-`grid` (`valuegrid`) und `part` (`codebox`) wurden auf jeder anderen Box
+`grid` (`valuegrid`; an der `ZSFtable` derselbe Regler in ihrer eigenen
+Familie) und `part` (`codebox`) wurden auf jeder anderen Box
 klaglos entgegengenommen und nie wieder gelesen. Welche Box welchen Regler
 besitzt, sagt sie der Fabrik über `\ZSF@boxOwnKnobs`, bevor sie sie ruft; der
 Vor-Lauf weist alles andere mit einer Meldung ab. Zurückgesetzt wird der Besitz

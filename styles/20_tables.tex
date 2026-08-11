@@ -194,6 +194,124 @@
 \makeatother
 
 % ------------------------------------------------------------
+% Gitterlinien
+% ------------------------------------------------------------
+% Der Regler heisst `grid` und hat dieselben drei Werte wie am valuegrid
+% (both | horizontal | none), weil er dieselbe Frage beantwortet: welche
+% Linienrichtungen gezeichnet werden. Zwei Namen für dieselbe Frage waeren
+% derselbe Fehler wie zwei Bedeutungen von `rows` (rules/02_ai_mandate →
+% gleiche Sache, gleiche Bedienung).
+%
+% Die Vorbelegung ist `both` — Linien sind da, und wer sie nicht will, nimmt
+% sie weg. Andersherum waere die Linie eine Sonderausstattung, die man pro
+% Tabelle neu erkaempft; das Zebra ersetzt sie nur in der kurzen Datenliste
+% und nicht im Register mit hohen Zellen.
+%
+% Die Linienstaerke ist \ZSFboxRuleWidth und nicht LaTeXs 0.4pt: Eine Linie
+% ist in diesem System EIN Mass (dieselbe Entscheidung wie beim valuegrid,
+% 60_boxes → \ZSF@gridSpec). Die Farbe kommt von colortbl und ist damit
+% dieselbe wie an einem handgesetzten \hline.
+\makeatletter
+\newif\ifZSF@tblHRules
+\newif\ifZSF@tblVRules
+\makeatother
+
+% --- waagrecht: eine Linie nach JEDEM \cr, ohne die Zeilenenden anzufassen
+%
+% \hline nach jeder Zeile zu verlangen waere Handarbeit im Kapitel, und ein
+% Patch auf \\ / \@arraycr trifft die Optionsform \\[2pt] nicht mehr richtig
+% (der eingeschobene \hline steht dann vor dem `['). TeX hat fuer genau das
+% \everycr: eine Tokenliste, die nach jedem \cr einer Ausrichtung eingefuegt
+% wird — auch nach dem \cr der Praeambel (Oberkante) und nach dem
+% abschliessenden \crcr (Unterkante, auch wenn die letzte Zeile ohne \\
+% endet). \hline steht darin ohne \noalign, weil es sein \noalign selbst
+% mitbringt.
+%
+% Sie laesst sich nur nicht vorher setzen: array.sty ueberschreibt \everycr in
+% \ar@ialign, unmittelbar bevor dort \halign laeuft (gemessen — ein \everycr
+% vor \begin{ZSFtable} kommt wirkungslos an). Dazwischen kommt man genau an
+% einer Stelle: \halign ist in \ar@ialign ein Token wie jedes andere. Der
+% Schalter unten haengt sich davor, ergaenzt \everycr um die Linie und stellt
+% sich dabei SELBST zurueck — das \let gilt in der Gruppe von \@array, sodass
+% eine verschachtelte Ausrichtung in einer Zelle (aligned, array) die
+% Erweiterung nicht erbt und der naechste Durchgang von tabularx sie wieder
+% bekommt.
+\makeatletter
+\let\ZSF@halign\halign
+\newcommand{\ZSF@tblHRulesOn}{%
+  \def\halign{%
+    \everycr\expandafter{\the\everycr\hline}%
+    \let\halign\ZSF@halign
+    \ZSF@halign}%
+}
+
+% --- senkrecht: ein '|' zwischen die Spalten, keines an die Aussenkanten
+%
+% Der Preamble-Parser von `array` expandiert nicht (siehe unten bei
+% \ZSF@tblSpec), ein Makro als Trennstrich kommt also nicht an. Die Striche
+% muessen deshalb VOR dem Parser in die Spaltenaufteilung — und weil die vom
+% Kapitel kommt, wird sie dafuer Token fuer Token durchgegangen.
+%
+% NUR zwischen den Spalten: Die Aussenkante gehoert der Box, und sie gehoert
+% ihr aus einem messbaren Grund. Die Farbflaeche einer Zeile ragt um genau
+% \tabcolsep ueber die Zelle hinaus (\CT@setup, siehe unten) — ein Strich
+% davor liegt ausserhalb der Flaeche, und Kopfzeile wie Zebra enden dann
+% sichtbar vor ihm statt an der Boxkante. Gemessen an der Boxgruppe: rund
+% 7 pt Weiss zwischen Strich und Farbe, auf jeder Seite.
+%
+% Das ist derselbe Kontrakt, den `colsep` weiter unten haelt, und die
+% Zielketten-Zeile (\ZSFspan) faellt gratis richtig aus: Eine Zelle ueber die
+% volle Breite hat keine innere Grenze, also zeichnet sie auch keine.
+%
+% Der Scanner kennt die Spaltentypen dieses Systems (L/C/R und Y/Z/Q/F mit
+% ihrem Faktor) und den Praefix >{...}; alles andere reicht er unveraendert
+% durch. Ein exotischer Eintrag verliert damit hoechstens seinen Strich — er
+% kann die Aufteilung nicht zerlegen. Ein bereits im Kapitel gesetztes '|'
+% faellt weg, sonst stuende dort ein doppelter Strich.
+\newcommand{\ZSF@tblVSpec}{}
+\newif\ifZSF@vfirst
+\def\ZSF@vstop{\ZSF@vstop}
+\newcommand{\ZSF@vappend}[1]{%
+  \edef\ZSF@tblVSpec{\unexpanded\expandafter{\ZSF@tblVSpec}\unexpanded{#1}}}
+% Die erste Spalte bekommt keinen Strich davor — sonst waere er die
+% Aussenkante.
+\newcommand{\ZSF@vsep}{%
+  \ifZSF@vfirst\ZSF@vfirstfalse\else\ZSF@vappend{|}\fi}
+\def\ZSF@vcolumn#1{\ZSF@vsep\ZSF@vappend{#1}\ZSF@vloop}
+\def\ZSF@vcolumnarg#1{\ZSF@vsep\ZSF@vappend{#1}\ZSF@vgrab}
+\def\ZSF@vgrab#1{\ZSF@vappend{{#1}}\ZSF@vloop}
+\def\ZSF@vpass#1{\ZSF@vappend{#1}\ZSF@vloop}
+\def\ZSF@vdrop#1{\ZSF@vloop}
+\def\ZSF@vfinish{}
+% Die Auswahl steht als \let-Kette und nicht als verschachteltes \else: Der
+% Zweig liest danach das naechste Token aus der Eingabe, und ein wartendes
+% \fi waere genau dieses Token.
+\def\ZSF@vdispatch#1{%
+  \let\ZSF@vnext\ZSF@vpass
+  \ifx L#1\let\ZSF@vnext\ZSF@vcolumn\fi
+  \ifx C#1\let\ZSF@vnext\ZSF@vcolumn\fi
+  \ifx R#1\let\ZSF@vnext\ZSF@vcolumn\fi
+  \ifx Y#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
+  \ifx Z#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
+  \ifx Q#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
+  \ifx F#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
+  \ifx >#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
+  \ifx |#1\let\ZSF@vnext\ZSF@vdrop\fi
+  \ZSF@vnext{#1}}
+\def\ZSF@vloop#1{%
+  \ifx#1\ZSF@vstop
+    \let\ZSF@vnextstep\ZSF@vfinish
+  \else
+    \def\ZSF@vnextstep{\ZSF@vdispatch{#1}}%
+  \fi
+  \ZSF@vnextstep}
+\newcommand{\ZSF@vrules}[1]{%
+  \renewcommand{\ZSF@tblVSpec}{}%
+  \ZSF@vfirsttrue
+  \ZSF@vloop#1\ZSF@vstop}
+\makeatother
+
+% ------------------------------------------------------------
 % Semantische Tabellen-Umgebung (Single Point of Truth)
 % ------------------------------------------------------------
 % EINE Umgebung mit Reglern statt mehrerer fast gleicher Varianten
@@ -211,6 +329,8 @@
 %   colsep      Zellpolsterung: 'normal' (Default) | 'tight'. Gilt zwischen
 %               den Spalten UND an der Boxkante — beides ist derselbe Wert,
 %               weil die Farbfläche einer Zeile genau um ihn überragt.
+%   grid        Gitterlinien: 'both' (Default) | 'horizontal' | 'none'.
+%               Gleiche Werte und gleiche Bedeutung wie am valuegrid.
 %
 % Warum `font`, `rows` und `colsep` drei Regler sind und nicht einer: Sie
 % beantworten drei verschiedene Fragen, die sich kreuzen. Eine Formeltabelle
@@ -231,6 +351,7 @@
 %   \begin{ZSFtable}[header=false]{Y{1.2} Q{0.8}}       % Zebra ab Zeile 1
 %   \begin{ZSFtable}[header=false, zebra=false]{L C}    % nackt
 %   \begin{ZSFtable}[font=dense]{Y{0.6} Y{1.55} Y{0.85}}
+%   \begin{ZSFtable}[grid=none]{L C}                    % nur Zebra trennt
 \makeatletter
 \newif\ifZSF@tblHeader
 \newif\ifZSF@tblZebra
@@ -274,6 +395,7 @@
   }%
 }
 \newcommand{\ZSF@tblSpec}{}
+\newcommand{\ZSF@tblRaw}{}
 \newcommand{\ZSF@beginTabularx}[1]{\tabularx{\linewidth}{#1}}
 \pgfkeys{
   /zsf/table/.is family, /zsf/table,
@@ -294,8 +416,15 @@
   colsep/.is choice,
   colsep/normal/.code={\ZSF@setColsep{normal}},
   colsep/tight/.code ={\ZSF@setColsep{tight}},
+  % Auch `grid` steht am valuegrid unter demselben Namen mit denselben Werten
+  % (60_boxes). Die Umsetzung ist eine andere — dort tabularray, hier
+  % \everycr und '|' —, die Wahl ist dieselbe.
+  grid/.is choice,
+  grid/both/.code      ={\ZSF@tblHRulestrue\ZSF@tblVRulestrue},
+  grid/horizontal/.code={\ZSF@tblHRulestrue\ZSF@tblVRulesfalse},
+  grid/none/.code      ={\ZSF@tblHRulesfalse\ZSF@tblVRulesfalse},
   ZSF@tblDefaults/.style={header=true, zebra=true, font=normal,
-                          rows=normal, colsep=normal},
+                          rows=normal, colsep=normal, grid=both},
 }
 \NewDocumentEnvironment{ZSFtable}{O{} m}{%
   \begingroup
@@ -347,7 +476,21 @@
   % Der \edef ist unbedenklich: Spaltenbuchstaben sind Zeichen (L/C/R/Y…
   % stammen aus \newcolumntype und sind keine Makros), \hskip ist ein Primitiv
   % und \ZSF@tblColSep ein Register — nichts davon expandiert.
-  \edef\ZSF@tblSpec{@{\hskip\ZSF@tblColSep}#2@{\hskip\ZSF@tblColSep}}%
+  %
+  % Die senkrechten Striche kommen VOR dem Parser in die Aufteilung; der
+  % Scanner laeuft deshalb auf der bereits aufgeloesten Fassung (\ZSF@tblRaw),
+  % nicht auf dem Argument selbst — sonst saehe er bei einem Gruppenmitglied
+  % nur \ZSFgroupcols.
+  \setlength{\arrayrulewidth}{\ZSFboxRuleWidth}%
+  \edef\ZSF@tblRaw{#2}%
+  \ifZSF@tblVRules
+    \expandafter\ZSF@vrules\expandafter{\ZSF@tblRaw}%
+  \else
+    \let\ZSF@tblVSpec\ZSF@tblRaw
+  \fi
+  \ifZSF@tblHRules\ZSF@tblHRulesOn\fi
+  \edef\ZSF@tblSpec{@{\hskip\ZSF@tblColSep}%
+    \unexpanded\expandafter{\ZSF@tblVSpec}@{\hskip\ZSF@tblColSep}}%
   \expandafter\ZSF@beginTabularx\expandafter{\ZSF@tblSpec}%
 }{%
   \endtabularx
