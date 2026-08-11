@@ -209,8 +209,13 @@
 %
 % Die Linienstaerke ist \ZSFboxRuleWidth und nicht LaTeXs 0.4pt: Eine Linie
 % ist in diesem System EIN Mass (dieselbe Entscheidung wie beim valuegrid,
-% 60_boxes → \ZSF@gridSpec). Die Farbe kommt von colortbl und ist damit
-% dieselbe wie an einem handgesetzten \hline.
+% 60_boxes → \ZSF@gridSpec).
+%
+% Und die Farbe ist \ZSFtoneFrameHard, also die harte Rahmenfarbe des Tons —
+% NICHT das schwarze Vorgabe-Lineal von colortbl. Der Grund steht im Abschnitt
+% darunter: Die Aussenkante des Gitters ist der Boxrahmen, und zwei Linien,
+% die aneinanderstossen, muessen dieselbe Tinte haben. Im Kapitelton ist das
+% Schwarz, in einem anderen Ton dessen harte Kante — genau wie beim Rahmen.
 \makeatletter
 \newif\ifZSF@tblHRules
 \newif\ifZSF@tblVRules
@@ -252,16 +257,30 @@
 % muessen deshalb VOR dem Parser in die Spaltenaufteilung — und weil die vom
 % Kapitel kommt, wird sie dafuer Token fuer Token durchgegangen.
 %
-% NUR zwischen den Spalten: Die Aussenkante gehoert der Box, und sie gehoert
-% ihr aus einem messbaren Grund. Die Farbflaeche einer Zeile ragt um genau
-% \tabcolsep ueber die Zelle hinaus (\CT@setup, siehe unten) — ein Strich
-% davor liegt ausserhalb der Flaeche, und Kopfzeile wie Zebra enden dann
-% sichtbar vor ihm statt an der Boxkante. Gemessen an der Boxgruppe: rund
-% 7 pt Weiss zwischen Strich und Farbe, auf jeder Seite.
+% NUR zwischen den Spalten — DIE AUSSENKANTE ZEICHNET DER BOXRAHMEN.
 %
-% Das ist derselbe Kontrakt, den `colsep` weiter unten haelt, und die
-% Zielketten-Zeile (\ZSFspan) faellt gratis richtig aus: Eine Zelle ueber die
-% volle Breite hat keine innere Grenze, also zeichnet sie auch keine.
+% Zwei Gruende, und der zweite ist der wichtigere:
+%
+% 1. Ein Strich an der Kante liegt ausserhalb der Farbflaeche. Die Flaeche
+%    einer Zeile ragt um genau \tabcolsep ueber die Zelle hinaus (\CT@setup,
+%    siehe unten); davor gesetzt, enden Kopfzeile und Zebra sichtbar vor ihm
+%    statt an der Boxkante. Gemessen an der Boxgruppe: rund 7 pt Weiss
+%    zwischen Strich und Farbe, auf jeder Seite.
+%
+% 2. Ein Strich an der Kante ist GERADE. Die Box hat runde Ecken, und eine
+%    Tabelle kann sie nicht nachfahren — das Gitter endete an vier Stellen im
+%    Nichts und sah abgeschnitten aus. Der Rahmen der Box kann es, weil
+%    tcolorbox ihn ohnehin entlang \ZSFboxArc zeichnet.
+%
+% Damit die beiden zusammengehen, sprechen sie dieselbe Sprache: gleiche
+% Staerke (\ZSFboxRuleWidth = boxrule) und gleiche Tinte (\ZSFtoneFrameHard =
+% colframe bei `frame=hard`, der Vorbelegung von tablebox und valuegrid). Wer
+% die Aussenkante nicht will, nimmt sie an der Box weg (`frame=none`) — dort
+% liegt sie, und dort ist sie auch abschaltbar.
+%
+% Nebenbei faellt die Zielketten-Zeile (\ZSFspan) gratis richtig aus: Eine
+% Zelle ueber die volle Breite hat keine innere Grenze, also zeichnet sie
+% auch keine.
 %
 % Der Scanner kennt die Spaltentypen dieses Systems (L/C/R und Y/Z/Q/F mit
 % ihrem Faktor) und den Praefix >{...}; alles andere reicht er unveraendert
@@ -482,6 +501,7 @@
   % nicht auf dem Argument selbst — sonst saehe er bei einem Gruppenmitglied
   % nur \ZSFgroupcols.
   \setlength{\arrayrulewidth}{\ZSFboxRuleWidth}%
+  \arrayrulecolor{\ZSFtoneFrameHard}%
   \edef\ZSF@tblRaw{#2}%
   \ifZSF@tblVRules
     \expandafter\ZSF@vrules\expandafter{\ZSF@tblRaw}%

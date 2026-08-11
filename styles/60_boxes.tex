@@ -798,11 +798,19 @@
 % Tabelle: Hintergrund bis an die Kante, damit das Zebra nicht kurz vor dem
 % Rahmen endet. 'clip upper' schneidet die Streifen an der Rundung ab.
 % Die Fläche bleibt ungetönt, weil das Zebra sie als Basis braucht.
+% `frame=hard` ist hier keine Betonung, sondern der Abschluss des Gitters:
+% Die ZSFtable zeichnet ihre Linien nur ZWISCHEN Zeilen und Spalten, die
+% Aussenkante gehoert der Box (20_tables → senkrecht). Nur sie kann die
+% runden Ecken nachfahren; ein blasser Rahmen daneben liess die Gitterlinien
+% im Nichts enden. Staerke und Tinte stimmen deshalb ueberein — boxrule ist
+% \ZSFboxRuleWidth wie \arrayrulewidth, `hard` ist \ZSFtoneFrameHard wie
+% \arrayrulecolor.
 \tcbset{preset/table/.style={
   zsftitlebox,
   ZSF@surface=plain,
   padx=none, pady=none,
   bodyparskip=inherit,
+  frame=hard,
   clip upper,
 }}
 % Abbildung: bleibt auch im Pack-Modus atomar (rules/30_spacing → Anhang) —
@@ -1540,12 +1548,20 @@
 % Die Linienstaerke ist \ZSFboxRuleWidth und nicht tabularrays Vorgabe: Eine
 % Linie ist in diesem System EIN Mass — der Boxrahmen zog 0.5pt, das Gitter
 % daneben 0.4pt, und entschieden hatte das niemand.
-\newcommand{\ZSF@gridSpec}{{wd=\ZSFboxRuleWidth}}
-\newcommand{\ZSF@gridLines}{hlines=\ZSF@gridSpec,vlines=\ZSF@gridSpec,}
+%
+% Gezeichnet wird NUR innen — `2-Y` laesst die erste und die letzte Linie
+% jeder Richtung weg. Die Aussenkante gehoert dem Boxrahmen, weil nur er die
+% runden Ecken nachfahren kann; eine gerade Linie davor endete an vier
+% Stellen im Nichts. Dieselbe Entscheidung und dieselbe Begruendung wie an
+% der ZSFtable (20_tables → senkrecht), und damit sie zusammengehen, teilen
+% sie Staerke (\ZSFboxRuleWidth) und Tinte (\ZSFtoneFrameHard) mit dem
+% Rahmen bei `frame=hard`.
+\newcommand{\ZSF@gridSpec}{{wd=\ZSFboxRuleWidth,fg=\ZSFtoneFrameHard}}
+\newcommand{\ZSF@gridLines}{hline{2-Y}=\ZSF@gridSpec,vline{2-Y}=\ZSF@gridSpec,}
 \tcbset{
   grid/.is choice,
-  grid/both/.code      ={\renewcommand{\ZSF@gridLines}{hlines=\ZSF@gridSpec,vlines=\ZSF@gridSpec,}},
-  grid/horizontal/.code={\renewcommand{\ZSF@gridLines}{hlines=\ZSF@gridSpec,}},
+  grid/both/.code      ={\renewcommand{\ZSF@gridLines}{hline{2-Y}=\ZSF@gridSpec,vline{2-Y}=\ZSF@gridSpec,}},
+  grid/horizontal/.code={\renewcommand{\ZSF@gridLines}{hline{2-Y}=\ZSF@gridSpec,}},
   grid/none/.code      ={\renewcommand{\ZSF@gridLines}{}},
   % Dieselben zwei Fragen wie an der ZSFtable, unter denselben Namen und mit
   % derselben Antwort (\ZSF@setRows / \ZSF@setColsep in 20_tables). Sie stehen
@@ -1567,7 +1583,7 @@
   zsftitlebox,
   padx=none, pady=tight,
   ZSF@surface=plain,
-  frame=strong,
+  frame=hard,
   grid=both,
   rows=normal, colsep=normal,
   atomic,

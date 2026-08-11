@@ -239,6 +239,17 @@ alle Wahlen fest, gleichgültig wer sie getroffen hat.
 
 - **Rahmen:** der Regler wählt die *Stärke*, der Ton die *Farbe*
   (`\ZSFtoneFrameSoft/Strong/Hard`).
+- **Der Rahmen ist zugleich die Aussenkante des Tabellengitters.** `ZSFtable`
+  und `valuegrid` zeichnen ihre Linien nur *zwischen* Zeilen und Spalten —
+  eine Tabellenlinie ist gerade und endete an den vier runden Ecken im
+  Nichts, der Rahmen läuft entlang `\ZSFboxArc` mit. Damit die beiden
+  zusammengehen, teilen sie das Mass (`boxrule` = `\arrayrulewidth` =
+  `\ZSFboxRuleWidth`) und die Tinte (`\ZSFtoneFrameHard` = `\arrayrulecolor`
+  bzw. tabularrays `fg`); `preset/table` und `preset/valuegrid` stehen
+  deshalb auf `frame=hard`. Die tabularray-Seite erreicht das über
+  `hline{2-Y}`/`vline{2-Y}` statt `hlines`/`vlines`, die tabularx-Seite über
+  einen Scanner, der nur *zwischen* den Spalten ein `|` einsetzt
+  (`20_tables`).
 - **Fläche:** der Baustein wählt die *Rolle*, der Ton die *Farbe*. Vier Rollen
   über den internen Schlüssel `ZSF@surface`: `auto` (laut oder ruhig — das
   Gewicht entscheidet), `plain` (ungetönt; Basis für Zebra, Gitterlinien,
