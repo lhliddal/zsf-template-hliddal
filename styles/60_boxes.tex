@@ -601,12 +601,24 @@
 % Was NICHT hier steht, sondern im Vertrag darüber: alles, was auch für eine
 % Box mit eigener Form gilt (Ton, Justierung, Eintritt, Reset der verzögerten
 % Wahlen). Sonst müsste jede rahmenlose Box es abschreiben.
+%
+% `titlerule` ist die Kante zwischen Kopfzeile und Inhalt und gehoert damit zum
+% Rahmen — sie hat dessen Staerke und dessen Tinte (tcolorbox zieht sie in
+% `colframe`). Sie stand auf 0 pt, und das fiel erst auf, seit die Tabellen ihr
+% Gitter selbst zeichnen: Die Aussenkante der Tabelle IST der Boxrahmen
+% (20_tables), oben war er aber nicht da — der Titelbalken stiess ohne Linie an
+% die erste Zeile, waehrend links, rechts und unten eine stand.
+%
+% Eine Box ohne Rahmen bekommt auch keine: `frame=none` setzt `boxrule=0pt`,
+% und `boxrule` ist in tcolorbox eine Sammeloption, die `titlerule` mitnimmt.
+% Genau deshalb steht die Zeile hier und nicht spaeter — ein `boxrule=` NACH
+% ihr wuerde sie ueberschreiben (siehe Rahmen-Regler oben).
 \tcbset{zsfboxshape/.style={
   zsfboxcontract,
   breakable=false,
   boxsep=0pt,
   boxrule=\ZSFboxRuleWidth,
-  titlerule=0pt,
+  titlerule=\ZSFboxRuleWidth,
   arc=\ZSFboxInnerArc,
   outer arc=\ZSFboxArc,
   padx=normal,
@@ -959,8 +971,11 @@
   \setlength{\ZSFBoxAfterSkip}{0pt}%
   \ifx\ZSF@groupHead\@empty\else
     \begin{tablebox}%
+      % Kein `\\' nach der Kopfzeile: Der Zeilenwechsel setzt die waagrechte
+      % Linie (20_tables), und hinter der letzten Zeile faellt sie mit dem
+      % Boxrahmen zusammen — die Kante saehe doppelt so stark aus.
       \begin{ZSFtable}[zebra=false]{\ZSFgroupcols}%
-        \ZSFheaderRow\ZSF@groupHead \\%
+        \ZSFheaderRow\ZSF@groupHead
       \end{ZSFtable}%
     \end{tablebox}%
   \fi

@@ -14,14 +14,36 @@
 %   - Drift zwischen Kapiteln (jede Tabelle nutzt dieselben Wrapper).
 
 % ------------------------------------------------------------
+% Wo in der Zeile stehen wir gerade?
+% ------------------------------------------------------------
+% Zwei Zaehler, EINE Frage: welche Spalte ist die naechste. Gebraucht wird sie
+% nur an einer Stelle — \ZSFspan muss wissen, ob sein Verbund an der letzten
+% Spalte endet, denn nur dann waere sein Trennstrich rechts die Aussenkante
+% (siehe \ZSFspan). Der Zaehler steht hier oben, weil ihn die Spaltentypen
+% darunter bereits hochzaehlen.
+%
+% \ZSF@tblNcols  — Spalten der Tabelle, gezaehlt vom Scanner (siehe unten).
+% \ZSF@tblCol    — bereits gesetzte Spalten der laufenden Zeile.
+%
+% Beide global: Der Tick steht im u-Teil einer Spalte und damit in deren
+% Zellgruppe; eine lokale Zuweisung waere mit dem `&' wieder weg.
+\makeatletter
+\newcount\ZSF@tblNcols
+\newcount\ZSF@tblCol
+\newcommand{\ZSF@tblColTick}{\global\advance\ZSF@tblCol\@ne}
+\makeatother
+
+% ------------------------------------------------------------
 % Spaltentypen (tabularx-X-Varianten)
 % ------------------------------------------------------------
 % Feste Varianten — jede zaehlt als Faktor 1:
 % m{#1}: X-Spalten vertikal mittig (Text + Grafik in einer Zeile).
 \renewcommand{\tabularxcolumn}[1]{m{#1}}
-\newcolumntype{L}{>{\RaggedRight\arraybackslash}X}   % linksbuendig, umbricht
-\newcolumntype{C}{>{\Centering\arraybackslash}X}     % zentriert,  umbricht
-\newcolumntype{R}{>{\RaggedLeft\arraybackslash}X}    % rechtsbuendig, umbricht
+\makeatletter
+\newcolumntype{L}{>{\ZSF@tblColTick\RaggedRight\arraybackslash}X}   % linksbuendig, umbricht
+\newcolumntype{C}{>{\ZSF@tblColTick\Centering\arraybackslash}X}     % zentriert,  umbricht
+\newcolumntype{R}{>{\ZSF@tblColTick\RaggedLeft\arraybackslash}X}    % rechtsbuendig, umbricht
+\makeatother
 
 % Parametrisierte, proportionale Varianten — #1 = relativer Anteil.
 %
@@ -38,12 +60,14 @@
 %   L       Y{2}    L         → 25% / 50% / 25%
 % Beispiele (4 Spalten → Summe 4):
 %   Y{1.2}  Y{0.8}  Y{1.2}  Y{0.8}  → 30% / 20% / 30% / 20%
-\newcolumntype{Y}[1]{>{\hsize=#1\hsize\RaggedRight\arraybackslash}X} % linksb., proport.
-\newcolumntype{Z}[1]{>{\hsize=#1\hsize\Centering\arraybackslash}X}   % zentriert, proport.
-\newcolumntype{Q}[1]{>{\hsize=#1\hsize\RaggedLeft\arraybackslash}X}  % rechtsb., proport.
+\makeatletter
+\newcolumntype{Y}[1]{>{\hsize=#1\hsize\ZSF@tblColTick\RaggedRight\arraybackslash}X} % linksb., proport.
+\newcolumntype{Z}[1]{>{\hsize=#1\hsize\ZSF@tblColTick\Centering\arraybackslash}X}   % zentriert, proport.
+\newcolumntype{Q}[1]{>{\hsize=#1\hsize\ZSF@tblColTick\RaggedLeft\arraybackslash}X}  % rechtsb., proport.
 
 % Zentrierte Formel-Spalte (Math-Mode automatisch, proportional)
-\newcolumntype{F}[1]{>{\hsize=#1\hsize\Centering\arraybackslash$}X<{$}}
+\newcolumntype{F}[1]{>{\hsize=#1\hsize\ZSF@tblColTick\Centering\arraybackslash$}X<{$}}
+\makeatother
 
 % ------------------------------------------------------------
 % Luft zwischen Zellinhalt und Zeilenkante
@@ -178,18 +202,58 @@
 % Breite eines Verbunds erst beim Satz feststeht. Das deckt die Rollen oben ab
 % (Kopf, Formel, kurze Abschnittszeile); für umbrechenden Fliesstext über die
 % volle Breite ist die Tabelle der falsche Baustein.
+%
+% DER TRENNSTRICH RECHTS GEHOERT ZUM VERBUND, nicht zur Spaltenaufteilung.
+% Grund ist eine Eigenschaft von `array`: Ein '|' zwischen zwei Spalten haengt
+% am Ende der LINKEN von beiden. Ein \multicolumn ersetzt die Vorlage aller
+% ueberspannten Spalten — und damit auch den Strich, der rechts an der letzten
+% davon hing. Gemessen: In `Y|Z|Z|Z` mit einem Verbund ueber die Spalten 2--3
+% steht der Strich 1|2 (er haengt an Spalte 1), der Strich 3|4 fehlt. In einer
+% gefaerbten Kopfzeile ist das ein weisses Loch mitten in der Flaeche.
+%
+% Deshalb setzt der Verbund ihn selbst — aber nur, wenn rechts von ihm noch
+% eine Spalte kommt. Endet er an der letzten, waere sein Strich die
+% AUSSENKANTE, und die gehoert dem Boxrahmen (siehe unten, senkrecht).
+% Gemessen: dort steht er 0,5 pt neben dem Rahmen und verdreifacht ihn optisch.
+%
+% Woher der Verbund weiss, wo er steht: \ZSF@tblCol zaehlt die gesetzten
+% Spalten der Zeile (Tick im u-Teil jeder Spalte, oben), \ZSF@tblNcols die
+% Spalten der Tabelle (Scanner, unten). Ein \multicolumn ueberspringt den u-Teil
+% — deshalb zaehlt der Verbund seine eigenen Spalten selbst weiter.
+%
+% Die Fallunterscheidung steht VOR \multicolumn und nicht als Schluessel: Bis
+% dorthin darf nur expandiert werden (Begruendung oben). \ifnum und \numexpr
+% duerfen das, eine Zuweisung nicht — deshalb zaehlt \ZSF@spanTick erst IM
+% Zellinhalt weiter, wo \omit laengst steht.
 \makeatletter
 \newcommand{\ZSF@spanBadAlign}[1]{%
   \PackageError{ZSF}{Unbekannte Ausrichtung '#1' in \string\ZSFspan}%
     {Gueltig sind L, C und R -- dieselben Buchstaben wie bei den
      Spaltentypen L/C/R.}%
 }
-\newcommand{\ZSFspan}[3]{%
-  \if L#1\multicolumn{#2}{l}{#3}%
-  \else\if R#1\multicolumn{#2}{r}{#3}%
-  \else\if C#1\multicolumn{#2}{c}{#3}%
-  \else\multicolumn{#2}{c}{\ZSF@spanBadAlign{#1}#3}%
+\newcommand{\ZSF@spanTick}[1]{\global\advance\ZSF@tblCol#1\relax}
+\newcommand{\ZSF@spanPlain}[3]{%
+  \if L#1\multicolumn{#2}{l}{\ZSF@spanTick{#2}#3}%
+  \else\if R#1\multicolumn{#2}{r}{\ZSF@spanTick{#2}#3}%
+  \else\if C#1\multicolumn{#2}{c}{\ZSF@spanTick{#2}#3}%
+  \else\multicolumn{#2}{c}{\ZSF@spanTick{#2}\ZSF@spanBadAlign{#1}#3}%
   \fi\fi\fi
+}
+\newcommand{\ZSF@spanRuled}[3]{%
+  \if L#1\multicolumn{#2}{l|}{\ZSF@spanTick{#2}#3}%
+  \else\if R#1\multicolumn{#2}{r|}{\ZSF@spanTick{#2}#3}%
+  \else\if C#1\multicolumn{#2}{c|}{\ZSF@spanTick{#2}#3}%
+  \else\multicolumn{#2}{c|}{\ZSF@spanTick{#2}\ZSF@spanBadAlign{#1}#3}%
+  \fi\fi\fi
+}
+% \ZSF@tblNcols ist 0, solange keine senkrechten Linien gezeichnet werden —
+% dann ist die Bedingung von selbst falsch und der Verbund setzt keinen Strich.
+\newcommand{\ZSFspan}[3]{%
+  \ifnum\numexpr\ZSF@tblCol+#2\relax<\ZSF@tblNcols
+    \ZSF@spanRuled{#1}{#2}{#3}%
+  \else
+    \ZSF@spanPlain{#1}{#2}{#3}%
+  \fi
 }
 \makeatother
 
@@ -221,31 +285,71 @@
 \newif\ifZSF@tblVRules
 \makeatother
 
-% --- waagrecht: eine Linie nach JEDEM \cr, ohne die Zeilenenden anzufassen
+% --- waagrecht: eine Linie ZWISCHEN zwei Zeilen, nirgends sonst
 %
-% \hline nach jeder Zeile zu verlangen waere Handarbeit im Kapitel, und ein
-% Patch auf \\ / \@arraycr trifft die Optionsform \\[2pt] nicht mehr richtig
-% (der eingeschobene \hline steht dann vor dem `['). TeX hat fuer genau das
-% \everycr: eine Tokenliste, die nach jedem \cr einer Ausrichtung eingefuegt
-% wird — auch nach dem \cr der Praeambel (Oberkante) und nach dem
-% abschliessenden \crcr (Unterkante, auch wenn die letzte Zeile ohne \\
-% endet). \hline steht darin ohne \noalign, weil es sein \noalign selbst
-% mitbringt.
+% \hline nach jeder Zeile zu verlangen waere Handarbeit im Kapitel. TeX hat
+% fuer genau das \everycr: eine Tokenliste, die nach jedem \cr einer
+% Ausrichtung eingefuegt wird. Sie feuert allerdings auch nach dem \cr der
+% Praeambel und nach dem abschliessenden \crcr — also OBEN und UNTEN, und
+% genau dort gehoert keine Linie hin: Die Aussenkante zeichnet der Boxrahmen
+% (Begruendung im Abschnitt darunter). Solange hier ein blankes \hline stand,
+% lief unter jeder Tabelle eine zweite Linie dicht neben dem Rahmen.
 %
-% Sie laesst sich nur nicht vorher setzen: array.sty ueberschreibt \everycr in
+% Die Unterscheidung ist die Herkunft des \cr: Nur ein `\\' im Kapitel meint
+% einen Zeilenwechsel — der \cr der Praeambel und der \crcr des Abschlusses
+% meinen den Rand der Tabelle. \@arraycr ist der gemeinsame Weg beider
+% `\\'-Formen (mit und ohne [2pt]) und setzt deshalb den Merker; der Tick
+% direkt nach dem \cr liest ihn und raeumt ihn weg. Ein Patch auf \@arraycr,
+% der den \hline selbst einschoebe, traefe die Optionsform nicht — er setzt
+% hier nur einen Schalter und fasst den Zeilenwechsel nicht an.
+%
+% \endarray raeumt den Merker ebenfalls weg, und das ist kein Zierrat: Eine
+% verschachtelte Ausrichtung in einer Zelle (pmatrix, cases, array) benutzt
+% dasselbe \@arraycr und liesse ihn sonst gesetzt zurueck — die naechste
+% Tabellenkante bekaeme die Linie, die zur Matrix gehoerte.
+%
+% Daraus folgt eine Schreibregel, und zwar dieselbe wie in jedem LaTeX-Satz:
+% NACH DER LETZTEN ZEILE KEIN `\\'. Es ist ein Zeilenwechsel, also kommt eine
+% Linie — und die faellt dort mit dem Boxrahmen zusammen und verdickt ihn.
+%
+% Der Tick traegt zugleich den Spaltenzaehler der Zeile zurueck (\ZSF@tblCol,
+% oben): Beides ist dieselbe Stelle — hier faengt eine neue Zeile an.
+%
+% Die Linie steht IM Tick und nicht als \hline daneben, damit \everycr genau
+% eine Ergaenzung bekommt; gezeichnet wird sie wie bei colortbls \hline, also
+% mit der Tinte aus \arrayrulecolor (\CT@arc@) und der Staerke der Tabelle.
+%
+% \everycr laesst sich nur nicht vorher setzen: array.sty ueberschreibt es in
 % \ar@ialign, unmittelbar bevor dort \halign laeuft (gemessen — ein \everycr
 % vor \begin{ZSFtable} kommt wirkungslos an). Dazwischen kommt man genau an
 % einer Stelle: \halign ist in \ar@ialign ein Token wie jedes andere. Der
-% Schalter unten haengt sich davor, ergaenzt \everycr um die Linie und stellt
+% Schalter unten haengt sich davor, ergaenzt \everycr um den Tick und stellt
 % sich dabei SELBST zurueck — das \let gilt in der Gruppe von \@array, sodass
 % eine verschachtelte Ausrichtung in einer Zelle (aligned, array) die
 % Erweiterung nicht erbt und der naechste Durchgang von tabularx sie wieder
 % bekommt.
 \makeatletter
+\newif\ifZSF@tblRowBreak
+\newcommand{\ZSF@tblCrTick}{%
+  \global\ZSF@tblCol\z@
+  \ifZSF@tblRowBreak
+    \global\ZSF@tblRowBreakfalse
+    \ifZSF@tblHRules{\CT@arc@\hrule\@height\arrayrulewidth}\fi
+  \fi}
+\let\ZSF@origArraycr\@arraycr
+\def\@arraycr{\global\ZSF@tblRowBreaktrue\ZSF@origArraycr}
+% Der Merker wird HINTER \crcr zurueckgesetzt, nicht davor — die Reihenfolge
+% ist hier kein Stil, sondern Mechanik: TeX ueberliest das abschliessende
+% \crcr nur, solange es die Zeile unmittelbar expandierend erreicht. Steht
+% eine Zuweisung davor, bricht TeX die Expansion ab und faengt eine Zeile an;
+% jede Tabelle, deren letzte Zeile mit `\\' endet, bekam damit eine leere
+% Phantomzeile (gemessen an der Kopfzeile der Boxgruppe).
+\let\ZSF@origEndarray\endarray
+\def\endarray{\ZSF@origEndarray\global\ZSF@tblRowBreakfalse}
 \let\ZSF@halign\halign
-\newcommand{\ZSF@tblHRulesOn}{%
+\newcommand{\ZSF@tblCrHookOn}{%
   \def\halign{%
-    \everycr\expandafter{\the\everycr\hline}%
+    \everycr\expandafter{\the\everycr\noalign{\ZSF@tblCrTick}}%
     \let\halign\ZSF@halign
     \ZSF@halign}%
 }
@@ -278,26 +382,41 @@
 % die Aussenkante nicht will, nimmt sie an der Box weg (`frame=none`) — dort
 % liegt sie, und dort ist sie auch abschaltbar.
 %
-% Nebenbei faellt die Zielketten-Zeile (\ZSFspan) gratis richtig aus: Eine
-% Zelle ueber die volle Breite hat keine innere Grenze, also zeichnet sie
-% auch keine.
+% Die Zeile ueber die volle Breite (\ZSFspan) faellt dabei gratis richtig aus:
+% Sie hat keine innere Grenze, also zeichnet sie auch keine. Ein Verbund ueber
+% nur einen Teil der Spalten braucht dagegen Zutun — siehe \ZSFspan oben.
 %
 % Der Scanner kennt die Spaltentypen dieses Systems (L/C/R und Y/Z/Q/F mit
 % ihrem Faktor) und den Praefix >{...}; alles andere reicht er unveraendert
 % durch. Ein exotischer Eintrag verliert damit hoechstens seinen Strich — er
 % kann die Aufteilung nicht zerlegen. Ein bereits im Kapitel gesetztes '|'
 % faellt weg, sonst stuende dort ein doppelter Strich.
+%
+% Ein >{...}-Praefix gehoert zur FOLGENDEN Spalte und ist selbst keine: Der
+% Strich steht davor, und die Spalte dahinter setzt keinen zweiten. Ohne diese
+% Merkung stuende er zwischen Praefix und Spalte — eine Stelle, an der `array`
+% keinen Strich erlaubt.
+%
+% Nebenbei zaehlt der Scanner die Spalten (\ZSF@tblNcols): Er geht die
+% Aufteilung ohnehin Token fuer Token durch, und \ZSFspan braucht die Zahl.
 \newcommand{\ZSF@tblVSpec}{}
 \newif\ifZSF@vfirst
+\newif\ifZSF@vprefix
 \def\ZSF@vstop{\ZSF@vstop}
 \newcommand{\ZSF@vappend}[1]{%
   \edef\ZSF@tblVSpec{\unexpanded\expandafter{\ZSF@tblVSpec}\unexpanded{#1}}}
 % Die erste Spalte bekommt keinen Strich davor — sonst waere er die
 % Aussenkante.
 \newcommand{\ZSF@vsep}{%
-  \ifZSF@vfirst\ZSF@vfirstfalse\else\ZSF@vappend{|}\fi}
-\def\ZSF@vcolumn#1{\ZSF@vsep\ZSF@vappend{#1}\ZSF@vloop}
-\def\ZSF@vcolumnarg#1{\ZSF@vsep\ZSF@vappend{#1}\ZSF@vgrab}
+  \ifZSF@vprefix
+    \ZSF@vprefixfalse
+  \else
+    \ifZSF@vfirst\ZSF@vfirstfalse\else\ZSF@vappend{|}\fi
+  \fi}
+\newcommand{\ZSF@vcount}{\global\advance\ZSF@tblNcols\@ne}
+\def\ZSF@vcolumn#1{\ZSF@vsep\ZSF@vcount\ZSF@vappend{#1}\ZSF@vloop}
+\def\ZSF@vcolumnarg#1{\ZSF@vsep\ZSF@vcount\ZSF@vappend{#1}\ZSF@vgrab}
+\def\ZSF@vprefixarg#1{\ZSF@vsep\ZSF@vprefixtrue\ZSF@vappend{#1}\ZSF@vgrab}
 \def\ZSF@vgrab#1{\ZSF@vappend{{#1}}\ZSF@vloop}
 \def\ZSF@vpass#1{\ZSF@vappend{#1}\ZSF@vloop}
 \def\ZSF@vdrop#1{\ZSF@vloop}
@@ -314,7 +433,7 @@
   \ifx Z#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
   \ifx Q#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
   \ifx F#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
-  \ifx >#1\let\ZSF@vnext\ZSF@vcolumnarg\fi
+  \ifx >#1\let\ZSF@vnext\ZSF@vprefixarg\fi
   \ifx |#1\let\ZSF@vnext\ZSF@vdrop\fi
   \ZSF@vnext{#1}}
 \def\ZSF@vloop#1{%
@@ -326,7 +445,8 @@
   \ZSF@vnextstep}
 \newcommand{\ZSF@vrules}[1]{%
   \renewcommand{\ZSF@tblVSpec}{}%
-  \ZSF@vfirsttrue
+  \global\ZSF@tblNcols\z@
+  \ZSF@vfirsttrue \ZSF@vprefixfalse
   \ZSF@vloop#1\ZSF@vstop}
 \makeatother
 
@@ -397,6 +517,20 @@
 %
 % \ZSF@tblStretch trifft nur die tabularx-Seite: tabularray hat kein
 % Zeilenstreben, dort erledigt \ZSFtableCellPadY als `rowsep` beides.
+%
+% `tight` VERKNAPPT DIE LUFT, ES NIMMT SIE NICHT WEG. Sie stand hier auf null,
+% und das war der eine Wert, der die Zusage des Registers aufhob: »der Inhalt
+% einer Zeile haelt Abstand zur Zeilenkante«. Solange keine Linien gezeichnet
+% wurden, sah man es nicht — seit das Gitter Vorbelegung ist, laeuft die Linie
+% durch die Oberlaengen (gemessen an D-06 des Katalogs: 1,1 pt zwischen
+% Oberkante und Strich, bei 0,8 pt Linienstaerke).
+%
+% Die knappe Stufe ist deshalb die HALBE Mindestluft und nicht dieselbe wie
+% `normal`: Am valuegrid ist \ZSFtableCellPadY das Einzige, was `rows` dort
+% ueberhaupt setzt (tabularray hat kein Zeilenstreben, siehe oben) — mit
+% gleicher Luft waere der Regler dort wirkungslos, und check_box_options meldet
+% genau das. Halbiert statt mit einem eigenen Register: Es ist dieselbe
+% Entscheidung wie `normal`, nur knapper, und faehrt so mit jeder Dichte mit.
 \newcommand{\ZSF@setRows}[1]{%
   \IfStrEqCase{#1}{%
     {normal}{\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}%
@@ -404,7 +538,8 @@
     {roomy} {\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchRoomy}%
              \setlength{\ZSFtableCellPadY}{\ZSFDensityTables\ZSFspaceS}}%
     {tight} {\renewcommand{\ZSF@tblStretch}{\ZSFtableArrayStretchTight}%
-             \setlength{\ZSFtableCellPadY}{0pt}}%
+             \setlength{\ZSFtableCellPadY}{\ZSFDensityTables\ZSFspaceXS}%
+             \setlength{\ZSFtableCellPadY}{0.5\ZSFtableCellPadY}}%
   }%
 }
 \newcommand{\ZSF@setColsep}[1]{%
@@ -506,9 +641,17 @@
   \ifZSF@tblVRules
     \expandafter\ZSF@vrules\expandafter{\ZSF@tblRaw}%
   \else
+    % Ohne senkrechte Linien wird nicht gezaehlt — und ohne Zahl setzt auch
+    % \ZSFspan keinen Trennstrich. Die Null muss trotzdem stehen: sonst laese
+    % der Verbund die Spaltenzahl der zuletzt gesetzten Tabelle.
+    \global\ZSF@tblNcols\z@
     \let\ZSF@tblVSpec\ZSF@tblRaw
   \fi
-  \ifZSF@tblHRules\ZSF@tblHRulesOn\fi
+  % Der Tick haengt IMMER am \cr — er traegt den Spaltenzaehler zurueck, auch
+  % wo keine Linie gezeichnet wird.
+  \global\ZSF@tblCol\z@
+  \global\ZSF@tblRowBreakfalse
+  \ZSF@tblCrHookOn
   \edef\ZSF@tblSpec{@{\hskip\ZSF@tblColSep}%
     \unexpanded\expandafter{\ZSF@tblVSpec}@{\hskip\ZSF@tblColSep}}%
   \expandafter\ZSF@beginTabularx\expandafter{\ZSF@tblSpec}%
