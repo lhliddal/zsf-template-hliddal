@@ -85,21 +85,13 @@ defbox[atomic]; hier ohne Bild, um den Container pur zu zeigen.}
 \Zweck{Herleitung und Fallunterscheidung. Technisch defbox mit vier Reglern
 plus ungetönter Fläche.}
 
-\begin{valuegrid}[B-10 · valuegrid]{2}
-  Mustertext & zum & Formvergleich \\
-  Zweite Zeile & fixes & Gitter \\
-  Erste Spalte & immer & Beschriftung
-\end{valuegrid}
-\Zweck{Kompakte Wertetabelle mit festem Gitter; das Argument ist die Anzahl
-Datenspalten.}
-
 \SubsectionBar[kat:box-nesting]{Boxen gruppieren und gliedern}
 \ZSFindex{ZSFboxgroup}
 \ZSFindex{ZSFinset}
 
 \begin{ZSFboxgroup}[cols={Y{1.0} Q{1.0}},
                     head={\ZSFhead{Mustertext} & \ZSFhead{Formvergleich}}]
-  \begin{tablebox}[B-11 · ZSFboxgroup]
+  \begin{tablebox}[B-10 · ZSFboxgroup]
     \begin{ZSFtable}[header=false]{\ZSFgroupcols}
       Erster Block & 1
     \end{ZSFtable}
@@ -113,7 +105,7 @@ Datenspalten.}
 \Zweck{Mehrere Boxen als ein Block: gemeinsame Kopfzeile, geschlossene
 Zwischenräume, Spaltenaufteilung nur einmal gesetzt.}
 
-\begin{tablebox}[B-12 · ZSFinset]
+\begin{tablebox}[B-11 · ZSFinset]
   \begin{ZSFtable}[header=false]{Y{1.0} Q{1.0}}
     Tabelle bis an die Kante & 1 \\
     damit das Zebra & 2

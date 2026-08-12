@@ -154,11 +154,10 @@ Vorbelegung: top.}
 
 \SubsectionBar[kat:regler-eigen]{Regler mit nur einem Besitzer}
 \ZSFindex{ordered}
-\ZSFindex{grid}
 
 \begin{runintext}
   Vier Regler gehören genau einer Box und brechen auf jeder anderen mit einer
-  Meldung. Zwei stehen hier, die Tabellen-Regler in \ZSFref{kat:tabellen},
+  Meldung. Einer steht hier, die Tabellen-Regler in \ZSFref{kat:tabellen},
   \ZSFkeyword*{part} in \ZSFref{kat:module}.
 \end{runintext}
 
@@ -168,19 +167,7 @@ Vorbelegung: top.}
 \end{ZSFlist}
 \Zweck{ZSFlist nummeriert statt aufgezählt — nur bei stabiler Schrittfolge.}
 
-\begin{valuegrid}[C-21 · grid=horizontal][grid=horizontal]{2}
-  Mustertext & zum & Formvergleich \\
-  Zweite Zeile & nur & Zeilenlinien
-\end{valuegrid}
-\Zweck{valuegrid ohne Senkrechte. Vorbelegung: both.}
-
-\begin{valuegrid}[C-22 · grid=none][grid=none]{2}
-  Mustertext & zum & Formvergleich \\
-  Zweite Zeile & ganz & ohne Gitter
-\end{valuegrid}
-\Zweck{Gar keine Linien — wo die Spalten selbst sprechen.}
-
-\begin{defbox}[C-23 · ZSFlist ohne Titel][tone=neutral, weight=quiet]
+\begin{defbox}[C-21 · ZSFlist ohne Titel][tone=neutral, weight=quiet]
   Ohne Titel entsteht keine Box, also gibt es keinen Träger für die
   Box-Regler. \ZSFkeyword*{ordered} und \ZSFkeyword*{tone} wirken trotzdem,
   jeder andere Regler bricht dort mit einer Meldung ab.

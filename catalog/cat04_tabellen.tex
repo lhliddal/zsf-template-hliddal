@@ -3,7 +3,7 @@
 \StartChapter[kat:tabellen]{D · Tabellen}
 
 \begin{runintext}
-  Eine Tabellen-Umgebung mit fünf Reglern, dazu das kompakte
+  Eine Tabellen-Umgebung mit sechs Reglern, dazu das kompakte
   \ZSFkeyword{valuegrid}. Alle Einträge tragen denselben Zellinhalt, damit
   die Regler und nicht die Daten den Unterschied machen.
 \end{runintext}
@@ -89,9 +89,10 @@ den Spalten und an der Boxkante. Vorbelegung: normal.}
 \SubsectionBar[kat:tab-struktur]{Zellverbund, Bild, Linien}
 \ZSFindex{ZSFspan}
 \ZSFindex{ZSFimage}
+\ZSFindex{grid}
 
 \begin{tablebox}[D-08 · ZSFspan]
-  \begin{ZSFtable}{Y{1.2} Z{0.9} Z{0.9} Z{0.8}}
+  \begin{ZSFtable}{Y{1.4} Z{0.9} Z{0.9} Z{0.8}}
     \ZSFheaderRow \ZSFhead{Erste} & \ZSFspan{C}{2}{\ZSFhead{Gruppe}}
                                   & \ZSFhead{C} \\
     Mustertext & 12 & 24 & 36 \\
@@ -113,27 +114,39 @@ bricht nicht um.}
 \Zweck{Das Bild ohne eigene Box; die Höhe stellt der Container, nicht der
 Aufruf.}
 
-\begin{tablebox}[D-10 · Linien]
-  \begin{ZSFtable}[header=false, zebra=false]{Y{1.0} | Q{1.0}}
-    Mustertext & zum Formvergleich \\ \hline
-    Zweite Zeile & nach hline \\
-    Dritte Zeile & senkrecht getrennt
+\begin{tablebox}[D-10 · grid=horizontal]
+  \begin{ZSFtable}[grid=horizontal]{Y{1.0} Q{1.0}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & nur Zeilenlinien \\
+    Dritte Zeile & zeigt den Wechsel
   \end{ZSFtable}
 \end{tablebox}
-\Zweck{Vorbelegung ist ohne Linien, aber hline und der Pipe in der
-Spaltenangabe bleiben erlaubt — nur ihre Farbe wird nicht lokal gesetzt.}
+\Zweck{Ohne Senkrechte. Vorbelegung ist both; die Aussenkante zeichnet in
+jedem Fall der Boxrahmen, nicht das Gitter.}
+
+\begin{tablebox}[D-11 · grid=none]
+  \begin{ZSFtable}[grid=none]{Y{1.0} Q{1.0}}
+    \ZSFheaderRow \ZSFhead{Erste} & \ZSFhead{Zweite} \\
+    Mustertext & zum Formvergleich \\
+    Zweite Zeile & ganz ohne Gitter \\
+    Dritte Zeile & zeigt den Wechsel
+  \end{ZSFtable}
+\end{tablebox}
+\Zweck{Gar keine Linien — wo die Spalten selbst sprechen und das Zebra
+trennt. Derselbe Regler mit denselben Werten wie am valuegrid.}
 
 \SubsectionBar[kat:tab-spalten]{Spaltentypen}
 \ZSFindex{Spaltentyp}
 
-\begin{tablebox}[D-11 · L C R F]
+\begin{tablebox}[D-12 · L C R F]
   \begin{ZSFtable}[header=false, zebra=false]{L C R F{1}}
     L links & C zentriert & R rechts & F{1}: x^2+1
   \end{ZSFtable}
 \end{tablebox}
 \Zweck{Gleichverteilt mit Faktor 1; F ist der neutrale Typ für Mathe-Inhalt.}
 
-\begin{tablebox}[D-12 · Y Z Q mit Gewicht]
+\begin{tablebox}[D-13 · Y Z Q mit Gewicht]
   \begin{ZSFtable}[header=false, zebra=false]{Y{1.4} Z{0.8} Q{0.8}}
     Y links, Gewicht 1.4 & Z zentriert & Q rechts
   \end{ZSFtable}
@@ -144,7 +157,7 @@ der Faktoren entspricht der Anzahl Spalten.}
 \SubsectionBar[kat:tab-grid]{Wertegitter}
 \ZSFindex{valuegrid}
 
-\begin{valuegrid}[D-13 · valuegrid]{3}
+\begin{valuegrid}[D-14 · valuegrid]{3}
   Mustertext & 12 & 24 & 36 \\
   Zweite Zeile & 20 & 40 & 60 \\
   Dritte Zeile & 30 & 60 & 90
@@ -152,7 +165,7 @@ der Faktoren entspricht der Anzahl Spalten.}
 \Zweck{Festes Gitter, erste Spalte immer Beschriftung. Nimmt rows, colsep
 und grid unter denselben Namen wie die ZSFtable.}
 
-\begin{valuegrid}[D-14 · valuegrid rows=tight][rows=tight, colsep=tight]{3}
+\begin{valuegrid}[D-15 · valuegrid rows=tight][rows=tight, colsep=tight]{3}
   Mustertext & 12 & 24 & 36 \\
   Zweite Zeile & 20 & 40 & 60 \\
   Dritte Zeile & 30 & 60 & 90
