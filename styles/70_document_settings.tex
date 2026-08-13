@@ -51,6 +51,19 @@
   % hielt diese Kopplung nur zufällig ein und hätte sie bei jeder Änderung der
   % Zeilenhöhe verloren.
   \setlength{\maxdepth}{0.5\ZSFcolumnTopSkip}%
+  % Der Grundzustand des Dokuments ist die Fliesstext-Rolle, nicht die
+  % Bausteingrösse: Zwischen den Strukturmakros steht in einer ZSF blanker
+  % Text, der zu keinem Baustein gehört und deshalb sonst nirgends eine Rolle
+  % bekäme. Genau ihn traf frueher das rohe \fontsize in main.tex.
+  %
+  % Die Bausteine holen sich ihre Groesse selbst zurueck (\ZSFfontContent =
+  % \normalsize = die Grundgroesse), der Umgebungsfont beruehrt sie nicht.
+  %
+  % NACH den Spaltenskips: \topskip soll die groessere der beiden Groessen
+  % tragen. Eine Spalte kann mit einer Box beginnen, und ein zu knapper
+  % Spaltenkopf-Abstand laesst deren erste Zeile anstossen — zu viel Abstand
+  % kostet nur Platz, zu wenig kostet Lesbarkeit.
+  \ZSFfontFlow
 }
 
 % Kompakte Listen (wie Analysis: kein überschüssiges Whitespace)

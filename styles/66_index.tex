@@ -220,6 +220,10 @@
 \renewenvironment{theindex}{%
   \ZSFTitleBarLockOff % Register ist Inhalt: Balken-Sperre endet hier
   \begingroup
+  % Dieselbe Rolle wie der freie Fliesstext: Das Register ist Nachschlagetext
+  % ausserhalb der Bausteine und folgt deshalb \ZSFFlowTextScale, nicht der
+  % Grösse des Bausteininhalts.
+  \ZSFfontFlow
   \RaggedRight
   \setlength{\parindent}{0pt}%
   \setlength{\parskip}{0pt plus \ZSFindexParStretch}%

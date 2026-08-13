@@ -37,14 +37,34 @@
 % Wirkung bricht den Build.
 % ─────────────────────────────────────────────────────────────────────
 
-% ── Platz: Dichte, Zeilenhöhe, Umbruchreserve ────────────────────────
+% ── Platz: Grundgrösse, Dichte, Zeilenhöhe, Umbruchreserve ───────────
 % Müssen VOR styles/30_layout_spacing stehen.
-% Dichte und Zeilenhöhe sind getrennt, weil unterschiedlich riskant:
-% Abstände sind Leerraum und vertragen jede Skalierung, Zeilenhöhe
-% enthält die Schrift selbst — nur in kleinen Schritten senken und
-% danach das PDF auf kollidierende Formelzeilen prüfen.
+%
+% Drei Hebel, drei verschiedene Fragen — bewusst nicht einer:
+%   Grundgrösse   wie gross die Schrift ist
+%   Dichte        wie viel Leerraum zwischen den Blöcken liegt
+%   Zeilenhöhe    wie eng die Zeilen aufeinander folgen
+% Sie sind getrennt, weil unterschiedlich riskant: Abstände sind Leerraum und
+% vertragen jede Skalierung, Zeilenhöhe enthält die Schrift selbst — nur in
+% kleinen Schritten senken und danach das PDF auf kollidierende Formelzeilen
+% prüfen.
+%
+% Die Grundgrösse des Satzes. Leer = die Klassenoption aus main.tex
+% (\documentclass[8pt]). Nimmt den ganzen Schriftsatz mit — Klassenstufen,
+% Titel- und Balkengrössen, Diagramm-Beschriftungen —, sodass die Verhältnisse
+% erhalten bleiben. Erreicht auch Grössen, die extsizes nicht als Klassenoption
+% anbietet (7pt). Der grösste der drei Hebel: ~30 % Fläche zwischen 8pt und 7pt.
+% \def\ZSFBodyFontSize{7pt}       % leer = Klassengrösse (8pt)
 % \def\ZSFDensityFactor{0.85}     % 1    = Referenz, kleiner = dichter
 % \def\ZSFLeadingFactor{0.92}     % 0.95 = Referenz, kleiner = enger
+%
+% Wie laut die verbindende Prosa neben dem Bausteininhalt steht — ein
+% ROLLEN-Faktor auf die Grundgrösse, für blanken Text zwischen den
+% Strukturmakros, `runintext` und das Register. Boxen, Tabellen, Balken und
+% Titel bleiben unberührt. In einer box-lastigen ZSF trägt die Box den
+% prüfungsrelevanten Inhalt und die Prosa verbindet ihn — dann darf sie eine
+% Stufe leiser stehen. 0.875 = 7pt bei 8pt Grundgrösse.
+% \def\ZSFFlowTextScale{0.875}    % 1 = wie der Bausteininhalt
 %
 % Bereichsfaktoren multiplizieren den globalen Faktor für IHREN Bereich —
 % für ZSF, die ungleich verteilt sind (box-lastig vs. textlastig).
@@ -67,8 +87,8 @@
 % Schriftgrösse der Diagramm-Beschriftung — beide Stufen gemeinsam
 % (\ZSFfontDiagramLabel und \ZSFfontDiagramLabelSmall). Kleiner für Fächer mit
 % vielen gedrängten Zeichnungen; die zwei Stufen bleiben dabei unterscheidbar.
-% Der einzige Schrift-Regler des Systems: Fliesstext- und Titelgrössen sind
-% aufeinander abgestimmt und werden nicht pro ZSF gedreht.
+% Ein ROLLEN-Faktor: Er multipliziert die Grundgrösse für diese eine Rolle,
+% statt sie zu ersetzen — wie die Bereichsfaktoren bei der Dichte.
 % \def\ZSFDiagramLabelScale{0.85} % 1 = Referenz, kleiner = kleinere Labels
 
 \input{styles/00_packages}

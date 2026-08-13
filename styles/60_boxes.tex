@@ -300,7 +300,27 @@
 \newcommand{\ZSF@blockBefore}{%
   \ifnum\lastnodetype=-1\relax\else
     \par
-    \ifvmode\addvspace{\glueexpr\ZSFBoxBeforeSkip-\parskip\relax}\fi
+    \ifvmode
+      % Die Sperre gilt auch fuer den Vorabstand DIESES Blocks, nicht nur fuer
+      % die Umbruchpunkte, die das Balken-System selbst setzt.
+      %
+      % Warum das noetig ist: Direkt nach einem Balken steht
+      % \penalty10000 + Glue — dort ist kein Bruch moeglich, weil eine Glue
+      % nach einer Penalty kein legaler Umbruchpunkt ist. Steht zwischen Balken
+      % und Block aber ein NICHT-verwerfbarer Knoten, ist die Kette
+      % unterbrochen: \ZSFindex schreibt einen \write-Whatsit, \label ebenso.
+      % Danach ist die naechste Glue wieder ein legaler Umbruchpunkt, und der
+      % Balken bleibt allein am Spaltenfuss stehen. Genau so gesehen im Anhang,
+      % wo \ZSFBreakReservesOff die zweite Absicherung wegnimmt.
+      %
+      % Nur wenn KEINE Glue zum Verschmelzen daliegt: Ist \lastskip von null
+      % verschieden, zieht \addvspace die vorhandene Glue ein und die
+      % \penalty10000 des Balkens steht wieder unmittelbar davor — dort waere
+      % ein \nobreak wirkungslos und wuerde die Verschmelzung verhindern, also
+      % zusaetzlichen Abstand erzeugen.
+      \ifzsfTitleBarPending\ifdim\lastskip=0pt\nobreak\fi\fi
+      \addvspace{\glueexpr\ZSFBoxBeforeSkip-\parskip\relax}%
+    \fi
   \fi
   % BEIDE Merker, nicht nur der eine. Ein Block zwischen Kapitelbalken und
   % Abschnittsbalken heisst, dass die beiden Balken NICHT aneinanderstossen —
@@ -1081,8 +1101,12 @@
 % derselbe Ort, zwei Abstände, je nachdem was folgt. Sichtbar war das als
 % auffällige Lücke zwischen Balken und erstem Satz.
 \makeatletter
+% Die Schriftrolle steht hier und nicht im Aufruf: runintext ist der Baustein
+% »freier Fliesstext«, und wie laut der neben dem Bausteininhalt steht, ist
+% eine Dokumententscheidung (\ZSFFlowTextScale, 50_typography_semantics).
 \newenvironment{runintext}{%
   \ZSF@blockBefore
+  \ZSFfontFlow
   \noindent\ZSFReadableAuto\ignorespaces
 }{\par}
 \makeatother

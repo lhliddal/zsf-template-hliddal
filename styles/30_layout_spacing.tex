@@ -13,6 +13,92 @@
 \newcounter{zsfFirstChap}\setcounter{zsfFirstChap}{1}
 
 % ------------------------------------------------------------
+% GRUNDGRÖSSE DES SATZES — die dritte Platz-Stellschraube
+% ------------------------------------------------------------
+% Die Klassenoption (\documentclass[8pt]) setzt die Grundgrösse, und extsizes
+% kennt nur seine eigene Stufenliste — 7pt steht nicht darauf. Eine ZSF, die
+% enger gesetzt werden muss, hatte deshalb bisher nur den lokalen Ausweg: ein
+% rohes \fontsize direkt nach \begin{document}. Das trifft \normalsize und
+% sonst nichts. \footnotesize (die `dense`-Stufe), die Titel- und Balkengrössen
+% und alles aus \baselineskip Abgeleitete bleiben auf der Klassenstufe stehen;
+% der Satz wird danach nicht kleiner, sondern unstimmig — und zwar lautlos,
+% weil jede Grösse für sich weiter korrekt aussieht.
+%
+% Deshalb ist die Grundgrösse eine Stellschraube wie Dichte und Zeilenhöhe:
+% EINE Zahl, die den ganzen Schriftsatz mitnimmt — die Klassenstufen, die
+% benannten Schriftrollen aus 50_typography_semantics und die Balkenhöhe. Die
+% VERHÄLTNISSE bleiben dabei erhalten; genau das heisst »aufeinander
+% abgestimmt«. Abgestimmt heisst nicht unveränderlich.
+%
+%   \def\ZSFBodyFontSize{7pt}   % in preamble.tex, VOR diesem \input
+%
+% Leer (Default) = Klassengrösse, es wird nichts angefasst.
+%
+% Drei Regler, drei Fragen, bewusst nicht einer: Die Grundgrösse ändert die
+% Schrift, \ZSFDensityFactor den Leerraum zwischen den Blöcken,
+% \ZSFLeadingFactor den Abstand zwischen den Zeilen. Wer eine Seite sparen
+% muss, hat damit drei unabhängige Hebel statt eines groben.
+%
+% BEWUSST AUSSERHALB: \ZSFfontFooter und \ZSFfontIdentityMarker. Beide gehören
+% zur SEITE und nicht zur Textspalte — die Seitenzahl am Fuss ist eine feste
+% physische Grösse und schrumpft nicht mit, nur weil der Text enger gesetzt ist.
+\providecommand{\ZSFBodyFontSize}{}
+\makeatletter
+% Die Klassengrösse als Referenz sichern, bevor irgendetwas umgeschaltet wird.
+% Auch den Zeilenabstand: 50_typography_semantics leitet daraus die Rolle des
+% freien Fliesstextes ab und braucht beide Masse der Basis, nicht nur eines.
+\edef\ZSF@classFontSize{\f@size}
+\edef\ZSF@classBaselineSkip{\f@baselineskip}
+% Der Faktor, den 50_typography_semantics für seine Schriftrollen mitliest.
+\def\ZSFBodyScale{1}
+% Der Leer-Test läuft über den EXPANDIERTEN Inhalt, nicht über das Makro.
+% Ein Vergleich der Bedeutung (\ifx…\@empty, ebenso \tl_if_empty:N) ist hier
+% falsch: \providecommand erzeugt ein \long-Makro, \@empty und \c_empty_tl
+% sind keines — der Test wäre immer »nicht leer« und die Schraube liefe
+% ungefragt mit Faktor 0, also mit Schriftgrösse null. \edef macht daraus
+% beidseitig ein gewöhnliches Makro und vergleicht, was wirklich dasteht.
+\edef\ZSF@bodySizeGiven{\ZSFBodyFontSize}
+\ifx\ZSF@bodySizeGiven\@empty\else
+  \ExplSyntaxOn
+  \xdef\ZSFBodyScale{\fp_eval:n
+    { \dim_to_fp:n {\ZSFBodyFontSize} / \dim_to_fp:n {\ZSF@classFontSize pt} }}
+  \ExplSyntaxOff
+\fi
+% Entschieden wird am FAKTOR und nicht am Leer-Zustand: Ein ausgeschriebenes
+% \ZSFBodyFontSize{8pt} (= die Klassengrösse) nimmt damit denselben Weg wie
+% gar keine Angabe, statt die Klassenstufen ohne Grund neu zu schreiben.
+\ifdim\ZSFBodyScale pt=1pt\else
+  % Die Klassenstufen einzeln nachziehen. Gelesen wird, was die Klasse
+  % TATSÄCHLICH gesetzt hat, nicht eine hier wiederholte Wertetabelle — sonst
+  % driften Klasse und Umrechnung auseinander, sobald jemand die Klassenoption
+  % ändert. \selectfont ist dabei stillgelegt: Gebraucht werden nur die von
+  % \fontsize normalisierten Werte, nicht der geladene Font.
+  \newcommand{\ZSF@rescaleSize}[1]{%
+    \begingroup
+      \let\selectfont\relax
+      #1%
+      \xdef\ZSF@rsSize{\f@size}\xdef\ZSF@rsSkip{\f@baselineskip}%
+    \endgroup
+    \begingroup
+      \@tempdima=\ZSFBodyScale\dimexpr\ZSF@rsSize pt\relax
+      \@tempdimb=\ZSFBodyScale\dimexpr\ZSF@rsSkip\relax
+      \edef\ZSF@rsApply{\endgroup
+        \noexpand\renewcommand\noexpand#1{%
+          \noexpand\@setfontsize\noexpand#1%
+            {\strip@pt\@tempdima}{\strip@pt\@tempdimb}}}%
+    \ZSF@rsApply}
+  \ZSF@rescaleSize{\tiny}        \ZSF@rescaleSize{\scriptsize}
+  \ZSF@rescaleSize{\footnotesize}\ZSF@rescaleSize{\small}
+  \ZSF@rescaleSize{\normalsize}  \ZSF@rescaleSize{\large}
+  \ZSF@rescaleSize{\Large}       \ZSF@rescaleSize{\LARGE}
+  \ZSF@rescaleSize{\huge}        \ZSF@rescaleSize{\Huge}
+  % Sofort umschalten: alles, was weiter unten aus \baselineskip abgeleitet
+  % wird (die Umbruchreserven), muss die neue Grundgrösse bereits sehen.
+  \normalsize
+\fi
+\makeatother
+
+% ------------------------------------------------------------
 % SPACING-SKALA (4 Stufen) — die einzige Quelle für Abstände
 % ------------------------------------------------------------
 % ── Dichte: die globale Stellschraube pro ZSF ────────────────────────
@@ -185,7 +271,11 @@
   \setlength{\ZSFbreakThreshold}{\ZSFBreakReserveFactor\dimexpr 7\baselineskip\relax}
 \newlength{\ZSFbreakThresholdSubsubsection}
   \setlength{\ZSFbreakThresholdSubsubsection}{\ZSFBreakReserveFactor\dimexpr 5\baselineskip\relax}
-\newlength{\ZSFtitleBarHeight}\setlength{\ZSFtitleBarHeight}{9.2pt}
+% An die Schrift gebunden und deshalb an \ZSFBodyFontSize, nicht an die Dichte:
+% Der Streifen muss die Titelzeile tragen. Wird die Grundgrösse kleiner, wird
+% er es mit — bliebe er stehen, wüchse die Polsterung um den Titel still mit.
+\newlength{\ZSFtitleBarHeight}
+  \setlength{\ZSFtitleBarHeight}{\ZSFBodyScale\dimexpr 9.2pt\relax}
 \newlength{\ZSFsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceL}
 \newlength{\ZSFsubsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceS}
 \newlength{\ZSFsubsectionAfterChapterGap}\ZSFderive{\ZSFsubsectionAfterChapterGap}{\ZSFDensityStructure\ZSFspaceXS}

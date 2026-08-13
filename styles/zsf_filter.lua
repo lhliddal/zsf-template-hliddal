@@ -94,7 +94,13 @@ local function zsf_filter(line)
   -- Platzhalter wiederherstellen
   line = line:gsub(placeholder_double_dollar, "$$")
   line = line:gsub(placeholder_escaped_dollar, "\\$")
-  line = line:gsub(placeholder_pct, "\\%")
+  -- %% und nicht %: Im ERSATZ-String von gsub leitet % eine Referenz ein
+  -- (%1, %0). Ein einzelnes % am Ende ist damit kein Zeichen, sondern ein
+  -- abgeschnittener Escape — Lua bricht mit "invalid use of '%' in
+  -- replacement string" ab, und zwar erst, wenn ein Kapitel wirklich ein
+  -- \% enthält. Beim $ daneben stellt sich die Frage nicht: Nur % ist im
+  -- Ersatz-String besonders.
+  line = line:gsub(placeholder_pct, "\\%%")
 
   return line
 end

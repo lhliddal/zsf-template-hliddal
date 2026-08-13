@@ -59,6 +59,9 @@ und `rules/55_index.md`.
   `\ZSFallowbreak`.
 - Dokumentkopf und Skriptverweis: `\ZSFTitleHeader`, `\ZSFScriptRef`.
 - Globale Stellschrauben (in `preamble.tex`, nicht in Kapiteln):
+  `\ZSFBodyFontSize` (Grundgrösse des Satzes, siehe `rules/30_spacing.md`),
+  `\ZSFFlowTextScale` (Rollen-Faktor für freien Fliesstext und Register,
+  siehe `rules/30_spacing.md`),
   `\ZSFDensityFactor`, `\ZSFLeadingFactor`,
   Bereichsfaktoren `\ZSFDensityBoxes`, `\ZSFDensityText`, `\ZSFDensityTables`,
   `\ZSFDensityStructure`, `\ZSFBreakReserveFactor`,

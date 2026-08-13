@@ -2,18 +2,47 @@
 % 50_typography_semantics.tex — Schriftmakros für Box-Typen & semantische Inhaltsmakros
 % ============================================================
 
-% Explizite bp-Grössen (wie Analysis) für präzise, font-unabhängige Kontrolle
-\newcommand{\ZSFfontChapter}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
-\newcommand{\ZSFfontSection}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
-\newcommand{\ZSFfontSubsubsection}{\sffamily\bfseries\fontsize{7.2bp}{8.0bp}\selectfont}
-\newcommand{\ZSFfontBoxTitle}{\sffamily\bfseries\fontsize{8.1bp}{9.1bp}\selectfont}
+% ── Die eine Rechenstelle für jede benannte Schriftrolle ─────────────
+% Jede Grösse unten wird GERECHNET, nicht geschrieben: Sie ist ihr bp-Mass
+% mal dem Rollenfaktor mal der Grundgrösse der ZSF (\ZSFBodyScale aus
+% 30_layout_spacing, 1 solange \ZSFBodyFontSize nicht steht). Über \the und
+% damit in pt, weil \fontsize sein Argument sonst als Zahl ohne Einheit lesen
+% müsste — der Faktor kommt so als fertiges Mass an und nicht als Term.
+%
+% \ZSFBodyScale steht hier fest verdrahtet und nicht als vierter Parameter:
+% Es gibt keine Schriftrolle im Textkörper, die der Grundgrösse NICHT folgen
+% soll. Wäre sie ein Argument, wäre die Frage bei jeder neuen Rolle wieder
+% offen — und genau eine Rolle bekäme sie irgendwann anders beantwortet.
+\makeatletter
+\newlength{\ZSF@fontSize}
+\newlength{\ZSF@fontSkip}
+\newcommand{\ZSF@scaledFont}[3]{%
+  \setlength{\ZSF@fontSize}{\ZSFBodyScale\dimexpr #1\dimexpr #2\relax\relax}%
+  \setlength{\ZSF@fontSkip}{\ZSFBodyScale\dimexpr #1\dimexpr #3\relax\relax}%
+  \fontsize{\the\ZSF@fontSize}{\the\ZSF@fontSkip}\selectfont}
+
+% Explizite bp-Grössen (wie Analysis) für präzise, font-unabhängige Kontrolle.
+% Der Rollenfaktor ist 1, wo die Rolle keinen eigenen Regler hat — nur die
+% Diagramm-Beschriftung bringt mit \ZSFDiagramLabelScale einen mit.
+\newcommand{\ZSFfontChapter}{\sffamily\bfseries\ZSF@scaledFont{1}{8.1bp}{9.1bp}}
+\newcommand{\ZSFfontSection}{\sffamily\bfseries\ZSF@scaledFont{1}{8.1bp}{9.1bp}}
+\newcommand{\ZSFfontSubsubsection}{\sffamily\bfseries\ZSF@scaledFont{1}{7.2bp}{8.0bp}}
+\newcommand{\ZSFfontBoxTitle}{\sffamily\bfseries\ZSF@scaledFont{1}{8.1bp}{9.1bp}}
 % chktex 6
-\newcommand{\ZSFfontNote}{\sffamily\fontsize{6.7bp}{7.5bp}\itshape\selectfont}
+\newcommand{\ZSFfontNote}{\sffamily\itshape\ZSF@scaledFont{1}{6.7bp}{7.5bp}}
 % Rechtsbuendiges Meta-/Kategorie-Tag im Titelbalken (vgl. \ZSFTitleTag in
 % styles/60_boxes.tex). Etwas kleiner und kursiv, damit es den Titel begleitet
 % statt mit ihm zu konkurrieren.
-\newcommand{\ZSFfontTitleTag}{\sffamily\fontsize{6.4bp}{7.0bp}\itshape\selectfont}
-\newcommand{\ZSFfontTitleHeader}{\sffamily\fontsize{11bp}{12.5bp}\bfseries\selectfont}
+\newcommand{\ZSFfontTitleTag}{\sffamily\itshape\ZSF@scaledFont{1}{6.4bp}{7.0bp}}
+\newcommand{\ZSFfontTitleHeader}{\sffamily\bfseries\ZSF@scaledFont{1}{11bp}{12.5bp}}
+\makeatother
+
+% ── Seitenmöbel: bewusst OHNE \ZSFBodyScale ──────────────────────────
+% Fusszeile und Identity-Marker gehören zur SEITE und nicht zur Textspalte.
+% Die Seitenzahl am Fuss ist eine feste physische Grösse — sie schrumpft nicht
+% mit, nur weil der Text der ZSF enger gesetzt ist, und der 4pt-Marker wäre
+% eine Stufe kleiner nicht mehr lesbar. Deshalb rohes \fontsize: Das ist hier
+% die Aussage »absolut gemeint«, nicht ein vergessener Regler.
 \newcommand{\ZSFfontFooter}{\sffamily\bfseries\fontsize{9.5pt}{9.5pt}\selectfont}
 \newcommand{\ZSFfontIdentityMarker}{\fontsize{4pt}{4pt}\selectfont}
 
@@ -40,6 +69,29 @@
 % für sich korrekt aussieht.
 \newcommand{\ZSFfontContent}{\normalsize\ZSFApplyDisplaySkips}
 \newcommand{\ZSFfontContentDense}{\footnotesize\ZSFApplyDisplaySkips}
+
+% ── Freier Fliesstext: die dritte Inhaltsrolle ───────────────────────
+% `runintext` ist der einzige Inhalts-Baustein OHNE eigene Schriftrolle — er
+% erbt schlicht die Umgebungsgrösse. Damit war der Fliesstext das einzige
+% Stück Satz, das man nur über einen rohen \fontsize erreichen konnte, und
+% genau dort landete historisch der Notausgang in main.tex.
+%
+% Als eigene Rolle ist es eine Entscheidung statt eines Nebeneffekts: Wie laut
+% steht die verbindende Prosa neben dem Bausteininhalt, der sie umgibt? In
+% einer box-lastigen ZSF trägt die Box den prüfungsrelevanten Inhalt und der
+% Fliesstext verbindet — dann darf er eine Spur leiser sein. In einer
+% textlastigen ist es umgekehrt und der Faktor bleibt auf 1.
+%
+% Gerechnet wird von der KLASSENGRÖSSE aus, nicht vom aktuellen Font: So
+% multiplizieren sich Grundgrösse und Rollenfaktor sauber (\ZSF@scaledFont
+% legt \ZSFBodyScale selbst davor), statt sich zu verdoppeln, wenn die Rolle
+% in einem bereits umgeschalteten Kontext aufgerufen wird.
+\providecommand{\ZSFFlowTextScale}{1}
+\makeatletter
+\newcommand{\ZSFfontFlow}{%
+  \ZSF@scaledFont{\ZSFFlowTextScale}{\ZSF@classFontSize pt}{\ZSF@classBaselineSkip}%
+  \ZSFApplyDisplaySkips}
+\makeatother
 
 % ── Auszeichnungen INNERHALB der Bausteine ──
 % Vier Rollen, die vorher als rohes \bfseries bzw. \small in den Bausteinen
@@ -97,16 +149,11 @@
 % \ZSFDiagramLabelScale wird wie die übrigen Faktoren in preamble.tex gesetzt,
 % VOR diesem \input.
 \providecommand{\ZSFDiagramLabelScale}{1}
-% Die Grösse wird gerechnet statt geschrieben. Über \the und damit in pt, weil
-% \fontsize sein Argument sonst als Zahl ohne Einheit lesen müsste — der Faktor
-% kommt so als fertiges Mass an und nicht als Term, den \fontsize zerlegt.
+% Gerechnet wird oben in \ZSF@scaledFont — dieselbe Stelle wie für jede andere
+% Schriftrolle. Der Rollenfaktor \ZSFDiagramLabelScale multipliziert dort die
+% Grundgrösse der ZSF: Ein diagrammlastiges Blatt dreht seine Beschriftungen
+% kleiner, ohne dass sie aufhören, dem Satz der ZSF zu folgen.
 \makeatletter
-\newlength{\ZSF@fontSize}
-\newlength{\ZSF@fontSkip}
-\newcommand{\ZSF@scaledFont}[3]{%
-  \setlength{\ZSF@fontSize}{#1\dimexpr #2\relax}%
-  \setlength{\ZSF@fontSkip}{#1\dimexpr #3\relax}%
-  \fontsize{\the\ZSF@fontSize}{\the\ZSF@fontSkip}\selectfont}
 \newcommand{\ZSFfontDiagramLabel}{%
   \sffamily\ZSF@scaledFont{\ZSFDiagramLabelScale}{5.8bp}{6.4bp}}
 \newcommand{\ZSFfontDiagramLabelSmall}{%
@@ -170,7 +217,14 @@
 \newcommand{\ZSFkeywordStyle}[1]{\textbf{#1}}
 \newcommand{\ZSFlabelStyle}[1]{\textbf{#1}}
 
-\newcommand{\ZSFScriptRef}[1]{\hfill\textcolor{\ScriptRefColor}{\ZSFfontBoxBinding (S.#1)}}
+% \ZSFInk statt \textcolor: Der Skriptverweis steht genauso oft IM Titel eines
+% Balkens wie im Boxinhalt (\SubsectionBar{Reihen\ZSFScriptRef{51}}). Ein hart
+% gesetztes \textcolor behielte dort sein Grau und stuende damit lesbar-schwach
+% auf der farbigen Flaeche — waehrend jeder andere farbtragende Inline-Marker
+% die Kontrastfarbe erbt. \ZSFInk macht ihn zum Teil desselben Vertrags:
+% im Boxinhalt gedaempft wie bisher, auf einer besitzenden Flaeche deren Tinte
+% (rules/25_structure_markers -> Ink-Vertrag).
+\newcommand{\ZSFScriptRef}[1]{\hfill\ZSFInk{\ScriptRefColor}{\ZSFfontBoxBinding (S.#1)}}
 
 % \ZSFhl{...} — Hervorhebung des EINEN prüfungskritischsten Fakts pro Box
 % (fett + unterstrichen). Bewusst sparsam: hoechstens einmal pro Block.
