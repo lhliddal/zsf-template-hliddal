@@ -494,6 +494,21 @@
 \makeatletter
 \newif\ifZSF@tblHeader
 \newif\ifZSF@tblZebra
+% Die Schrift, mit der eine ZSFtable STARTET, bevor ihre eigene Optionsliste
+% gelesen wird. Als eigenes Makro und nicht als Wert in ZSF@tblDefaults, weil
+% eine Ebene darüber sie setzen können muss: \ZSFboxgroup gibt `font` einmal
+% an der Gruppe an, und Kopfzeile wie Mitglieder folgen (60_boxes).
+%
+% Ohne diese Ebene war die Kopfzeile einer Boxgruppe die einzige Tabelle im
+% System, deren Schrift niemand erreichte — sie stand fest auf `normal`,
+% während ihre eigenen Zeilen auf `dense` liefen. Am Satz gemessen: Kopf 7 pt,
+% Rumpf 5.25 pt, ein Drittel Unterschied in einer Tabelle, die als eine
+% gelesen wird. Kein Verifier konnte das sehen — beide Werte sind für sich
+% gültig (rules/21_box_options → kein Regler verwirft einen anderen).
+%
+% Ein `font=` in der Optionsliste der einzelnen Tabelle überschreibt weiterhin;
+% die Gruppe setzt die Vorbelegung, nicht das Ergebnis.
+\newcommand{\ZSF@tblFontDefault}{\ZSFfontContent}
 \newcommand{\ZSF@tblFont}{\ZSFfontContent}
 \newcommand{\ZSF@tblStretch}{\ZSFtableArrayStretch}
 \newlength{\ZSF@tblColSep}
@@ -577,7 +592,10 @@
   grid/both/.code      ={\ZSF@tblHRulestrue\ZSF@tblVRulestrue},
   grid/horizontal/.code={\ZSF@tblHRulestrue\ZSF@tblVRulesfalse},
   grid/none/.code      ={\ZSF@tblHRulesfalse\ZSF@tblVRulesfalse},
-  ZSF@tblDefaults/.style={header=true, zebra=true, font=normal,
+  % `font` steht bewusst NICHT in der Vorbelegung: Es wird eine Zeile vorher
+  % aus \ZSF@tblFontDefault gesetzt, damit die Boxgruppe es vorgeben kann.
+  % Hier eingetragen überschriebe die Vorbelegung sie bei jeder Tabelle.
+  ZSF@tblDefaults/.style={header=true, zebra=true,
                           rows=normal, colsep=normal, grid=both},
 }
 \NewDocumentEnvironment{ZSFtable}{O{} m}{%
@@ -586,6 +604,9 @@
   % Explizit und nicht als Default verlassen, damit eine Tabelle IN einer
   % figbox nicht deren Abbildungsbudget erbt (siehe \ZSF@imgBudget, 60_boxes).
   \renewcommand{\ZSF@imgBudget}{\ZSFimageMaxHeight}%
+  % VOR den Schlüsseln: die Vorbelegung der Ebene darüber (Boxgruppe oder,
+  % ausserhalb einer Gruppe, \ZSFfontContent). `font=` in #1 sticht sie.
+  \let\ZSF@tblFont\ZSF@tblFontDefault
   \pgfkeys{/zsf/table, ZSF@tblDefaults, #1}%
   \setlength{\tabcolsep}{\ZSF@tblColSep}%
   \renewcommand{\arraystretch}{\ZSF@tblStretch}%

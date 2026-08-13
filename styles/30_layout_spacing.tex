@@ -10,7 +10,6 @@
 \predisplaypenalty=10000
 
 \raggedcolumns
-\newcounter{zsfFirstChap}\setcounter{zsfFirstChap}{1}
 
 % ------------------------------------------------------------
 % GRUNDGRÖSSE DES SATZES — die dritte Platz-Stellschraube
@@ -548,10 +547,16 @@
 % Abstände, nicht Farben (rules/10_architecture → Was wo hingehört). Dass er
 % dort lag, hatte einen Grund — er hängt an den Balken —, aber der Ort war
 % trotzdem falsch, und die Modultabelle behauptete das Gegenteil.
-\newif\ifzsfAfterChapterBar
-\zsfAfterChapterBarfalse
-\newcommand{\ZSFMarkAfterChapterBar}{\global\zsfAfterChapterBartrue}
-\newcommand{\ZSFConsumeAfterChapterBar}{\global\zsfAfterChapterBarfalse}
+% Es gibt genau EINEN Merker für »ein Balken steht da, und es kam noch kein
+% Inhalt«: \ifzsfTitleBarPending (60_boxes). Alles, was an Balkengrenzen über
+% Abstände entscheidet, liest ihn.
+%
+% Daneben stand lange ein zweiter, \ifzsfAfterChapterBar, mit vier eigenen
+% Makros und fünf Aufrufstellen — er sagte dasselbe, nur auf den Kapitelbalken
+% eingeschränkt. Diese Einschränkung war ohne Wirkung: Sein einziger Leser war
+% \ZSFCollapseAfterChapterBar, gerufen ausschliesslich aus dem
+% Subsection-Balken, und dort stossen zwei Balken entweder aneinander oder
+% nicht — welcher davor stand, ändert die Antwort nicht.
 
 % Der Abstand VOR einem Block. Direkt nach einem Titelbalken der Balken-Abstand,
 % sonst der normale Blockabstand.
@@ -563,16 +568,17 @@
 % Balken, während der frühere \ifzsfAfterSubsectionBar nur die beiden
 % Abschnittsebenen kannte — nach einem Kapitelbalken zog derselbe Block
 % deshalb einen anderen Abstand.
-\newcommand{\ZSFBoxBeforeSkip}{%
-  \ifzsfTitleBarPending\ZSFbarAfterGap\else\ZSFspaceS\fi
-}
+% Der Balkenfall steht nicht hier: Dort hat \ZSFTitleBarAfter den Abstand
+% bereits gesetzt, und \ZSF@blockBefore ruft dieses Makro deshalb nur im
+% \else. Ein Zweig für \ZSFbarAfterGap wäre unerreichbar — er stand hier und
+% war es auch.
+\newcommand{\ZSFBoxBeforeSkip}{\ZSFspaceS}
 
 % Kollabiert den before-skip der SubsectionBar auf \ZSFsubsectionAfterChapterGap,
 % wenn sie direkt nach einer ChapterBar steht.
 \newcommand{\ZSFCollapseAfterChapterBar}{%
-  \ifzsfAfterChapterBar
+  \ifzsfTitleBarPending
     \vspace*{\dimexpr\ZSFsubsectionAfterChapterGap-\ZSFsubsectionBarBeforeSkip\relax}%
-    \ZSFConsumeAfterChapterBar
   \fi
 }
 
@@ -708,13 +714,23 @@
 % ein Absatz, und TeX setzt \parskip beim Absatzbeginn selbst. Ohne den Abzug
 % käme er zu #1 hinzu.
 %
+% ES MUSS \glueexpr SEIN UND NICHT \dimexpr: \parskip ist eine GLUE
+% (3.5pt plus 1pt minus 0.5pt), keine Laenge. \dimexpr liest nur den
+% Sollwert, der Follower zahlt beim Absatzbeginn aber die ganze Glue zurueck
+% — unter dem Block blieb `#1 plus 1pt minus 0.5pt` stehen. In einem
+% multicols*-Dokument ist genau dieser Leim der, mit dem TeX die Spalten
+% fuellt: Der Abstand war dann das Ergebnis des Spaltenausgleichs statt #1.
+% Mit \glueexpr heben sich die negativen Streckanteile gegen \parskip auf
+% und uebrig bleibt starr #1 — dieselbe Rechnung wie \ZSF@blockBefore
+% (60_boxes) und tcolorbox' eigenes `before skip`.
+%
 % Die erste Zeile faengt den Fall ab, dass zwei Einschuebe direkt aufeinander
 % treffen (\ZSFsep, unmittelbar gefolgt vom naechsten Kettenglied): Dann gilt
 % der zweite, statt dass sich beide addieren.
 \newcommand{\ZSFInterlude}[1]{%
   \par
   \ifdim\lastskip>0pt\relax \vskip-\lastskip \fi
-  \vskip\dimexpr#1-\parskip\relax
+  \vskip\glueexpr#1-\parskip\relax
   \nointerlineskip
 }
 % Trenner-Abstand um den Mittelpunkt im Index-Locator "6.2 · (S. 4)" (66_index).

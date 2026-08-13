@@ -46,6 +46,8 @@ und `rules/55_index.md`.
 - Inhaltsboxen: `defbox`, `tablebox`, `figbox`, `formulabox`, `warnbox`,
   `ZSFlist`, `goalbox`, `valuegrid`, `splitbox`, `runintext`.
 - Boxgruppe (mehrere Boxen als ein Block): `ZSFboxgroup`, `\ZSFgroupcols`.
+  Ihre drei Regler (cols, head, font) gelten fuer Kopfzeile UND Mitglieder
+  gemeinsam — siehe `rules/20_boxes.md`.
 - Block innerhalb einer Box: `ZSFinset`.
 - Tabellen: `ZSFtable`, Spaltentypen
   `L`, `C`, `R`, `Y`, `Z`, `Q`, `F`, `\ZSFheaderRow`, `\ZSFhead`, `\ZSFspan`.
@@ -60,6 +62,8 @@ und `rules/55_index.md`.
 - Dokumentkopf und Skriptverweis: `\ZSFTitleHeader`, `\ZSFScriptRef`.
 - Globale Stellschrauben (in `preamble.tex`, nicht in Kapiteln):
   `\ZSFBodyFontSize` (Grundgrösse des Satzes, siehe `rules/30_spacing.md`),
+  `\ZSFContentScale` (Rollen-Faktor für den Bausteininhalt — Boxtext,
+  Tabellenzelle, Formel; Balken und Titel bleiben, siehe `rules/30_spacing.md`),
   `\ZSFFlowTextScale` (Rollen-Faktor für freien Fliesstext und Register,
   siehe `rules/30_spacing.md`),
   `\ZSFDensityFactor`, `\ZSFLeadingFactor`,

@@ -67,8 +67,46 @@
 % (\ZSFApplyDisplaySkips in 30_layout_spacing). Ohne diesen Nachsatz wären
 % Formeln in jeder Box luftiger als im Fliesstext — lautlos, weil beides
 % für sich korrekt aussieht.
-\newcommand{\ZSFfontContent}{\normalsize\ZSFApplyDisplaySkips}
-\newcommand{\ZSFfontContentDense}{\footnotesize\ZSFApplyDisplaySkips}
+% ── Der Rollenfaktor des Bausteininhalts ────────────────────────────
+% Das Gegenstück zu \ZSFFlowTextScale, und aus demselben Grund: Wie laut steht
+% der Inhalt der Bausteine — Boxtext, Tabellenzelle, Formel — neben den
+% Titelbalken, die ihn gliedern?
+%
+% Ohne diesen Faktor gab es dafür nur \ZSFBodyFontSize, und das nimmt die
+% Balken MIT. Der Zustand »Balken auf voller Grösse, Inhalt eine Stufe
+% darunter« war damit nicht ausdrückbar — obwohl er der natürliche ist: Die
+% Balkengrössen stehen absolut in bp (oben) und sind auf die Spaltenbreite
+% abgestimmt, der Inhalt dagegen muss in eine Tabellenzelle passen. Das sind
+% zwei Fragen, und sie hatten einen gemeinsamen Regler.
+%
+% Gemessen, woran das auffiel: Eine Formelzelle einer zweispaltigen Tabelle
+% ist 86.2 pt breit. \sin(\arctan(x)) = x/\sqrt{1+x^2} braucht bei einem
+% Inhalt von 8 pt 86.3 pt und bricht um; bei 7 pt sind es 75.9 pt. Wer das
+% ueber \ZSFBodyFontSize loest, schrumpft die Balken von 8.1 auf 7.1 bp mit
+% und aendert das Satzbild an einer Stelle, an der nichts falsch war.
+%
+% Angewandt NACH der Klassenstufe, nicht statt ihr: \normalsize und
+% \footnotesize tragen \ZSFBodyScale bereits (30_layout_spacing rechnet die
+% Stufen um, sobald \ZSFBodyFontSize steht). Der Rollenfaktor multipliziert
+% nur noch — sonst zaehlte die Grundgroesse doppelt.
+%
+% Ein Faktor fuer beide Stufen, nicht zwei: »eine Stufe kleiner« (`font=dense`)
+% ist eine Entscheidung PRO STELLE und bleibt es; wie laut der Inhalt insgesamt
+% steht, ist eine Entscheidung pro ZSF. Zwei Faktoren wuerden die beiden Fragen
+% vermischen (styles/README → Vereinigungstest).
+\providecommand{\ZSFContentScale}{1}
+\makeatletter
+\newcommand{\ZSF@stepScale}[1]{%
+  \setlength{\ZSF@fontSize}{#1\dimexpr\f@size pt\relax}%
+  \setlength{\ZSF@fontSkip}{#1\dimexpr\f@baselineskip\relax}%
+  \fontsize{\the\ZSF@fontSize}{\the\ZSF@fontSkip}\selectfont}
+% Bei Faktor 1 gar nicht erst umschalten: Ein \fontsize auf denselben Wert
+% kostet eine Fontauswahl und kann durch die pt-Rundung minimal danebenliegen.
+\newcommand{\ZSF@applyContentScale}{%
+  \ifdim\ZSFContentScale pt=1pt\else\ZSF@stepScale{\ZSFContentScale}\fi}
+\newcommand{\ZSFfontContent}{\normalsize\ZSF@applyContentScale\ZSFApplyDisplaySkips}
+\newcommand{\ZSFfontContentDense}{\footnotesize\ZSF@applyContentScale\ZSFApplyDisplaySkips}
+\makeatother
 
 % ── Freier Fliesstext: die dritte Inhaltsrolle ───────────────────────
 % `runintext` ist der einzige Inhalts-Baustein OHNE eigene Schriftrolle — er

@@ -19,14 +19,38 @@
 %   \ZSFReserveSpace  — „lieber vorher umbrechen, wenn es eng wird" (Bremse)
 %   \ZSFTitleBarLock  — „hier NICHT umbrechen, es kam noch kein Inhalt" (Sperre)
 % Die Sperre ist die verlässliche; sie hängt an keiner Höhenschätzung.
+%
+% Gelöscht wird die Sperre vom ERSTEN Absatz danach — Box, runintext oder
+% blanker Fliesstext. Der \everypar-Haken ist der einzige Ort, an dem TeX
+% »hier beginnt Inhalt« zuverlässig meldet; \ZSF@blockBefore allein genügt
+% nicht, denn den durchläuft nur eine Box. Ohne den Haken blieb die Sperre
+% nach »Balken → Fliesstext« stehen — und weil ALLE Leser unten sie lesen,
+% hiess das: Box-Vorabstand übersprungen, Balken-Penalty und Platzreserve
+% dauerhaft auf »Verbot«. Drei Mechanismen liefen praktisch nie.
+% \everypar ist im Template sonst unbenutzt (auch multicol rührt es nicht an);
+% \global, weil der Haken sonst in der Gruppe verfällt, in der er zündet.
 \newif\ifzsfTitleBarPending
-\newcommand{\ZSFTitleBarLockOn}{\global\zsfTitleBarPendingtrue}
-\newcommand{\ZSFTitleBarLockOff}{\global\zsfTitleBarPendingfalse}
+\newcommand{\ZSFTitleBarLockOn}{%
+  \global\zsfTitleBarPendingtrue
+  \global\everypar{\ZSFTitleBarLockOff}%
+}
+\newcommand{\ZSFTitleBarLockOff}{%
+  \global\zsfTitleBarPendingfalse
+  \global\everypar{}%
+}
+
+% Umbruchsteuerung an Balken — der Schalter für BEIDE Mechanismen unten
+% (\ZSFBarPenalty, \ZSFReserveSpace). Aus über \ZSFBreakReservesOff.
+%
+% Was der Schalter NICHT abschaltet: das \penalty10000, solange die Sperre
+% steht. Das ist keine Steuerung, sondern die Zusage, dass ein Balken nicht
+% als letztes Element einer Spalte stehenbleibt.
+\newif\ifZSFBarSteering \ZSFBarSteeringtrue
 
 % Jeder Umbruchpunkt, den das Balken-System selbst setzt, läuft hierüber:
 % solange noch kein Inhalt folgte, wird daraus ein Verbot.
 \newcommand{\ZSFBarPenalty}[1]{%
-  \ifzsfTitleBarPending\penalty10000\else\penalty#1\fi
+  \ifzsfTitleBarPending\penalty10000\else\ifZSFBarSteering\penalty#1\fi\fi
 }
 
 % Platzreserve vor einem Titelbalken: Ist weniger als #1 frei, bricht die
@@ -99,6 +123,19 @@
     left=\ZSFboxPadX,
     right=\ZSFboxPadX,
     before skip=0pt,
+    % HIER KEIN `after skip`. Was unter einem Balken frei bleibt, setzt
+    % \ZSFTitleBarAfter vollständig; die vier Balken hängen es unten als
+    % `after={\ZSFTitleBarAfter}` ein und ersetzen damit die Default-Aktion.
+    %
+    % `after skip` daneben zu setzen sieht harmlos aus und ist es nicht:
+    % Es ist — wie `before skip`, siehe styles/README — kein Schlüssel,
+    % sondern ein Stil, der `after` schreibt, mit dem Rumpf
+    % `\addvspace{\glueexpr#1-\parskip}`. Selbst mit #1=0pt steht danach ein
+    % `-\parskip` hinter der Box. tcolorbox darf das, weil der folgende Absatz
+    % \parskip selbst zurückzahlt — nur zieht \ZSFInterlude ihn hier ein
+    % zweites Mal ab, und zurückgezahlt wird er einmal. Der Abstand unter
+    % jedem Balken ist dann um einen vollen \parskip zu klein, der Satz läuft
+    % in die Balkenkante. Genau so passiert, deshalb steht es hier.
   },
 }
 
@@ -210,7 +247,14 @@
 % jeder dasselbe tut (rules/02_ai_mandate → Katalog-Ökonomie):
 %   \ZSFNewColumn
 %   \SubsectionBar[sec:x]{Titel}
-\newcommand{\ZSFNewColumn}{\columnbreak}
+%
+% `\columnbreak[3]` (\penalty-9999) und NICHT das nackte `\columnbreak`
+% (\penalty-10005). Ab Betrag 10000 gilt der Umbruch als ERZWUNGEN: multicol
+% legt das Material dahinter in \colbreak@box zwischen und spielt es spaeter
+% wieder ein — auch beim \end{multicols*}, wo daraus eine zusaetzliche,
+% leere Seite wird. -9999 bricht praktisch immer, bleibt aber ein regulaerer
+% Umbruchpunkt.
+\newcommand{\ZSFNewColumn}{\columnbreak[3]}
 
 % ------------------------------------------------------------
 % Gemeinsame tcb-Stile — die Grundverträge aller Inhaltsboxen
@@ -326,7 +370,7 @@
   % Abschnittsbalken heisst, dass die beiden Balken NICHT aneinanderstossen —
   % blieb der Kapitel-Merker stehen, zog der Abschnittsbalken seinen Vorabstand
   % trotzdem zusammen. Derselbe Fehler eine Ebene hoeher.
-  \ZSFConsumeAfterChapterBar\ZSFTitleBarLockOff
+  \ZSFTitleBarLockOff
 }
 \tcbset{zsfbox/.style={
   enhanced jigsaw,
@@ -974,11 +1018,22 @@
 \newcommand{\ZSFgroupcols}{}
 \newcommand{\ZSF@groupHead}{}
 \newlength{\ZSF@groupOuterAfter}
+% `font` steht aus demselben Grund an der Gruppe wie `cols`: Es ist eine
+% Eigenschaft des BLOCKS und nicht der einzelnen Tabelle. In jedem Mitglied
+% wiederholt, steht es beim n-ten einmal anders — und die Kopfzeile erreichte
+% es gar nicht, weil sie kein Mitglied ist, sondern die Gruppe sie baut
+% (rules/20_boxes → Die Spaltenaufteilung steht an der Gruppe).
+%
+% Es setzt die VORBELEGUNG (\ZSF@tblFontDefault, 20_tables), nicht das
+% Ergebnis: Ein Mitglied mit eigenem `font=` sticht sie weiterhin.
 \pgfkeys{
   /zsf/boxgroup/.is family, /zsf/boxgroup,
   cols/.store in=\ZSFgroupcols,
   head/.store in=\ZSF@groupHead,
-  ZSF@groupDefaults/.style={cols=, head=},
+  font/.is choice,
+  font/normal/.code={\renewcommand{\ZSF@tblFontDefault}{\ZSFfontContent}},
+  font/dense/.code ={\renewcommand{\ZSF@tblFontDefault}{\ZSFfontContentDense}},
+  ZSF@groupDefaults/.style={cols=, head=, font=normal},
 }
 \NewDocumentEnvironment{ZSFboxgroup}{O{}}{%
   \par
@@ -1699,9 +1754,17 @@
   \tcbset{zsftitlebox/.append style={breakable=false},
           preset/quiet/.append style={breakable=false}}%
 }
-% Hebt die Platzreserven vor Boxen und Überschriften auf, damit ein
-% Anhang dicht packt statt früh umzubrechen.
+% Nimmt die Umbruchsteuerung an Balken zurück: die Platzreserven UND den
+% negativen Penalty, der vor jedem Balken einen Spaltenumbruch anbietet.
+% Beides ist dieselbe Absicht — »hier soll nicht früh umgebrochen werden« —
+% und war als zwei getrennte Hälften ein Fehler: Wer nur die Reserven
+% abschaltete, bekam den Sog weiterhin.
+%
+% Dokumentweit in preamble.tex für eine ZSF, die ihre Spaltenumbrüche von Hand
+% setzt (\ZSFNewColumn); pro Kapitel für einen dicht packenden Anhang.
+% Das Umbruchverbot direkt hinter einem Balken bleibt in beiden Fällen.
 \newcommand{\ZSFBreakReservesOff}{%
+  \global\ZSFBarSteeringfalse
   \renewcommand{\BreakIfNotEnoughSpace}{}%
   \renewcommand{\BreakIfNotEnoughSpaceChapter}{}%
   \renewcommand{\BreakIfNotEnoughSpaceSubsubsection}{}%

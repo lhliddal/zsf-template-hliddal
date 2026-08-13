@@ -595,7 +595,6 @@
 % Abschnittsnummer — und zwar ohne Fehler, weil beide Zweige gueltig sind.
 \let\ZSF@frontIdxLabel\@empty
 \newcommand{\StartChapter}[2][]{%
-  \ifnum\value{zsfFirstChap}=1\setcounter{zsfFirstChap}{0}\fi
   \refstepcounter{section}
   \SetChapterPaletteByNumber
   \setcounter{subsection}{0}
@@ -603,7 +602,6 @@
   \let\ZSF@frontIdxLabel\@empty
   \if\relax\detokenize{#1}\relax\else\label{#1}\fi
   \ChapterBar{\thesection. #2}
-  \ZSFMarkAfterChapterBar
 }
 
 % Für ein Kapitel auf neuer Spalte: \ZSFNewColumn davorsetzen
@@ -625,8 +623,18 @@
 %
 % Das Label ist reiner Text und kurz — es steht in jedem Registereintrag
 % dieses Kapitels und konkurriert dort mit den Abschnittsnummern.
+% Kein eingebauter \columnbreak. Er stand hier und war der einzige Umbruch im
+% System, den der Aufrufer nicht sah und nicht abschalten konnte: »Front-Kapitel«
+% ist eine Aussage über Nummerierung und Farbe, nicht über Spalten. Wer ein
+% Kapitel auf einer neuen Spalte will, setzt \ZSFNewColumn davor — derselbe
+% sichtbare Weg wie bei jedem anderen Kapitel, und der einzige.
+%
+% Der Umbruch war zudem nur über einen privaten Zähler (zsfFirstChap) zu
+% umgehen, den ausschliesslich er brauchte; \StartChapter trug einen Zweig, der
+% nichts tat, ausser ihn zu pflegen. Umgangen wurde er in einer Fach-ZSF per
+% \setcounter{zsfFirstChap}{1} in einer KAPITELDATEI — also mit Layout an einem
+% Ort, an dem rules/10_architecture keines duldet.
 \newcommand{\StartFrontChapter}[2][]{%
-  \ifnum\value{zsfFirstChap}=1\setcounter{zsfFirstChap}{0}\else\columnbreak\fi
   \renewcommand{\chaptercolor}{ChapterColor0}%
   \renewcommand{\chaptercolorlight}{ChapterColor0Light}%
   \renewcommand{\chaptercolortext}{ChapterColor0Text}%
@@ -634,6 +642,5 @@
   \setcounter{subsubsection}{0}%
   \def\ZSF@frontIdxLabel{#1}%
   \ChapterBar{#2}%
-  \ZSFMarkAfterChapterBar
 }
 \makeatother
