@@ -16,9 +16,14 @@
 % erst auffällt, sobald eine ZSF dicht genug gesetzt ist, um eine Spalte
 % wirklich auszufüllen. Höhe wird aus der Footer-Schrift gemessen statt
 % geraten, damit sie einer Schriftänderung folgt.
+% Der Faktor am Schluss und nicht an jedem Summanden: Skaliert würde sonst
+% dreimal gerundet, und der Anteil jedes Summanden wäre eine eigene Entscheidung
+% — es ist aber EIN Freiraum. Das Register und die Begründung des Faktors
+% stehen in 30_layout_spacing.
 \settoheight{\ZSFfooterClearance}{\ZSFfontFooter 0}
 \addtolength{\ZSFfooterClearance}{\ZSFfooterBottomInset}
 \addtolength{\ZSFfooterClearance}{\ZSFspaceS}
+\setlength{\ZSFfooterClearance}{\ZSFFooterClearanceFactor\ZSFfooterClearance}
 \geometry{bottom=\ZSFfooterClearance}
 
 \AddToShipoutPictureFG{%

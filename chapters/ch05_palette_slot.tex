@@ -11,6 +11,12 @@
 \ZSFfigside[width=0.27]{example-image-a}{Bild links, Text rechts\ZSFTitleTag{ZSFfigside}}{%
   Der erste Wert bestimmt den Bildanteil, der Rest gehört dem Text.}
 
+\ZSFfigside[width=0.27, container=def]{example-image-a}%
+  {Skizze zur Aussage\ZSFTitleTag{container=def}}{%
+  \ZSFkeyword*{container=def} trägt dieselbe Geometrie in einer
+  \ZSFkeyword*{defbox}: für die Aussage mit Skizze statt der Abbildung mit
+  Text. Spart den handgebauten Dreisatz aus Box, Split und Bild.}
+
 \ZSFfig{example-image-a,example-image-b,example-image-c}%
   {Dasselbe Makro, mehrere Pfade\ZSFTitleTag{ZSFfig}}%
   {Eine Pfadliste ergibt eine Reihe; die Breite folgt der Anzahl.}

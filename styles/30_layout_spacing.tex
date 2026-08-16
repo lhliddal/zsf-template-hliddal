@@ -277,13 +277,15 @@
   \setlength{\ZSFtitleBarHeight}{\ZSFBodyScale\dimexpr 9.2pt\relax}
 \newlength{\ZSFsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceL}
 \newlength{\ZSFsubsubsectionBarBeforeSkip}\ZSFderive{\ZSFsubsubsectionBarBeforeSkip}{\ZSFDensityStructure\ZSFspaceS}
-\newlength{\ZSFsubsectionAfterChapterGap}\ZSFderive{\ZSFsubsectionAfterChapterGap}{\ZSFDensityStructure\ZSFspaceXS}
 
 % ── Der Abstand NACH einem Titelbalken ───────────────────────────────
 % EIN Register für alle vier Balken, und es ist der GANZE Abstand von der
 % Unterkante des Balkens bis zur Oberkante des folgenden Blocks — Fliesstext
-% wie Box. Der Weg dorthin ist \ZSFInterlude (unten), aufgerufen im
-% after-Hook \ZSFTitleBarAfter (60_boxes).
+% wie Box. \ZSFTitleBarAfter (60_boxes) markiert ihn als ausstehend; genau der
+% erste sichtbare Follower setzt ihn ueber \ZSFTitleBarGapConsume. Bis dahin
+% steht \parskip auf null und kann den Abstand nicht unbemerkt vergroessern.
+% Der Verbraucher stellt \parskip vor dem Inhalt wieder her und setzt nur
+% positiven Leim; eine negative Gegenkorrektur gibt es an dieser Grenze nicht.
 %
 % Vorher war dieser Abstand herrenlos, und zwar nach demselben Muster wie
 % \ZSFBoxBeforeSkip (styles/README → »Abstand hat genau einen Schreiber«):
@@ -327,6 +329,17 @@
 % ist wie der zwischen den Gliedern — die Kette liest sich dadurch als ein
 % gleichmässiger Stapel.
 \newlength{\ZSFgoalLinkSep}  \ZSFderive{\ZSFgoalLinkSep}{\ZSFDensityBoxes\ZSFspaceS}
+% Innenpolsterung der beiden Zielketten-Pillen (\GoalConditionBox,
+% \GoalTargetBox in 60_boxes). Ein eigenes Paar und nicht \ZSFboxPadX/Y: Die
+% Pillen sind INLINE-Kästen in einer Textzeile und kein Block — mit der
+% Block-Polsterung schieben sie die Zeile auseinander, in der sie stehen.
+%
+% Waagrecht das Doppelte des senkrechten Werts, weil die Rundung an den Seiten
+% mehr Weiss frisst als oben und unten; mit gleichem Wert steht die Schrift
+% optisch an der Kante an. Aus \ZSFspaceXS abgeleitet statt roh gesetzt,
+% damit die Pillen der Dichte folgen wie alles andere Vertikale.
+\newlength{\ZSFgoalPillPadX}\ZSFderive{\ZSFgoalPillPadX}{2\ZSFspaceXS}
+\newlength{\ZSFgoalPillPadY}\ZSFderive{\ZSFgoalPillPadY}{\ZSFspaceXS}
 % Zeilenhöhe der ZSFtable in drei Stufen — der Regler `rows` wählt zwischen
 % ihnen (20_tables). Drei Werte statt eines, weil die Höhe einer Zeile nicht
 % aus der Tabellenart folgt, sondern aus ihrem Inhalt: Eine Tabelle mit
@@ -529,58 +542,35 @@
 % einer voll gefüllten Spalte. Der Wert wird in 70_document_settings aus der
 % Footer-Schrift gemessen und an geometry übergeben; hier steht nur das
 % Register, damit alle Masse an einem Ort liegen.
+%
+% Der Faktor darauf ist die Stellschraube der ZSF. Er existiert, weil die
+% Messung grosszügig ist: Sie reserviert die volle Höhe der Footer-Ziffer plus
+% Inset plus einen Blockabstand, und das ist mehr, als das Overlay zum
+% Nicht-Überdrucken braucht. Eine box-lastige ZSF gewinnt hier Spaltenhöhe auf
+% JEDER Seite, und der Preis ist ein knapperer, aber weiterhin freier Fuss.
+%
+% Ein Faktor und kein setzbares Register: Die Messung soll einer Änderung der
+% Footer-Schrift weiter folgen — ein roher Wert in preamble.tex bliebe stehen
+% und liefe still gegen eine grössere Schrift. Damit verhält sich die Clearance
+% wie \ZSFDensityFactor und \ZSFBarGapFactor: Faktor auf eine berechnete Basis.
+\providecommand{\ZSFFooterClearanceFactor}{1}
 \newlength{\ZSFfooterClearance}
 \newlength{\ZSFitemizeLeftMargin}     \setlength{\ZSFitemizeLeftMargin}{3mm}
 \newlength{\ZSFenumerateLeftMargin}   \setlength{\ZSFenumerateLeftMargin}{4mm}
 \newlength{\ZSFidentityMarkerInset}   \setlength{\ZSFidentityMarkerInset}{2mm}
 
 % ------------------------------------------------------------
-% Spacing-Kollaps an Kapitel- und Abschnittsgrenzen
+% Spacing an Titel- und Blockgrenzen
 % ------------------------------------------------------------
-% Steht ein Block direkt unter einem Titelbalken, soll der Balken-Abstand
-% gelten und nicht zusätzlich der normale Blockabstand. Der Merker hält fest,
-% ob eine ChapterBar vorausging (ein Abschnittsbalken zieht dann seinen
-% Vorabstand zusammen); \ZSF@blockBefore (60_boxes) verbraucht ihn — für
-% JEDEN Block, Box wie runintext.
-%
-% Aus 40_colors_structure hierher gezogen: Der Mechanismus entscheidet
-% Abstände, nicht Farben (rules/10_architecture → Was wo hingehört). Dass er
-% dort lag, hatte einen Grund — er hängt an den Balken —, aber der Ort war
-% trotzdem falsch, und die Modultabelle behauptete das Gegenteil.
 % Es gibt genau EINEN Merker für »ein Balken steht da, und es kam noch kein
 % Inhalt«: \ifzsfTitleBarPending (60_boxes). Alles, was an Balkengrenzen über
 % Abstände entscheidet, liest ihn.
-%
-% Daneben stand lange ein zweiter, \ifzsfAfterChapterBar, mit vier eigenen
-% Makros und fünf Aufrufstellen — er sagte dasselbe, nur auf den Kapitelbalken
-% eingeschränkt. Diese Einschränkung war ohne Wirkung: Sein einziger Leser war
-% \ZSFCollapseAfterChapterBar, gerufen ausschliesslich aus dem
-% Subsection-Balken, und dort stossen zwei Balken entweder aneinander oder
-% nicht — welcher davor stand, ändert die Antwort nicht.
 
-% Der Abstand VOR einem Block. Direkt nach einem Titelbalken der Balken-Abstand,
-% sonst der normale Blockabstand.
-%
-% Gelesen wird die Balken-SPERRE (\ifzsfTitleBarPending, 60_boxes) und kein
-% eigener Merker: Sie sagt bereits genau das, was hier gebraucht wird — »ein
-% Balken steht da, und es kam noch kein Inhalt«. Ein zweiter Merker daneben
-% wäre dieselbe Aussage ein zweites Mal, und die Sperre gilt für ALLE vier
-% Balken, während der frühere \ifzsfAfterSubsectionBar nur die beiden
-% Abschnittsebenen kannte — nach einem Kapitelbalken zog derselbe Block
-% deshalb einen anderen Abstand.
-% Der Balkenfall steht nicht hier: Dort hat \ZSFTitleBarAfter den Abstand
-% bereits gesetzt, und \ZSF@blockBefore ruft dieses Makro deshalb nur im
-% \else. Ein Zweig für \ZSFbarAfterGap wäre unerreichbar — er stand hier und
-% war es auch.
+% Der Abstand VOR einem Block, wenn KEIN Balken vorausging. Im Balkenfall
+% verbraucht \ZSF@blockBefore stattdessen direkt \ZSFbarAfterGap und erreicht
+% diesen Wert nicht. Ein Balken-Zweig an diesem Register wäre daher doppelte
+% Zuständigkeit.
 \newcommand{\ZSFBoxBeforeSkip}{\ZSFspaceS}
-
-% Kollabiert den before-skip der SubsectionBar auf \ZSFsubsectionAfterChapterGap,
-% wenn sie direkt nach einer ChapterBar steht.
-\newcommand{\ZSFCollapseAfterChapterBar}{%
-  \ifzsfTitleBarPending
-    \vspace*{\dimexpr\ZSFsubsectionAfterChapterGap-\ZSFsubsectionBarBeforeSkip\relax}%
-  \fi
-}
 
 % ============================================================
 % TEXT-BOX-BINDUNGEN
@@ -635,7 +625,14 @@
     \ZSFBoxAlign
   \else
     \par
-    \addvspace{\ZSFspaceOuter}%
+    % Genau ein Verbraucher fuer den Balkenabstand. \textVorBox setzt seinen
+    % Absatzleim unten bewusst auf null und kann den positiven Abstand deshalb
+    % direkt setzen; eine Vorauszahlung oder Gegenkorrektur existiert nicht.
+    \ifzsfTitleBarPending
+      \ZSFTitleBarGapConsume
+    \else
+      \addvspace{\ZSFspaceOuter}%
+    \fi
     \begingroup
     \setlength{\parskip}{0pt}%
     {\ZSFfontBoxBinding\color{TextVorBoxColor} \noindent #1\par}%

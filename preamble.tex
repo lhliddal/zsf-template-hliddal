@@ -84,6 +84,13 @@
 % ZSF mit vielen kurzen Abschnitten will man ihn enger als alles andere.
 % \def\ZSFBarGapFactor{1}         % 1 = Referenz (3pt), kleiner = enger
 %
+% Freiraum am Satzspiegel-Fuss für das Footer-Overlay. Die Referenz misst die
+% Footer-Ziffer plus Inset plus einen Blockabstand und ist bewusst grosszügig;
+% kleiner heisst mehr Spaltenhöhe auf JEDER Seite bei knapperem, aber weiter
+% freiem Fuss. Ein Faktor und kein Mass, damit die Messung einer geänderten
+% Footer-Schrift weiter folgt.
+% \def\ZSFFooterClearanceFactor{1} % 1 = Referenz, kleiner = mehr Spaltenhöhe
+%
 % Schriftgrösse der Diagramm-Beschriftung — beide Stufen gemeinsam
 % (\ZSFfontDiagramLabel und \ZSFfontDiagramLabelSmall). Kleiner für Fächer mit
 % vielen gedrängten Zeichnungen; die zwei Stufen bleiben dabei unterscheidbar.

@@ -218,7 +218,9 @@
 \newcommand{\ZSF@idxsubsubitem}{\par\hangindent\ZSFindexSubsubitemIndent\hspace*{\ZSFindexSubsubitemOffset}}
 \newcommand{\ZSF@idxspace}{\par\addvspace{\ZSFspaceM}}
 \renewenvironment{theindex}{%
-  \ZSFTitleBarLockOff % Register ist Inhalt: Balken-Sperre endet hier
+  % Das Register ist der erste sichtbare Follower des Front-Balkens und
+  % verbraucht deshalb denselben zentralen Abstand wie Text und Boxen.
+  \ZSFTitleBarGapConsume
   \begingroup
   % Dieselbe Rolle wie der freie Fliesstext: Das Register ist Nachschlagetext
   % ausserhalb der Bausteine und folgt deshalb \ZSFFlowTextScale, nicht der

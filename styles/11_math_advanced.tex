@@ -23,6 +23,16 @@
 \DeclareMathOperator{\sig}{sig}
 \DeclareMathOperator{\Adj}{Adj}
 
+% --- Areafunktionen ---
+% Die Umkehrungen der Hyperbelfunktionen. TeX bringt dafuer nichts mit, und ein
+% \operatorname im Kapitel meldet der Linter zu Recht: Ein mehrfach gebrauchter
+% Operator gehoert einmal hierher. Aus einer Fach-ZSF zurueckgeflossen, die sie
+% an 14 Stellen brauchte — sie sind nicht fachspezifisch, sondern fehlen jeder
+% Analysis- und den meisten Physik-ZSF gleichermassen.
+\DeclareMathOperator{\Arsinh}{Arsinh}
+\DeclareMathOperator{\Arcosh}{Arcosh}
+\DeclareMathOperator{\Artanh}{Artanh}
+
 % --- Gotisches Im/Re -> moderne aufrechte Operatoren ---
 % AtBeginDocument, weil unicode-math seine Symbole ebenfalls erst dort
 % definiert — eine Praeambel-Renewcommand wuerde still ueberschrieben.

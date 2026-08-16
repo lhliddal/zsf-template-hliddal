@@ -6,10 +6,10 @@ Modulares Style-System, geladen von `preamble.tex` in dieser Reihenfolge:
 | --- | --- |
 | `00_packages.tex` | Immer aktive Basispakete und deren Setup (fontspec+Carlito, unicode-math+NewCMSansMath, mathtools, siunitx, xcolor[table], tabularx, tabularray, tcolorbox, ulem, hyperref, ...) |
 | `10_math.tex` | Math-Macros: `\R \C \N \Z \Q`, `\dd`, `\norm \abs`, `\sgn \grad \divg \rot`, `\vect`, ZSFsumMode/ZSFlimMode |
-| `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), aufrechtes `\Im`/`\Re`, Klammern über Zellgrenzen (`\tikzmark`/`\drawbrace`/`\annote` + `\ZSFbraceRoom`) |
+| `11_math_advanced.tex` | **OPT-IN** (LinAlg/Analysis): Operatoren (`\Ker \rang \Spur \diag \spanop \eig \proj` ...), Areafunktionen (`\Arsinh \Arcosh \Artanh`), aufrechtes `\Im`/`\Re`, Klammern über Zellgrenzen (`\tikzmark`/`\drawbrace`/`\annote` + `\ZSFbraceRoom`) |
 | `12_plots.tex` | **OPT-IN**: lädt `pgfplots` und setzt die zentrale Kompatibilitätsversion |
 | `20_tables.tex` | Semantisches Table-System: Spaltentypen `L/C/R/Y/Z/Q/F`, `ZSFtable` mit den Reglern `header`/`zebra`/`font`/`rows`/`colsep`/`grid`, `\ZSFheaderRow`, `\ZSFhead`, Zellverbund `\ZSFspan` |
-| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Kollaps-Merker an Balkengrenzen (`\ZSFBoxBeforeSkip`, `\ZSFbarAfterGap`), Formel-Innenmasse (`\ZSFmathRowSep`/`\ZSFmathColSep`), Spaltenkopf (`\ZSFcolumnTopSkip`), samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
+| `30_layout_spacing.tex` | Spacing-Skala XS/S/M/L, Block- und Balken-Folgeabstände (`\ZSFBoxBeforeSkip`, `\ZSFbarAfterGap`), Formel-Innenmasse (`\ZSFmathRowSep`/`\ZSFmathColSep`), Spaltenkopf (`\ZSFcolumnTopSkip`), samt den globalen Stellschrauben `\ZSFDensityFactor` (Abstände) und `\ZSFLeadingFactor` (Zeilenhöhe), `\ZSFInterlude`, horizontale Innenabstände (`\ZSFboxPadX`, `\ZSFboxPadXBar`, `\ZSFtableEdgePad`), Break-Schwellwerte, `\textVorBox`/`\textNachBox` (schalten in der `formulabox` selbst um), `\ZSFRobustUnskip`, `\ZSFgap` |
 | `40_colors_structure.tex` | 18-Slot-Index-Palette, semantische Farben, aktive Kapitelfarben, Flag-System, `\StartChapter`/`\StartFrontChapter`, Ink-Vertrag (`\ZSFInk`/`\ZSFInkOwned`), Grössenfarben-Palette + `\ZSFDeclareQuantity` |
 | `50_typography_semantics.tex` | Schriftmakros (`\ZSFfontChapter` etc., inkl. `\ZSFfontDiagramLabel`), die Auszeichnungs-Hooks der Bausteine (`\ZSFfontTableHead`, `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`), die dezente Anmerkung `\ZSFBoxNote`, `\ZSFkeyword`, `\ZSFlabel`, `\ZSFconclusion` |
 | `55_readability.tex` | Flattersatz + TeX-Penalties für schmale Spalten (`\ZSFReadableOn`, `ZSFReadable` env, `\ZSFbreak`/`\ZSFnobreak`) |
@@ -70,6 +70,8 @@ und `rules/55_index.md`.
   Bereichsfaktoren `\ZSFDensityBoxes`, `\ZSFDensityText`, `\ZSFDensityTables`,
   `\ZSFDensityStructure`, `\ZSFBreakReserveFactor`,
   `\ZSFBarGapFactor` (Abstand nach einem Titelbalken, siehe `rules/30_spacing.md`),
+  `\ZSFFooterClearanceFactor` (Freiraum am Satzspiegel-Fuss für das Footer-Overlay;
+  Faktor auf die gemessene Höhe, siehe `rules/30_spacing.md`),
   `\ZSFDiagramLabelScale` (beide Diagramm-Beschriftungsstufen gemeinsam,
   siehe `rules/20_boxes.md`),
   `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
@@ -91,6 +93,10 @@ und `rules/55_index.md`.
   `\formulanote`,
   `\ZSFformulaline`,
   `\textVorBox`, `\textNachBox`.
+  `\ZSFformulaline` misst Formel und Note: bevorzugt zentriert sie die Formel,
+  bei knapper Breite setzt sie beide sicher nebeneinander und erst bei echtem
+  Platzmangel die Note rechtsbündig in die Folgezeile. Ein Overlay darf die
+  Formel nie überdrucken.
 - Goal-System: `\GoalCondition`, `\GoalStep`, `\GoalTarget`,
   `\ZSFDerivationCase`.
 - Optionale Module: die in `11_math_advanced`, `12_plots`, `65_code_style`,
@@ -183,7 +189,7 @@ unabhängig vom Namen. Das `ZSF@`-Präfix markiert nur einen Teil der Internas;
 viele heissen schlicht `ZSF…` und sehen dadurch öffentlich aus. Beispiele für
 Internas ohne Präfix: die Farb-Tokens (`\BoxTitleColor`, `\SubsectionBarColor`,
 `\ZSFtoneEmphasisBack*`, …), die Balken-Hooks
-(`\ZSFConsumeAfterSubsectionBar`, `\ZSFMarkAfterSubsectionBar`), die
+(`\ZSFTitleBarAfter`, `\ZSFTitleBarGapConsume`), die
 Spacing-Register (`\ZSFboxPadX`, `\ZSFbarPadY`, …), die Schrift- und
 Auszeichnungs-Hooks (`\ZSFfontBoxTitle`, `\ZSFfontTableHead`,
 `\ZSFfontBlockLabel`, `\ZSFfontBoxBinding`, `\ZSFfontDangerTag`,
@@ -209,8 +215,8 @@ nur noch, worin sie sich wirklich unterscheidet:
 | Schicht | Verantwortung |
 | --- | --- |
 | `zsfbox` | Fluss — Skips (`\ZSFBoxBeforeSkip`/`\ZSFBoxAfterSkip`) und Eintritts-Hook (Balken-Bindung). Auch rahmenlose Boxen laufen hierüber. |
-| `zsfboxcontract` | Vertrag — Ton, Justierung, Absatzabstand, Eintritts-Sequenz, Hook-Reset und das Zurücksetzen der verzögert aufgelösten Wahlen (`frame`, `ZSF@surface`, `ZSF@titlefill`, `splitalign`). Gilt auch für Boxen mit eigener Form. |
-| `zsfboxshape` | Form — Rahmenstärke, Ecken, `boxsep`, Innenabstand, `breakable`. **Die eine Stelle für die Geometrie geschlossener Boxen.** |
+| `zsfboxcontract` | Vertrag — Breakability (`ZSF@breakability`), Ton, Justierung, Absatzabstand, Eintritts-Sequenz, Hook-Reset und das Zurücksetzen der verzögert aufgelösten Wahlen (`frame`, `ZSF@surface`, `ZSF@titlefill`, `splitalign`). Gilt auch für Boxen mit eigener Form. |
+| `zsfboxshape` | Form — Rahmenstärke, Ecken, `boxsep`, Innenabstand. **Die eine Stelle für die Geometrie geschlossener Boxen.** |
 | `zsftitlebox` | Titelbox — Form plus Titelbalken (`zsftitlebar`). Zwei Zeilen, mehr ist sie nicht. |
 
 `defbox`, `tablebox`, `figbox`, `warnbox`, `formulabox`, `goalbox`, `valuegrid`
@@ -368,27 +374,28 @@ Balken rechnete einen Wert aus, den niemand las, und `ZSFboxgroup` schloss
 seine Zwischenräume nicht. Wer hier etwas ändert, prüft es am Satz — ein
 Register, das keiner liest, sieht im Code korrekt aus.
 
-**Der Abstand NACH einem Titelbalken** gehört `\ZSFbarAfterGap`, gesetzt in
-`\ZSFTitleBarAfter` (`60_boxes`) für alle vier Balken. Derselbe Fehlertyp wie
-oben, nur eine Ebene höher: Es gab zwei Register (`\ZSFchapterBarAfterSkip`,
-`\ZSFsubsectionAfterGap`), und beide setzten je *einen* Posten von dreien.
-Die anderen zwei setzte niemand — `\parskip`, weil der Text nach dem Balken ein
-neuer Absatz ist, und die Zeilenschaltung. Am Satz gemessen ergab das drei
-verschiedene Abstände an derselben Stelle des Systems: Balken → Box 1pt,
-Abschnittsbalken → Fliesstext 6.8pt, Kapitelbalken → Fliesstext 9.5pt. Keiner
-davon war gewählt; der grösste stand in keinem Register.
+**Der Abstand NACH einem Titelbalken** gehört `\ZSFbarAfterGap`. Der Balken
+setzt ihn nicht vorab, sondern markiert mit `\ifzsfTitleBarPending`, dass der
+erste sichtbare Follower ihn noch verbrauchen muss. Box, Fliesstext und ein
+direkt folgender Balken laufen dadurch alle über denselben
+`\ZSFTitleBarGapConsume`; unsichtbare Index-Writes verbrauchen den Zustand
+nicht. Direkt vor dem positiven Abstand erneuert der Verbraucher zugleich das
+Umbruchverbot, damit ein Write die Bindung Titel → erster Block nicht auftrennt.
 
-Der Weg zur Exaktheit ist `\ZSFInterlude` — dasselbe Makro, das die Zielkette
-benutzt, und aus demselben Grund. Es zieht `\parskip` ab und nimmt mit
-`\nointerlineskip` die Zeilenschaltung heraus; danach ist der Abstand von der
-Balken-Unterkante zur Oberkante des folgenden Blocks genau `\ZSFbarAfterGap`,
-unabhängig davon, ob dort Text, eine Box oder ein Bild folgt. Zwei Dinge
-mussten dafür weichen: `\ZSFPostChapterSpacing` (ein `\vspace*{0pt}` direkt
-nach dem Kapitelbalken — eine nicht verwerfbare 0pt-Glue, an der `\addvspace`
-seine Max-Semantik verliert und den Abstand deshalb *addierte* statt ihn zu
-kollabieren; genau daher kam der Unterschied 9.5 zu 6.8) und der Merker
-`\ifzsfAfterSubsectionBar`, dessen Aussage die Balken-Sperre
-`\ifzsfTitleBarPending` bereits trug — für alle vier Balken statt nur für zwei.
+Während der Zustand offen ist, steht `\parskip` vorübergehend auf null. Beim
+ersten freien Absatz verbraucht ihn der LaTeX-Hook `para/before`, stellt den
+Dokumentwert noch vor dem Inhalt wieder her und setzt genau
+`\ZSFbarAfterGap`. Boxen und der nächste Balken rufen denselben Verbraucher
+direkt. So schreibt an dieser Grenze weder ein automatischer Absatzabstand noch
+ein zweites tcolorbox-`after skip` mit; insbesondere braucht es keine negative
+Gegenverschiebung. Der Hook koexistiert mit Paket-Hooks und ersetzt nicht mehr
+das globale `\everypar`-Register.
+
+Der frühere Aufbau hatte zwei Register (`\ZSFchapterBarAfterSkip`,
+`\ZSFsubsectionAfterGap`) plus impliziten `\parskip` und eine eigene
+Kapitel→Abschnitt-Korrektur. Dadurch entstanden für denselben sichtbaren Ort
+drei verschiedene Abstände. `\ZSFPostChapterSpacing`, der zweite
+Kapitel-Merker und die negative Kollaps-Korrektur sind deshalb entfallen.
 
 **Die Inventur ist vollständig gemacht worden**, nicht angenommen: Alle
 TeX- und LaTeX-Abstandsparameter wurden im laufenden Dokument ausgelesen und
@@ -519,7 +526,7 @@ deshalb nicht in der Token-Liste oben:
 | Schlüssel | Boxen | Werte (Default zuerst) |
 | --- | --- | --- |
 | `tone` | alle Boxen | `chapter`, `neutral`, `warn` |
-| `weight` | alle Boxen mit Titel | `loud`, `quiet` |
+| `weight` | alle Boxen mit Titel | `loud`, `quiet`, `caption` |
 | `padx` | alle Boxen | `normal`, `bar`, `none` |
 | `pady` | alle Boxen | `normal`, `tight`, `none` |
 | `align` | alle Boxen | `left`, `center` |
@@ -536,6 +543,13 @@ deshalb nicht in der Token-Liste oben:
 | `font` | alle Boxen, `ZSFtable` | `normal`, `dense` |
 | `rows` | `ZSFtable`, `valuegrid` | `normal`, `roomy`, `tight` |
 | `colsep` | `ZSFtable`, `valuegrid` | `normal`, `tight` |
+
+`\ZSFfig` und `\ZSFfigside` kennen zusätzlich `width`, `height` und `container`
+(`fig` · `def` — welcher Baustein die Abbildung trägt). Sie stehen bewusst
+**nicht** in der Tabelle oben: Das sind Schlüssel der Bild-MAKROS, keine
+Optionen einer Box. Die Tabelle ist die Quelle dreier Verifier-Durchgänge, die
+jeden Eintrag gegen jede Box kreuzen — ein Makro-Schlüssel hat dort keine Box,
+auf der er stehen könnte.
 
 Diese Tabelle ist die Quelle für **drei** Verifier-Durchgänge, je einer pro
 Zusage, die ein Eintrag hier abgibt:
@@ -583,6 +597,18 @@ Geprüft in `check_box_options.sh`, Durchgang 7.
 Drei Boxen erzwingen ihr Umbruchverhalten mit dem Regler `atomic` **nach**
 `zsftitlebox` (`figbox`, `goalbox`, `valuegrid`), damit der Pack-Modus
 (`\ZSFBoxesBreakableOn`) sie nicht aufbricht.
+
+Der Pack-Modus selbst ersetzt genau den Zwischenstil `ZSF@breakability` im
+gemeinsamen `zsfboxcontract`. Er hängt keine weiteren Optionen an Presets an;
+damit gibt es zu jedem Zeitpunkt nur einen aktuellen Wert, und auch
+`preset/quiet` folgt derselben Wahl. `atomic` bleibt der bewusste spätere
+Gegenentscheid. Dasselbe gilt für `split`: Der letzte Resolver setzt
+`sidebyside` und `unbreakable` gemeinsam. Das ist keine Stilwahl, sondern die
+Paketgrenze — parallele Hälften lassen sich nicht synchron über eine
+Spaltengrenze teilen. Für den ersten Teil einer tatsächlich breakable Box
+verwendet der Pack-Modus in `multicols*` eine Sicherheitsreserve von einer
+`\baselineskip`; Folgeteile nutzen wieder die volle natürliche Spaltenhöhe
+(`break at=-\baselineskip/0pt`).
 
 ## Readability-System (55_readability.tex)
 
