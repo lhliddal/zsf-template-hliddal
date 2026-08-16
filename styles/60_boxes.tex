@@ -33,6 +33,23 @@
 % insbesondere nicht mehr das globale \everypar-Register.
 \newif\ifzsfTitleBarPending
 \newskip\ZSFTitleBarSavedParskip
+% Laeuft gerade Inhalt INNERHALB einer Box? Gesetzt von \ZSFBoxSetup und damit
+% auf die Optionen-Gruppe der Box beschraenkt.
+%
+% Der para/before-Hook unten gehoert dem FREIEN TEXT (siehe Kopfkommentar):
+% Boxen rufen \ZSFTitleBarGapConsume ueber ihren before-Schluessel selbst, und
+% der setzt den Abstand VOR die Box. Ohne diesen Merker feuerte der Hook
+% zusaetzlich im Boxinhalt — die leise Fassung beginnt ihre Titelzeile mit
+% einem \par, und der loeste den Verbraucher dort aus. Folge: \ZSFbarAfterGap
+% landete INNERHALB der ersten leisen Box nach einem Balken statt darueber,
+% und die globale \parskip-Wiederherstellung ueberschrieb den Absatzabstand,
+% den tcolorbox fuer den Boxinhalt gesetzt hatte. Dieselbe Box war an erster
+% Stelle 3pt hoeher als an jeder anderen — ohne Build- oder Linterfehler, weil
+% beide Fassungen fuer sich plausibel aussehen.
+%
+% Der Name traegt kein @: Diese Zeile und \ZSFBoxSetup stehen ausserhalb der
+% \makeatletter-Zonen dieser Datei, wie die uebrigen \ZSFBox*-Internals auch.
+\newif\ifZSFInsideBox
 \newcommand{\ZSFTitleBarLockOn}{%
   % Defensive Idempotenz: Ein direkter zweiter Balken muss den ersten zuerst
   % verbrauchen. Falls ein neuer Balkentyp diesen Vertrag einmal vergisst,
@@ -62,9 +79,11 @@
 }
 \AddToHook{para/before}[zsf/titlebar-lock]{%
   \ifzsfTitleBarPending
-    % Der Absatzstart hat den voruebergehend auf null gesetzten \parskip
-    % bereits verarbeitet. Ab hier darf der Dokumentwert wieder gelten.
-    \ZSFTitleBarGapConsume
+    \ifZSFInsideBox\else
+      % Der Absatzstart hat den voruebergehend auf null gesetzten \parskip
+      % bereits verarbeitet. Ab hier darf der Dokumentwert wieder gelten.
+      \ZSFTitleBarGapConsume
+    \fi
   \fi
 }
 
@@ -527,7 +546,10 @@
 % es meldet sich nicht (rules/02_ai_mandate → Randverhalten I).
 % \ZSFBoxFont steht zuerst: Die Grösse ändert \baselineskip und die
 % Display-Skips, und was danach kommt, soll auf der fertigen Grösse aufsetzen.
-\newcommand{\ZSFBoxSetup}{\ZSFBoxFont\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext}
+% \ZSFInsideBoxtrue steht zuerst: Alles danach — auch die Titelzeile der leisen
+% Fassung, die \ZSFBoxEnter unmittelbar anschliesst — laeuft damit als Boxinhalt
+% und nicht als freier Text (Begruendung bei \ifZSFInsideBox oben).
+\newcommand{\ZSFBoxSetup}{\ZSFInsideBoxtrue\ZSFBoxFont\ZSFBoxParskip\ZSFBoxAlign\ZSFBoxContext}
 \newcommand{\ZSFBoxEnter}{\ZSFBoxSetup\ZSFBoxQuietTitle}
 
 % ------------------------------------------------------------

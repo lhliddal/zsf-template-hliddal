@@ -61,17 +61,17 @@ und `rules/55_index.md`.
   `\ZSFallowbreak`.
 - Dokumentkopf und Skriptverweis: `\ZSFTitleHeader`, `\ZSFScriptRef`.
 - Globale Stellschrauben (in `preamble.tex`, nicht in Kapiteln):
-  `\ZSFBodyFontSize` (Grundgrösse des Satzes, siehe `rules/30_spacing.md`),
+  `\ZSFBodyFontSize` (Grundgrösse des Satzes, siehe `rules/31_sizing.md`),
   `\ZSFContentScale` (Rollen-Faktor für den Bausteininhalt — Boxtext,
-  Tabellenzelle, Formel; Balken und Titel bleiben, siehe `rules/30_spacing.md`),
+  Tabellenzelle, Formel; Balken und Titel bleiben, siehe `rules/31_sizing.md`),
   `\ZSFFlowTextScale` (Rollen-Faktor für freien Fliesstext und Register,
-  siehe `rules/30_spacing.md`),
+  siehe `rules/31_sizing.md`),
   `\ZSFDensityFactor`, `\ZSFLeadingFactor`,
   Bereichsfaktoren `\ZSFDensityBoxes`, `\ZSFDensityText`, `\ZSFDensityTables`,
   `\ZSFDensityStructure`, `\ZSFBreakReserveFactor`,
-  `\ZSFBarGapFactor` (Abstand nach einem Titelbalken, siehe `rules/30_spacing.md`),
+  `\ZSFBarGapFactor` (Abstand nach einem Titelbalken, siehe `rules/31_sizing.md`),
   `\ZSFFooterClearanceFactor` (Freiraum am Satzspiegel-Fuss für das Footer-Overlay;
-  Faktor auf die gemessene Höhe, siehe `rules/30_spacing.md`),
+  Faktor auf die gemessene Höhe, siehe `rules/31_sizing.md`),
   `\ZSFDiagramLabelScale` (beide Diagramm-Beschriftungsstufen gemeinsam,
   siehe `rules/20_boxes.md`),
   `\SetZSFsumMode`, `\SetZSFlimMode`, `\SetZSFzebraBG`,
@@ -86,7 +86,7 @@ und `rules/55_index.md`.
 - Pack-Modus für Anhang-artige Kapitel (am Kapitelanfang):
   `\ZSFBoxesBreakableOn`, `\ZSFBoxesBreakableOff`, `\ZSFBreakReservesOff`.
 - Dichte für ein einzelnes Kapitel (am Kapitelanfang):
-  `\ZSFChapterDensity`, `\ZSFChapterDensityReset` (siehe `rules/30_spacing.md`).
+  `\ZSFChapterDensity`, `\ZSFChapterDensityReset` (siehe `rules/31_sizing.md`).
 - Formel-API: `\R`, `\C`, `\N`, `\Z`, `\Q`, `\dd`, `\vect`, `\abs`,
   `\norm`, `\ZSFsumAuto`, `\ZSFlimAuto`, `\ZSFbraceunder`,
   `\ZSFbraceover`, `\ZSFmhlA`, `\ZSFmhlB`, `\ZSFmhlC`, `\ZSFmhlD`,
